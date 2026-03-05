@@ -1,17 +1,47 @@
-import { Outlet } from 'react-router-dom'
-import Sidebar from './Sidebar'
-import Topbar from './Topbar'
+import { Outlet } from "react-router-dom"
+import Sidebar from "./Sidebar"
+import Topbar from "./Topbar"
 
 export default function AppLayout() {
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div style={layoutStyles.root}>
       <Sidebar />
-      <div className="flex flex-col flex-1 overflow-hidden">
+      <div style={layoutStyles.main}>
         <Topbar />
-        <main className="flex-1 overflow-y-auto p-6">
+        <main style={layoutStyles.content}>
           <Outlet />
         </main>
       </div>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Sans:wght@300;400;500;600&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: #232320; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #232320; }
+        ::-webkit-scrollbar-thumb { background: #3a3a36; border-radius: 3px; }
+      `}</style>
     </div>
   )
+}
+
+const layoutStyles = {
+  root: {
+    display: "flex",
+    height: "100vh",
+    background: "#232320",
+    fontFamily: "'DM Sans', sans-serif",
+    overflow: "hidden",
+  },
+  main: {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    overflow: "hidden",
+  },
+  content: {
+    flex: 1,
+    overflowY: "auto",
+    padding: "32px",
+    background: "#232320",
+  },
 }
