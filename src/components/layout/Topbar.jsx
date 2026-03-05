@@ -1,25 +1,127 @@
-import { useAuthStore } from '../../store/authStore'
-import { useNavigate } from 'react-router-dom'
-import { LogOut } from 'lucide-react'
+import { useNavigate, useLocation } from "react-router-dom"
+import { useAuthStore } from "../../store/authStore"
+
+const PAGE_TITLES = {
+  "/dashboard":   "Dashboard",
+  "/kiosks":      "Kiosk Management",
+  "/regions":     "Region Management",
+  "/playlists":   "Playlist Management",
+  "/media":       "Media Library",
+  "/interactive": "Interactive Pages",
+  "/settings":    "Settings",
+}
 
 export default function Topbar() {
   const logout = useAuthStore((s) => s.logout)
   const navigate = useNavigate()
+  const location = useLocation()
+
+  const title = Object.entries(PAGE_TITLES).find(([path]) =>
+    location.pathname.startsWith(path)
+  )?.[1] ?? "eKiosk CMS"
 
   const handleLogout = () => {
     logout()
-    navigate('/login')
+    navigate("/login")
   }
 
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-end px-6">
-      <button
-        onClick={handleLogout}
-        className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 transition-colors"
-      >
-        <LogOut size={16} />
-        Logout
-      </button>
+    <header style={topbarStyles.header}>
+      <div>
+        <h2 style={topbarStyles.title}>{title}</h2>
+      </div>
+      <div style={topbarStyles.right}>
+        <div style={topbarStyles.userChip}>
+          <div style={topbarStyles.avatar}>A</div>
+          <span style={topbarStyles.userName}>Admin</span>
+        </div>
+        <button
+          onClick={handleLogout}
+          style={topbarStyles.logoutBtn}
+          onMouseEnter={e => Object.assign(e.currentTarget.style, topbarStyles.logoutBtnHover)}
+          onMouseLeave={e => Object.assign(e.currentTarget.style, topbarStyles.logoutBtn)}
+        >
+          <LogoutIcon />
+          Keluar
+        </button>
+      </div>
     </header>
   )
 }
+
+const topbarStyles = {
+  header: {
+    height: "60px",
+    background: "#1e1e1c",
+    borderBottom: "1px solid #2e2e2a",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "0 32px",
+    flexShrink: 0,
+  },
+  title: {
+    fontFamily: "'DM Sans', sans-serif",
+    fontSize: "15px",
+    fontWeight: 600,
+    color: "#b2a893",
+    letterSpacing: "0.3px",
+  },
+  right: {
+    display: "flex",
+    alignItems: "center",
+    gap: "16px",
+  },
+  userChip: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+  },
+  avatar: {
+    width: "28px",
+    height: "28px",
+    borderRadius: "50%",
+    background: "linear-gradient(135deg, #2a4f85, #1b818a)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: "12px",
+    fontWeight: 600,
+    color: "#fff9eb",
+  },
+  userName: {
+    fontSize: "13px",
+    color: "#808180",
+    fontWeight: 500,
+  },
+  logoutBtn: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    background: "transparent",
+    border: "1px solid #2e2e2a",
+    borderRadius: "6px",
+    padding: "6px 12px",
+    fontSize: "12px",
+    color: "#5a5956",
+    cursor: "pointer",
+    fontFamily: "'DM Sans', sans-serif",
+    transition: "all 0.15s",
+  },
+  logoutBtnHover: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    background: "rgba(216,58,47,0.08)",
+    border: "1px solid rgba(216,58,47,0.25)",
+    borderRadius: "6px",
+    padding: "6px 12px",
+    fontSize: "12px",
+    color: "#f2767c",
+    cursor: "pointer",
+    fontFamily: "'DM Sans', sans-serif",
+    transition: "all 0.15s",
+  },
+}
+
+function LogoutIcon() { return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> }
