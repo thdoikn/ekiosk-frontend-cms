@@ -24,7 +24,7 @@ const addItem       = ({ playlistId, mediaId, duration, order }) =>
 const removeItem   = ({ playlistId, itemId }) =>
   client.delete(`/playlists/${playlistId}/items/${itemId}/`)
 const reorderItems = ({ playlistId, items }) =>
-  client.post(`/playlists/${playlistId}/items/reorder/`, { items })
+  client.post(`/playlists/${playlistId}/reorder-items/`, { items })
 const updateItem   = ({ playlistId, itemId, duration }) =>
   client.patch(`/playlists/${playlistId}/items/${itemId}/`, { duration_seconds: duration })
 
@@ -192,7 +192,10 @@ export default function PlaylistBuilderPage() {
     queryKey: ["playlist", id],
     queryFn: () => fetchPlaylist(id),
     onSuccess: (data) => {
-      if (!localItems) setLocalItems(data.items ?? [])
+      // always sync from server, but only if no local edits are pending
+      // (addMut and removeMut keep localItems in sync themselves,
+      //  so we only reset here on fresh page load i.e. localItems is null)
+      setLocalItems(prev => prev === null ? (data.items ?? []) : prev)
     },
   })
 
@@ -214,17 +217,23 @@ export default function PlaylistBuilderPage() {
 
   const addMut = useMutation({
     mutationFn: addItem,
-    onSuccess: (res) => {
-      setLocalItems(prev => [...(prev ?? []), res.data])
-      qc.invalidateQueries(["playlist", id])
+    onSuccess: (res, vars) => {
+      // use full media object from already-loaded media library
+      // so thumbnail, file_url, etc. are all present
+      const fullMedia = allMedia.find(m => m.id === vars.mediaId)
+      const newItem = {
+        ...res.data,
+        media: fullMedia ?? res.data.media,
+      }
+      setLocalItems(prev => [...(prev ?? []), newItem])
     },
   })
 
   const removeMut = useMutation({
     mutationFn: removeItem,
     onSuccess: (_, vars) => {
-      setLocalItems(prev => prev.filter(i => i.id !== vars.itemId))
-      qc.invalidateQueries(["playlist", id])
+      setLocalItems(prev => (prev ?? []).filter(i => i.id !== vars.itemId))
+      // qc.invalidateQueries(["playlist", id])
     },
   })
 
