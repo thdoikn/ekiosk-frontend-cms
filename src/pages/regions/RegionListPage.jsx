@@ -136,7 +136,11 @@ function AssignModal({ region, playlists, onAssign, onClose, loading }) {
             <div style={S.pickerInfo}>
               <span style={S.pickerName}>{p.name}</span>
               <span style={S.pickerMeta}>
-                {p.items?.length ?? 0} item · {p.region?.name ?? "Tidak ada region"}
+                {p.items?.length ?? 0} item · {
+                  p.assigned_regions?.length
+                    ? p.assigned_regions.map(r => r.name).join(', ')
+                    : "Belum di-assign ke region"
+                }
               </span>
             </div>
             {selected === p.id && (
