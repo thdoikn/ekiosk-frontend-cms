@@ -224,7 +224,7 @@ export default function PlaylistListPage() {
 // ── Styles ─────────────────────────────────────────────────
 const S = {
   page: {
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     color: "#fff9eb",
     maxWidth: "1200px",
     animation: "fadeUp 0.4s ease both",
@@ -236,7 +236,7 @@ const S = {
     marginBottom: "28px",
   },
   pageTitle: {
-    fontFamily: "'Cinzel', serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "26px",
     fontWeight: 600,
     color: "#fff9eb",
@@ -282,7 +282,7 @@ const S = {
     borderRadius: "20px",
     padding: "3px 10px",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
   },
   inactiveBadge: {
     fontSize: "11px",
@@ -292,10 +292,10 @@ const S = {
     borderRadius: "20px",
     padding: "3px 10px",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
   },
   cardName: {
-    fontFamily: "'Cinzel', serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "14px",
     fontWeight: 600,
     color: "#fff9eb",
@@ -319,7 +319,7 @@ const S = {
     flex: 1,
   },
   cardMetaValue: {
-    fontFamily: "'Cinzel', serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "18px",
     fontWeight: 600,
     color: "#d5b57e",
@@ -351,7 +351,7 @@ const S = {
     fontSize: "12px",
     color: "#808180",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
     fontWeight: 500,
   },
@@ -367,7 +367,7 @@ const S = {
     fontSize: "12px",
     color: "#7ba3d4",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
     fontWeight: 500,
   },
@@ -411,7 +411,7 @@ const S = {
     marginBottom: "20px",
   },
   modalTitle: {
-    fontFamily: "'Cinzel', serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "17px",
     color: "#fff9eb",
     margin: 0,
@@ -424,7 +424,7 @@ const S = {
     fontSize: "16px",
     cursor: "pointer",
     padding: "2px 6px",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
   },
   fieldGroup: {
     display: "flex",
@@ -446,7 +446,7 @@ const S = {
     padding: "11px 14px",
     fontSize: "14px",
     color: "#fff9eb",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     width: "100%",
     boxSizing: "border-box",
@@ -474,7 +474,7 @@ const S = {
     fontWeight: 600,
     color: "#fff9eb",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
   },
   btnGhost: {
@@ -487,7 +487,7 @@ const S = {
     fontSize: "13px",
     color: "#808180",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
   },
   empty: {
     display: "flex",
@@ -497,7 +497,7 @@ const S = {
     gap: "12px",
   },
   emptyTitle: {
-    fontFamily: "'Cinzel', serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "18px",
     color: "#5a5956",
     margin: 0,

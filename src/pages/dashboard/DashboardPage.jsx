@@ -223,7 +223,6 @@ export default function DashboardPage() {
       )}
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Sans:wght@300;400;500;600&display=swap');
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
         @keyframes shimmer {
           0% { background-position: -400px 0 }
@@ -237,7 +236,7 @@ export default function DashboardPage() {
 // ── Styles ─────────────────────────────────────────────────
 const styles = {
   page: {
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     color: "#fff9eb",
     maxWidth: "1400px",
   },
@@ -248,7 +247,7 @@ const styles = {
     marginBottom: "32px",
   },
   pageTitle: {
-    fontFamily: "'Cinzel', serif",
+    fontFamily: "''Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "28px",
     fontWeight: 600,
     color: "#fff9eb",
@@ -308,7 +307,7 @@ const styles = {
     color: "#5a5956",
   },
   statValue: {
-    fontFamily: "'Cinzel', serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "36px",
     fontWeight: 600,
     lineHeight: 1,
@@ -350,7 +349,7 @@ const styles = {
     fontSize: "13px",
     color: "#808180",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
   },
   filterTabActive: {
@@ -496,7 +495,7 @@ const styles = {
     fontSize: "12px",
     color: "#808180",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
   },
   forceBtnHover: {
@@ -507,7 +506,7 @@ const styles = {
     fontSize: "12px",
     color: "#f2767c",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
   },
 

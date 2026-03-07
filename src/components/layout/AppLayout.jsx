@@ -13,7 +13,8 @@ export default function AppLayout() {
         </main>
       </div>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Sans:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #232320; }
         ::-webkit-scrollbar { width: 6px; }
@@ -29,7 +30,7 @@ const layoutStyles = {
     display: "flex",
     height: "100vh",
     background: "#232320",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     overflow: "hidden",
   },
   main: {

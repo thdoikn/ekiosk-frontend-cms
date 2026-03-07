@@ -94,7 +94,7 @@ const sidebarStyles = {
     gap: "1px",
   },
   logoTitle: {
-    fontFamily: "'Cinzel', serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "18px",
     fontWeight: 600,
     color: "#fff9eb",

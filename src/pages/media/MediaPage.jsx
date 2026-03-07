@@ -581,7 +581,6 @@ function SpinIcon() {
 
 // ── Styles ─────────────────────────────────────────────────
 const ANIM_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Mono:wght@400&family=DM+Sans:wght@300;400;500;600&display=swap');
   @keyframes fadeUp  { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
   @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
   @keyframes slideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
@@ -591,14 +590,14 @@ const ANIM_CSS = `
 
 const S = {
   page: {
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     color: "#fff9eb",
     maxWidth: "1400px",
     animation: "fadeUp 0.4s ease both",
   },
   header: { marginBottom: "20px" },
   pageTitle: {
-    fontFamily: "'Cinzel', serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "26px",
     fontWeight: 600,
     color: "#fff9eb",
@@ -626,7 +625,7 @@ const S = {
     alignItems: "center",
   },
   statValue: {
-    fontFamily: "'Cinzel', serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "22px",
     fontWeight: 600,
     color: "#d5b57e",
@@ -755,7 +754,7 @@ const S = {
     padding: "9px 36px",
     fontSize: "13px",
     color: "#fff9eb",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     width: "240px",
   },
@@ -783,7 +782,7 @@ const S = {
     fontSize: "12px",
     color: "#808180",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
   },
   typeTabActive: {
@@ -1050,7 +1049,7 @@ const S = {
     borderBottom: "1px solid #2e2e2a",
   },
   previewTitle: {
-    fontFamily: "'Cinzel', serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "16px",
     color: "#fff9eb",
     margin: "0 0 4px",
@@ -1064,7 +1063,7 @@ const S = {
     fontSize: "16px",
     cursor: "pointer",
     padding: "4px 8px",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     flexShrink: 0,
   },
   previewMedia: {
@@ -1140,7 +1139,7 @@ const S = {
     color: "#f2767c",
   },
   confirmTitle: {
-    fontFamily: "'Cinzel', serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "17px",
     color: "#fff9eb",
     margin: "0 0 10px",
@@ -1164,7 +1163,7 @@ const S = {
     fontSize: "13px",
     color: "#808180",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
   },
   btnDanger: {
     background: "rgba(216,58,47,0.15)",
@@ -1174,7 +1173,7 @@ const S = {
     fontSize: "13px",
     color: "#f2767c",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontWeight: 600,
   },
 
@@ -1188,7 +1187,7 @@ const S = {
     textAlign: "center",
   },
   emptyTitle: {
-    fontFamily: "'Cinzel', serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "16px",
     color: "#5a5956",
     margin: 0,
