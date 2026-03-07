@@ -73,7 +73,7 @@ function DiagCard({ label, value, mono, accent }) {
       <span style={S.diagLabel}>{label}</span>
       <span style={{
         ...S.diagValue,
-        fontFamily: mono ? "'DM Mono', monospace" : "'DM Sans', sans-serif",
+        fontFamily: mono ? "'Inter', 'Plus Jakarta Sans', sans-serif" : "'DM Sans', sans-serif",
         color: accent ?? "#fff9eb",
         fontSize: mono ? "13px" : "15px",
       }}>
@@ -437,7 +437,6 @@ function RefreshIcon() {
 
 // ── Styles ─────────────────────────────────────────────────
 const ANIM_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Mono:wght@400&family=DM+Sans:wght@300;400;500;600&display=swap');
   @keyframes fadeUp   { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
   @keyframes shimmer  { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
   @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:0.4} }
@@ -445,7 +444,7 @@ const ANIM_CSS = `
 
 const S = {
   page: {
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     color: "#fff9eb",
     maxWidth: "1200px",
     animation: "fadeUp 0.4s ease both",
@@ -461,7 +460,7 @@ const S = {
     fontSize: "13px",
     color: "#808180",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "color 0.15s",
   },
 
@@ -512,7 +511,7 @@ const S = {
     flexShrink: 0,
   },
   heroName: {
-    fontFamily: "'Cinzel', serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "22px",
     fontWeight: 600,
     color: "#fff9eb",
@@ -534,7 +533,7 @@ const S = {
     color: "#5a5956",
   },
   heroMetaMono: {
-    fontFamily: "'DM Mono', monospace",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     color: "#808180",
   },
   heroMetaDot: {
@@ -708,7 +707,7 @@ const S = {
   },
   storageLabel: {
     fontSize: "12px",
-    fontFamily: "'DM Mono', monospace",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     flexShrink: 0,
     minWidth: "60px",
   },
@@ -735,7 +734,7 @@ const S = {
     flexShrink: 0,
   },
   hashValue: {
-    fontFamily: "'DM Mono', monospace",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "12px",
     color: "#808180",
     wordBreak: "break-all",
@@ -772,7 +771,7 @@ const S = {
     color: "#fff9eb",
   },
   playlistHash: {
-    fontFamily: "'DM Mono', monospace",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "11px",
     color: "#5a5956",
   },
@@ -858,7 +857,7 @@ const S = {
     marginBottom: "2px",
   },
   logHash: {
-    fontFamily: "'DM Mono', monospace",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "10px",
     color: "#5a5956",
     display: "block",

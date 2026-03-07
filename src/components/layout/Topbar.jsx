@@ -61,7 +61,7 @@ const topbarStyles = {
     flexShrink: 0,
   },
   title: {
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "15px",
     fontWeight: 600,
     color: "#b2a893",

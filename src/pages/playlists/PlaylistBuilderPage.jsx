@@ -526,7 +526,7 @@ export default function PlaylistBuilderPage() {
 // ── Styles ─────────────────────────────────────────────────
 const S = {
   page: {
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     color: "#fff9eb",
     maxWidth: "1400px",
     animation: "fadeUp 0.35s ease both",
@@ -549,13 +549,13 @@ const S = {
     fontSize: "13px",
     color: "#808180",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     flexShrink: 0,
     marginTop: "4px",
   },
   titleArea: { display: "flex", flexDirection: "column", gap: "6px" },
   pageTitle: {
-    fontFamily: "'Cinzel', serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "22px",
     fontWeight: 600,
     color: "#fff9eb",
@@ -588,7 +588,7 @@ const S = {
     fontWeight: 600,
     color: "#fff9eb",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "box-shadow 0.2s",
     whiteSpace: "nowrap",
   },
@@ -646,7 +646,7 @@ const S = {
     background: "#1a1a18",
   },
   panelTitle: {
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "12px",
     fontWeight: 600,
     color: "#808180",
@@ -847,7 +847,7 @@ const S = {
     padding: "8px 10px 8px 30px",
     fontSize: "12px",
     color: "#fff9eb",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     boxSizing: "border-box",
   },
@@ -861,7 +861,7 @@ const S = {
     fontSize: "11px",
     color: "#808180",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
   },
   typeTabActive: {
@@ -928,7 +928,7 @@ const S = {
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     lineHeight: 1,
     transition: "all 0.15s",
   },
@@ -945,7 +945,7 @@ const S = {
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     lineHeight: 1,
   },
   libEmpty: {

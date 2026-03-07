@@ -22,7 +22,6 @@ function initials(user) {
 }
 
 const ANIM_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Mono:wght@400&family=DM+Sans:wght@300;400;500;600&display=swap');
   @keyframes fadeUp  { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
   @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
   @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
@@ -48,7 +47,7 @@ function Toast({ msg, type, onClose }) {
       <button onClick={onClose} style={{
         background: "none", border: "none", color: "inherit",
         cursor: "pointer", padding: "0 4px", opacity: 0.6,
-        fontFamily: "'DM Sans', sans-serif",
+        fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
       }}>✕</button>
     </div>
   )
@@ -67,7 +66,7 @@ function Input({ value, onChange, type = "text", placeholder, disabled, autoComp
         border: `1px solid ${focused ? "#d5b57e" : "#3a3a36"}`,
         borderRadius: "8px", padding: "10px 13px",
         fontSize: "13px", color: "#fff9eb",
-        fontFamily: "'DM Sans', sans-serif", outline: "none",
+        fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", outline: "none",
         width: "100%", boxSizing: "border-box",
         transition: "border-color 0.15s",
         opacity: disabled ? 0.5 : 1,
@@ -104,7 +103,7 @@ function Section({ title, subtitle, delay = "0s", children }) {
         background: "#1a1a18",
       }}>
         <h2 style={{
-          fontFamily: "'DM Sans', sans-serif", fontSize: "12px",
+          fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", fontSize: "12px",
           fontWeight: 600, color: "#808180", letterSpacing: "1.5px",
           textTransform: "uppercase", margin: subtitle ? "0 0 3px" : 0,
         }}>{title}</h2>
@@ -184,7 +183,7 @@ function PasswordForm() {
           border: "none", borderRadius: "8px", padding: "10px 18px",
           fontSize: "13px", fontWeight: 600, color: "#fff9eb",
           cursor: !valid || mut.isPending ? "not-allowed" : "pointer",
-          fontFamily: "'DM Sans', sans-serif",
+          fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
           opacity: !valid || mut.isPending ? 0.5 : 1,
         }}
         disabled={!valid || mut.isPending}
@@ -219,10 +218,10 @@ function CreateUserModal({ onClose, onSubmit, loading, error }) {
         maxHeight: "90vh", overflowY: "auto",
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-          <h3 style={{ fontFamily: "'Cinzel', serif", fontSize: "16px", color: "#fff9eb", margin: 0, letterSpacing: "0.5px" }}>
+          <h3 style={{ fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", fontSize: "16px", color: "#fff9eb", margin: 0, letterSpacing: "0.5px" }}>
             Tambah Pengguna Baru
           </h3>
-          <button onClick={onClose} style={{ background: "transparent", border: "none", color: "#5a5956", fontSize: "16px", cursor: "pointer", padding: "2px 6px", fontFamily: "'DM Sans', sans-serif" }}>✕</button>
+          <button onClick={onClose} style={{ background: "transparent", border: "none", color: "#5a5956", fontSize: "16px", cursor: "pointer", padding: "2px 6px", fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif" }}>✕</button>
         </div>
 
         {error && (
@@ -263,7 +262,7 @@ function CreateUserModal({ onClose, onSubmit, loading, error }) {
         </div>
 
         <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-          <button onClick={onClose} style={{ display: "inline-flex", alignItems: "center", background: "transparent", border: "1px solid #3a3a36", borderRadius: "8px", padding: "9px 16px", fontSize: "13px", color: "#808180", cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
+          <button onClick={onClose} style={{ display: "inline-flex", alignItems: "center", background: "transparent", border: "1px solid #3a3a36", borderRadius: "8px", padding: "9px 16px", fontSize: "13px", color: "#808180", cursor: "pointer", fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif" }}>
             Batal
           </button>
           <button
@@ -273,7 +272,7 @@ function CreateUserModal({ onClose, onSubmit, loading, error }) {
               border: "none", borderRadius: "8px", padding: "10px 18px",
               fontSize: "13px", fontWeight: 600, color: "#fff9eb",
               cursor: !valid || loading ? "not-allowed" : "pointer",
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
               opacity: !valid || loading ? 0.5 : 1,
             }}
             disabled={!valid || loading}
@@ -369,7 +368,7 @@ function UserRow({ user, onDeactivate, onReactivate, isActing, index }) {
             fontSize: "11px", fontWeight: 600,
             color: active ? "#f2767c" : "#86ac69",
             cursor: isActing ? "not-allowed" : "pointer",
-            fontFamily: "'DM Sans', sans-serif",
+            fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
             opacity: isActing ? 0.5 : 1,
             whiteSpace: "nowrap",
           }}
@@ -437,12 +436,12 @@ export default function SettingsPage() {
   const staffCount   = users.filter(u => u.is_staff).length
 
   return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif", color: "#fff9eb", maxWidth: "1400px", animation: "fadeUp 0.4s ease both" }}>
+    <div style={{ fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", color: "#fff9eb", maxWidth: "1400px", animation: "fadeUp 0.4s ease both" }}>
       <style>{ANIM_CSS}</style>
 
       {/* Header */}
       <div style={{ marginBottom: "28px" }}>
-        <h1 style={{ fontFamily: "'Cinzel', serif", fontSize: "26px", fontWeight: 600, color: "#fff9eb", margin: "0 0 4px", letterSpacing: "1px" }}>
+        <h1 style={{ fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", fontSize: "26px", fontWeight: 600, color: "#fff9eb", margin: "0 0 4px", letterSpacing: "1px" }}>
           Pengaturan
         </h1>
         <p style={{ fontSize: "13px", color: "#808180", margin: 0, fontWeight: 300 }}>
@@ -500,7 +499,7 @@ export default function SettingsPage() {
                   <div key={i} style={{ width: "1px", height: "32px", background: "#2e2e2a", flexShrink: 0 }} />
                 ) : (
                   <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px", alignItems: "center" }}>
-                    <span style={{ fontFamily: "'Cinzel', serif", fontSize: "22px", fontWeight: 600, color: item.color, lineHeight: 1 }}>{item.val}</span>
+                    <span style={{ fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", fontSize: "22px", fontWeight: 600, color: item.color, lineHeight: 1 }}>{item.val}</span>
                     <span style={{ fontSize: "10px", color: "#5a5956", textTransform: "uppercase", letterSpacing: "0.8px", fontWeight: 600 }}>{item.label}</span>
                   </div>
                 )
@@ -520,7 +519,7 @@ export default function SettingsPage() {
                   background: "linear-gradient(135deg, #2a4f85, #1b818a)",
                   border: "none", borderRadius: "8px", padding: "10px 18px",
                   fontSize: "13px", fontWeight: 600, color: "#fff9eb",
-                  cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                  cursor: "pointer", fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
                   transition: "box-shadow 0.2s",
                 }}
                 onClick={() => { setShowCreate(true); setCreateError("") }}
