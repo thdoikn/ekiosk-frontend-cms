@@ -6,7 +6,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ghcr.io/andifathulms/ekiosk-frontend
+  IMAGE_NAME: ghcr.io/thdoikn/ekiosk-frontend
 
 jobs:
   build:
