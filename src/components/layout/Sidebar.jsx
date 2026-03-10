@@ -10,31 +10,44 @@ const NAV_ITEMS = [
   { to: "/settings",    label: "Settings",    icon: GearIcon   },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ collapsed, onToggle }) {
   return (
-    <aside style={sidebarStyles.aside}>
-      <div style={sidebarStyles.logoArea}>
+    <aside style={{
+      ...sidebarStyles.aside,
+      width: collapsed ? "60px" : "220px",
+    }}>
+      {/* Logo */}
+      <div style={{
+        ...sidebarStyles.logoArea,
+        justifyContent: collapsed ? "center" : "flex-start",
+        padding: collapsed ? "24px 0" : "24px 20px",
+      }}>
         <div style={sidebarStyles.logoMark}>
           <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
             <polygon points="24,4 44,14 44,34 24,44 4,34 4,14" fill="none" stroke="#d5b57e" strokeWidth="2.5" />
             <circle cx="24" cy="24" r="6" fill="#d5b57e" />
           </svg>
         </div>
-        <div style={sidebarStyles.logoText}>
-          <span style={sidebarStyles.logoTitle}>eKiosk</span>
-          <span style={sidebarStyles.logoSub}>CMS</span>
-        </div>
+        {!collapsed && (
+          <div style={sidebarStyles.logoText}>
+            <span style={sidebarStyles.logoTitle}>eKiosk</span>
+            <span style={sidebarStyles.logoSub}>CMS</span>
+          </div>
+        )}
       </div>
 
-      <div style={sidebarStyles.navLabel}>NAVIGASI</div>
+      {!collapsed && <div style={sidebarStyles.navLabel}>NAVIGASI</div>}
 
-      <nav style={sidebarStyles.nav}>
+      <nav style={{ ...sidebarStyles.nav, padding: collapsed ? "0 6px" : "0 10px" }}>
         {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
+            title={collapsed ? label : undefined}
             style={({ isActive }) => ({
               ...sidebarStyles.navItem,
+              justifyContent: collapsed ? "center" : "flex-start",
+              padding: collapsed ? "10px" : "10px 12px",
               ...(isActive ? sidebarStyles.navItemActive : {}),
             })}
           >
@@ -46,32 +59,56 @@ export default function Sidebar() {
                 }}>
                   <Icon />
                 </span>
-                <span style={{
-                  ...sidebarStyles.navLabel2,
-                  color: isActive ? "#fff9eb" : "#808180",
-                }}>
-                  {label}
-                </span>
-                {isActive && <span style={sidebarStyles.activeBar} />}
+                {!collapsed && (
+                  <span style={{
+                    ...sidebarStyles.navLabel2,
+                    color: isActive ? "#fff9eb" : "#808180",
+                  }}>
+                    {label}
+                  </span>
+                )}
+                {isActive && !collapsed && <span style={sidebarStyles.activeBar} />}
               </>
             )}
           </NavLink>
         ))}
       </nav>
 
-      <div style={sidebarStyles.bottom}>
-        <div style={sidebarStyles.bottomBadge}>
-          <span style={sidebarStyles.bottomDot} />
-          <span style={sidebarStyles.bottomText}>IKN Nusantara</span>
-        </div>
+      {/* Bottom area */}
+      <div style={{
+        ...sidebarStyles.bottom,
+        padding: collapsed ? "16px 0" : "16px 20px",
+        alignItems: "center",
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+      }}>
+        {!collapsed && (
+          <div style={sidebarStyles.bottomBadge}>
+            <span style={sidebarStyles.bottomDot} />
+            <span style={sidebarStyles.bottomText}>IKN Nusantara</span>
+          </div>
+        )}
+        <button
+          onClick={onToggle}
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          style={sidebarStyles.toggleBtn}
+          onMouseEnter={e => Object.assign(e.currentTarget.style, sidebarStyles.toggleBtnHover)}
+          onMouseLeave={e => Object.assign(e.currentTarget.style, sidebarStyles.toggleBtn)}
+        >
+          <CollapseIcon collapsed={collapsed} />
+        </button>
       </div>
+
+      <style>{`
+        aside { transition: width 0.22s cubic-bezier(0.4,0,0.2,1); }
+      `}</style>
     </aside>
   )
 }
 
 const sidebarStyles = {
   aside: {
-    width: "220px",
     background: "#1e1e1c",
     borderRight: "1px solid #2e2e2a",
     display: "flex",
@@ -84,7 +121,6 @@ const sidebarStyles = {
     display: "flex",
     alignItems: "center",
     gap: "12px",
-    padding: "24px 20px",
     borderBottom: "1px solid #2e2e2a",
   },
   logoMark: { flexShrink: 0 },
@@ -92,6 +128,7 @@ const sidebarStyles = {
     display: "flex",
     flexDirection: "column",
     gap: "1px",
+    overflow: "hidden",
   },
   logoTitle: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
@@ -100,6 +137,7 @@ const sidebarStyles = {
     color: "#fff9eb",
     letterSpacing: "1px",
     lineHeight: 1,
+    whiteSpace: "nowrap",
   },
   logoSub: {
     fontSize: "9px",
@@ -115,19 +153,18 @@ const sidebarStyles = {
     fontWeight: 600,
     padding: "20px 20px 8px",
     textTransform: "uppercase",
+    whiteSpace: "nowrap",
   },
   nav: {
     display: "flex",
     flexDirection: "column",
     gap: "2px",
-    padding: "0 10px",
     flex: 1,
   },
   navItem: {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-    padding: "10px 12px",
     borderRadius: "8px",
     textDecoration: "none",
     position: "relative",
@@ -149,6 +186,8 @@ const sidebarStyles = {
     fontSize: "13px",
     fontWeight: 500,
     transition: "color 0.15s",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
   },
   activeBar: {
     position: "absolute",
@@ -159,13 +198,13 @@ const sidebarStyles = {
     background: "#d5b57e",
   },
   bottom: {
-    padding: "16px 20px",
     borderTop: "1px solid #2e2e2a",
   },
   bottomBadge: {
     display: "flex",
     alignItems: "center",
     gap: "8px",
+    width: "100%",
   },
   bottomDot: {
     width: "6px",
@@ -178,7 +217,49 @@ const sidebarStyles = {
     fontSize: "11px",
     color: "#5a5956",
     letterSpacing: "0.5px",
+    whiteSpace: "nowrap",
   },
+  toggleBtn: {
+    background: "transparent",
+    border: "1px solid #2e2e2a",
+    borderRadius: "6px",
+    width: "28px",
+    height: "28px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    color: "#5a5956",
+    padding: 0,
+    flexShrink: 0,
+    transition: "all 0.15s",
+  },
+  toggleBtnHover: {
+    background: "rgba(213,181,126,0.1)",
+    border: "1px solid #3a3a36",
+    borderRadius: "6px",
+    width: "28px",
+    height: "28px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    color: "#d5b57e",
+    padding: 0,
+    flexShrink: 0,
+    transition: "all 0.15s",
+  },
+}
+
+function CollapseIcon({ collapsed }) {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      {collapsed
+        ? <><polyline points="9 18 15 12 9 6" /></>
+        : <><polyline points="15 18 9 12 15 6" /></>
+      }
+    </svg>
+  )
 }
 
 function DashIcon()    { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg> }
