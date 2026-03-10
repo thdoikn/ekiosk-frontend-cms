@@ -1,11 +1,14 @@
+import { useState } from "react"
 import { Outlet } from "react-router-dom"
 import Sidebar from "./Sidebar"
 import Topbar from "./Topbar"
 
 export default function AppLayout() {
+  const [collapsed, setCollapsed] = useState(false)
+
   return (
     <div style={layoutStyles.root}>
-      <Sidebar />
+      <Sidebar collapsed={collapsed} onToggle={() => setCollapsed(c => !c)} />
       <div style={layoutStyles.main}>
         <Topbar />
         <main style={layoutStyles.content}>
@@ -38,6 +41,7 @@ const layoutStyles = {
     display: "flex",
     flexDirection: "column",
     overflow: "hidden",
+    minWidth: 0,
   },
   content: {
     flex: 1,

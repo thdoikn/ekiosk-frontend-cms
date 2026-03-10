@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from "react-leaflet"
+import "leaflet/dist/leaflet.css"
 import client from "../../api/client"
 
 // ── API calls ──────────────────────────────────────────────
@@ -30,6 +32,26 @@ function formatBytes(bytes) {
   return `${(bytes / 1e6).toFixed(0)} MB`
 }
 
+// ── Map helpers ─────────────────────────────────────────────
+function FitBounds({ kiosks }) {
+  const map = useMap()
+  useEffect(() => {
+    const points = kiosks.filter(k => k.latitude != null && k.longitude != null)
+    if (points.length === 0) return
+    if (points.length === 1) {
+      map.setView([points[0].latitude, points[0].longitude], 13)
+      return
+    }
+    const lats = points.map(k => k.latitude)
+    const lngs = points.map(k => k.longitude)
+    map.fitBounds(
+      [[Math.min(...lats), Math.min(...lngs)], [Math.max(...lats), Math.max(...lngs)]],
+      { padding: [40, 40] }
+    )
+  }, [kiosks, map])
+  return null
+}
+
 // ── Sub-components ─────────────────────────────────────────
 function StatCard({ label, value, color, icon }) {
   return (
@@ -50,6 +72,109 @@ function StatusBadge({ status }) {
       <span style={{ ...styles.badgeDot, background: cfg.dot }} />
       {cfg.label}
     </span>
+  )
+}
+
+function KioskMap({ kiosks }) {
+  const [activeStatus, setActiveStatus] = useState("all")
+
+  const mapped = kiosks.filter(k => k.latitude != null && k.longitude != null)
+  const filtered = activeStatus === "all" ? mapped : mapped.filter(k => k.status === activeStatus)
+
+  const defaultCenter = mapped.length > 0
+    ? [mapped[0].latitude, mapped[0].longitude]
+    : [-0.787281, 116.680908] // IKN default
+
+  return (
+    <div style={styles.mapSection}>
+      <div style={styles.mapHeader}>
+        <div>
+          <h2 style={styles.mapTitle}>Peta Sebaran Kiosk</h2>
+          <p style={styles.mapSubtitle}>
+            {mapped.length} dari {kiosks.length} kiosk memiliki koordinat
+          </p>
+        </div>
+        <div style={styles.mapLegend}>
+          {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
+            <button
+              key={key}
+              onClick={() => setActiveStatus(activeStatus === key ? "all" : key)}
+              style={{
+                ...styles.legendItem,
+                opacity: activeStatus !== "all" && activeStatus !== key ? 0.4 : 1,
+                background: activeStatus === key ? "rgba(255,249,235,0.05)" : "transparent",
+              }}
+            >
+              <span style={{ ...styles.legendDot, background: cfg.dot }} />
+              <span style={styles.legendLabel}>{cfg.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div style={styles.mapWrapper}>
+        {mapped.length === 0 ? (
+          <div style={styles.mapEmpty}>
+            <span style={styles.emptyIcon}>◫</span>
+            <p style={styles.emptyText}>Belum ada kiosk dengan koordinat GPS</p>
+          </div>
+        ) : (
+          <MapContainer
+            center={defaultCenter}
+            zoom={10}
+            style={{ width: "100%", height: "100%", borderRadius: "10px" }}
+            zoomControl={true}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <FitBounds kiosks={mapped} />
+            {filtered.map(kiosk => {
+              const cfg = STATUS_CONFIG[kiosk.status] || STATUS_CONFIG.never_connected
+              return (
+                <CircleMarker
+                  key={kiosk.id}
+                  center={[kiosk.latitude, kiosk.longitude]}
+                  radius={10}
+                  pathOptions={{
+                    color: cfg.dot,
+                    fillColor: cfg.dot,
+                    fillOpacity: 0.85,
+                    weight: 2,
+                  }}
+                >
+                  <Popup>
+                    <div style={styles.popupContent}>
+                      <div style={styles.popupHeader}>
+                        <span style={{ ...styles.popupDot, background: cfg.dot }} />
+                        <strong style={styles.popupName}>{kiosk.name}</strong>
+                      </div>
+                      <div style={styles.popupGrid}>
+                        <span style={styles.popupKey}>Status</span>
+                        <span style={{ ...styles.popupVal, color: cfg.dot }}>{cfg.label}</span>
+                        <span style={styles.popupKey}>Region</span>
+                        <span style={styles.popupVal}>{kiosk.region?.name ?? "—"}</span>
+                        <span style={styles.popupKey}>Last Heartbeat</span>
+                        <span style={styles.popupVal}>{timeSince(kiosk.last_heartbeat)}</span>
+                        <span style={styles.popupKey}>IP Address</span>
+                        <span style={styles.popupVal}>{kiosk.last_ip_address ?? "—"}</span>
+                        <span style={styles.popupKey}>Playlist</span>
+                        <span style={styles.popupVal}>{kiosk.active_playlist?.name ?? "None"}</span>
+                        <span style={styles.popupKey}>Storage Free</span>
+                        <span style={styles.popupVal}>{formatBytes(kiosk.last_storage_free)}</span>
+                        <span style={styles.popupKey}>Coordinates</span>
+                        <span style={styles.popupVal}>{kiosk.latitude.toFixed(5)}, {kiosk.longitude.toFixed(5)}</span>
+                      </div>
+                    </div>
+                  </Popup>
+                </CircleMarker>
+              )
+            })}
+          </MapContainer>
+        )}
+      </div>
+    </div>
   )
 }
 
@@ -115,6 +240,7 @@ export default function DashboardPage() {
   const qc = useQueryClient()
   const [forcingId, setForcingId] = useState(null)
   const [filter, setFilter] = useState("all")
+  const [view, setView] = useState("grid") // "grid" | "map"
 
   const { data: summary, isLoading: sumLoading } = useQuery({
     queryKey: ["summary"],
@@ -148,9 +274,28 @@ export default function DashboardPage() {
           <h1 style={styles.pageTitle}>Dashboard</h1>
           <p style={styles.pageSubtitle}>Monitoring dan kontrol semua eKiosk IKN</p>
         </div>
-        <div style={styles.refreshNote}>
-          <span style={styles.refreshDot} />
-          <span style={styles.refreshText}>Auto-refresh setiap 30 detik</span>
+        <div style={styles.headerRight}>
+          {/* View toggle */}
+          <div style={styles.viewToggle}>
+            <button
+              onClick={() => setView("grid")}
+              style={view === "grid" ? { ...styles.viewBtn, ...styles.viewBtnActive } : styles.viewBtn}
+              title="Grid view"
+            >
+              <GridIcon />
+            </button>
+            <button
+              onClick={() => setView("map")}
+              style={view === "map" ? { ...styles.viewBtn, ...styles.viewBtnActive } : styles.viewBtn}
+              title="Map view"
+            >
+              <MapPinIcon />
+            </button>
+          </div>
+          <div style={styles.refreshNote}>
+            <span style={styles.refreshDot} />
+            <span style={styles.refreshText}>Auto-refresh setiap 30 detik</span>
+          </div>
         </div>
       </div>
 
@@ -173,53 +318,63 @@ export default function DashboardPage() {
         )}
       </div>
 
-      {/* Filter tabs */}
-      <div style={styles.filterRow}>
-        {[
-          { key: "all",            label: "Semua" },
-          { key: "online",         label: "Online" },
-          { key: "offline",        label: "Offline" },
-          { key: "stale",          label: "Stale" },
-          { key: "never_connected",label: "Belum Terhubung" },
-        ].map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setFilter(key)}
-            style={filter === key ? { ...styles.filterTab, ...styles.filterTabActive } : styles.filterTab}
-          >
-            {label}
-            {key !== "all" && summary?.[key] !== undefined && (
-              <span style={filter === key ? { ...styles.filterCount, ...styles.filterCountActive } : styles.filterCount}>
-                {summary[key]}
-              </span>
-            )}
-          </button>
-        ))}
-      </div>
+      {/* Map view */}
+      {view === "map" && !kioskLoading && (
+        <KioskMap kiosks={kiosks} />
+      )}
 
-      {/* Kiosk grid */}
-      {kioskLoading ? (
-        <div style={styles.kioskGrid}>
-          {[...Array(6)].map((_, i) => (
-            <div key={i} style={styles.kioskSkeleton} />
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <div style={styles.emptyState}>
-          <span style={styles.emptyIcon}>◫</span>
-          <p style={styles.emptyText}>Tidak ada kiosk dengan status ini</p>
-        </div>
-      ) : (
-        <div style={styles.kioskGrid}>
-          {filtered.map(kiosk => (
-            <KioskCard
-              key={kiosk.id}
-              kiosk={kiosk}
-              onForceUpdate={(id) => mutation.mutate(id)}
-              isForcing={forcingId === kiosk.id}
-            />
-          ))}
-        </div>
+      {/* Grid view */}
+      {view === "grid" && (
+        <>
+          {/* Filter tabs */}
+          <div style={styles.filterRow}>
+            {[
+              { key: "all",            label: "Semua" },
+              { key: "online",         label: "Online" },
+              { key: "offline",        label: "Offline" },
+              { key: "stale",          label: "Stale" },
+              { key: "never_connected",label: "Belum Terhubung" },
+            ].map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setFilter(key)}
+                style={filter === key ? { ...styles.filterTab, ...styles.filterTabActive } : styles.filterTab}
+              >
+                {label}
+                {key !== "all" && summary?.[key] !== undefined && (
+                  <span style={filter === key ? { ...styles.filterCount, ...styles.filterCountActive } : styles.filterCount}>
+                    {summary[key]}
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Kiosk grid */}
+          {kioskLoading ? (
+            <div style={styles.kioskGrid}>
+              {[...Array(6)].map((_, i) => (
+                <div key={i} style={styles.kioskSkeleton} />
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
+            <div style={styles.emptyState}>
+              <span style={styles.emptyIcon}>◫</span>
+              <p style={styles.emptyText}>Tidak ada kiosk dengan status ini</p>
+            </div>
+          ) : (
+            <div style={styles.kioskGrid}>
+              {filtered.map(kiosk => (
+                <KioskCard
+                  key={kiosk.id}
+                  kiosk={kiosk}
+                  onForceUpdate={(id) => mutation.mutate(id)}
+                  isForcing={forcingId === kiosk.id}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
 
       <style>{`
@@ -228,8 +383,58 @@ export default function DashboardPage() {
           0% { background-position: -400px 0 }
           100% { background-position: 400px 0 }
         }
+        .leaflet-container {
+          background: #1a1a18 !important;
+          font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
+        }
+        .leaflet-popup-content-wrapper {
+          background: #2b2b27 !important;
+          border: 1px solid #3a3a36 !important;
+          border-radius: 10px !important;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important;
+          color: #fff9eb !important;
+          padding: 0 !important;
+        }
+        .leaflet-popup-tip {
+          background: #2b2b27 !important;
+        }
+        .leaflet-popup-content {
+          margin: 0 !important;
+        }
+        .leaflet-control-zoom a {
+          background: #2b2b27 !important;
+          border-color: #3a3a36 !important;
+          color: #808180 !important;
+        }
+        .leaflet-control-zoom a:hover {
+          background: #333330 !important;
+          color: #fff9eb !important;
+        }
+        .leaflet-control-attribution {
+          background: rgba(30,30,28,0.8) !important;
+          color: #5a5956 !important;
+          font-size: 10px !important;
+        }
+        .leaflet-control-attribution a { color: #808180 !important; }
       `}</style>
     </div>
+  )
+}
+
+// ── Icon components ─────────────────────────────────────────
+function GridIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+      <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
+    </svg>
+  )
+}
+function MapPinIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+    </svg>
   )
 }
 
@@ -259,6 +464,32 @@ const styles = {
     color: "#808180",
     margin: 0,
     fontWeight: 300,
+  },
+  headerRight: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+  },
+  viewToggle: {
+    display: "flex",
+    background: "#2b2b27",
+    border: "1px solid #3a3a36",
+    borderRadius: "8px",
+    overflow: "hidden",
+  },
+  viewBtn: {
+    background: "transparent",
+    border: "none",
+    padding: "7px 11px",
+    cursor: "pointer",
+    color: "#5a5956",
+    display: "flex",
+    alignItems: "center",
+    transition: "all 0.15s",
+  },
+  viewBtnActive: {
+    background: "rgba(42,79,133,0.3)",
+    color: "#fff9eb",
   },
   refreshNote: {
     display: "flex",
@@ -329,6 +560,115 @@ const styles = {
     background: "linear-gradient(90deg, #2b2b27 25%, #333330 50%, #2b2b27 75%)",
     backgroundSize: "800px 100%",
     animation: "shimmer 1.5s infinite",
+  },
+
+  // Map
+  mapSection: {
+    background: "#2b2b27",
+    border: "1px solid #3a3a36",
+    borderRadius: "10px",
+    overflow: "hidden",
+    marginBottom: "28px",
+  },
+  mapHeader: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "16px 20px",
+    borderBottom: "1px solid #3a3a36",
+    flexWrap: "wrap",
+    gap: "12px",
+  },
+  mapTitle: {
+    fontSize: "15px",
+    fontWeight: 600,
+    color: "#fff9eb",
+    margin: "0 0 2px",
+  },
+  mapSubtitle: {
+    fontSize: "12px",
+    color: "#5a5956",
+    margin: 0,
+  },
+  mapLegend: {
+    display: "flex",
+    gap: "4px",
+    flexWrap: "wrap",
+  },
+  legendItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    background: "transparent",
+    border: "1px solid #3a3a36",
+    borderRadius: "20px",
+    padding: "4px 10px",
+    cursor: "pointer",
+    transition: "all 0.15s",
+  },
+  legendDot: {
+    width: "7px",
+    height: "7px",
+    borderRadius: "50%",
+    flexShrink: 0,
+  },
+  legendLabel: {
+    fontSize: "11px",
+    color: "#808180",
+    whiteSpace: "nowrap",
+  },
+  mapWrapper: {
+    height: "420px",
+    position: "relative",
+  },
+  mapEmpty: {
+    height: "100%",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "12px",
+  },
+
+  // Popup
+  popupContent: {
+    padding: "14px 16px",
+    minWidth: "220px",
+  },
+  popupHeader: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    marginBottom: "10px",
+    paddingBottom: "10px",
+    borderBottom: "1px solid #3a3a36",
+  },
+  popupDot: {
+    width: "8px",
+    height: "8px",
+    borderRadius: "50%",
+    flexShrink: 0,
+  },
+  popupName: {
+    fontSize: "14px",
+    fontWeight: 600,
+    color: "#fff9eb",
+  },
+  popupGrid: {
+    display: "grid",
+    gridTemplateColumns: "auto 1fr",
+    gap: "5px 12px",
+    alignItems: "center",
+  },
+  popupKey: {
+    fontSize: "11px",
+    color: "#5a5956",
+    whiteSpace: "nowrap",
+  },
+  popupVal: {
+    fontSize: "12px",
+    color: "#b2a893",
+    fontWeight: 400,
   },
 
   // Filter tabs
