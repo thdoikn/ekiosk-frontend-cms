@@ -65,7 +65,7 @@ function RegionForm({ initial, onSubmit, onClose, loading }) {
       </div>
 
       <div style={S.fieldGroup}>
-        <label style={S.label}>Nama Region <span style={{ color: "#d83a2f" }}>*</span></label>
+        <label style={S.label}>Nama Region <span style={{ color: "#C0392B" }}>*</span></label>
         <input
           style={S.input}
           value={name}
@@ -114,7 +114,7 @@ function AssignModal({ region, playlists, onAssign, onClose, loading }) {
       <div style={S.formHeader}>
         <div>
           <h3 style={S.formTitle}>Assign Playlist</h3>
-          <p style={S.formSubtitle}>Region: <strong style={{ color: "#d5b57e" }}>{region?.name}</strong></p>
+          <p style={S.formSubtitle}>Region: <strong style={{ color: "#2D6A4F" }}>{region?.name}</strong></p>
         </div>
         <button style={S.closeBtn} onClick={onClose}>✕</button>
       </div>
@@ -126,8 +126,8 @@ function AssignModal({ region, playlists, onAssign, onClose, loading }) {
             onClick={() => setSelected(p.id)}
             style={{
               ...S.playlistPickerItem,
-              borderColor: selected === p.id ? "#2a4f85" : "#2e2e2a",
-              background: selected === p.id ? "rgba(42,79,133,0.15)" : "#1a1a18",
+              borderColor: selected === p.id ? "#2D6A4F" : "#E5E0D8",
+              background: selected === p.id ? "rgba(45,106,79,0.06)" : "#F9F6F1",
             }}
           >
             <div style={S.pickerCheck}>
@@ -149,7 +149,7 @@ function AssignModal({ region, playlists, onAssign, onClose, loading }) {
           </button>
         ))}
         {playlists.length === 0 && (
-          <p style={{ color: "#5a5956", fontSize: "13px", textAlign: "center", padding: "20px 0" }}>
+          <p style={{ color: "#8A8680", fontSize: "13px", textAlign: "center", padding: "20px 0" }}>
             Belum ada playlist aktif
           </p>
         )}
@@ -176,8 +176,8 @@ function RegionCard({ region, index, onEdit, onDelete, onAssign }) {
   return (
     <div
       style={{ ...S.regionCard, animationDelay: `${index * 0.06}s` }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = "#3a3a36"}
-      onMouseLeave={e => e.currentTarget.style.borderColor = "#2e2e2a"}
+      onMouseEnter={e => e.currentTarget.style.borderColor = "#C49A3C"}
+      onMouseLeave={e => e.currentTarget.style.borderColor = "#E5E0D8"}
     >
       {/* Top accent stripe */}
       <div style={{
@@ -190,7 +190,7 @@ function RegionCard({ region, index, onEdit, onDelete, onAssign }) {
         <div style={S.regionCardTop}>
           <div style={{
             ...S.regionIcon,
-            background: `${REGION_COLORS[index % REGION_COLORS.length]}22`,
+            background: `${REGION_COLORS[index % REGION_COLORS.length]}18`,
             border: `1px solid ${REGION_COLORS[index % REGION_COLORS.length]}44`,
           }}>
             <MapPinIcon color={REGION_COLORS[index % REGION_COLORS.length]} />
@@ -219,7 +219,7 @@ function RegionCard({ region, index, onEdit, onDelete, onAssign }) {
           <div style={S.regionStat}>
             <span style={{
               ...S.regionStatValue,
-              color: region.active_playlist ? "#86ac69" : "#5a5956",
+              color: region.active_playlist ? "#2D6A4F" : "#8A8680",
               fontSize: "12px",
               fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
             }}>
@@ -317,7 +317,7 @@ export default function RegionListPage() {
         </div>
       ) : regions.length === 0 ? (
         <div style={S.empty}>
-          <MapPinIcon color="#3a3a36" size={40} />
+          <MapPinIcon color="#C5BFB8" size={40} />
           <p style={S.emptyTitle}>Belum ada region</p>
           <p style={S.emptyText}>Buat region pertama untuk mulai mengatur kiosk berdasarkan lokasi</p>
           <button style={S.btnPrimary} onClick={() => setModal("create")}>
@@ -386,7 +386,7 @@ const REGION_COLORS = [
 ]
 
 // ── Icons ──────────────────────────────────────────────────
-function MapPinIcon({ color = "#808180", size = 20 }) {
+function MapPinIcon({ color = "#8A8680", size = 20 }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
 }
 function PlusIcon() {
@@ -413,8 +413,8 @@ const ANIM_CSS = `
 const S = {
   page: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    color: "#fff9eb",
-    maxWidth: "1200px",
+    color: "#1A1A18",
+    width: "100%",
     animation: "fadeUp 0.4s ease both",
   },
   header: {
@@ -427,13 +427,13 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "26px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: "0 0 4px",
-    letterSpacing: "1px",
+    letterSpacing: "0.5px",
   },
   pageSub: {
     fontSize: "13px",
-    color: "#808180",
+    color: "#8A8680",
     margin: 0,
     fontWeight: 300,
   },
@@ -447,11 +447,11 @@ const S = {
 
   // Region card
   regionCard: {
-    background: "#1e1e1c",
-    border: "1px solid #2e2e2a",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "12px",
     overflow: "hidden",
-    transition: "border-color 0.2s",
+    transition: "border-color 0.2s, box-shadow 0.2s",
     animation: "fadeUp 0.4s ease both",
     position: "relative",
   },
@@ -484,14 +484,14 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "15px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: "0 0 6px",
     letterSpacing: "0.3px",
     lineHeight: 1.3,
   },
   regionDesc: {
     fontSize: "12px",
-    color: "#808180",
+    color: "#8A8680",
     margin: "0 0 16px",
     lineHeight: 1.5,
     minHeight: "36px",
@@ -501,7 +501,7 @@ const S = {
     display: "flex",
     alignItems: "center",
     gap: "16px",
-    background: "#252522",
+    background: "#F9F6F1",
     borderRadius: "8px",
     padding: "10px 14px",
     marginBottom: "14px",
@@ -516,12 +516,12 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "20px",
     fontWeight: 600,
-    color: "#d5b57e",
+    color: "#C49A3C",
     lineHeight: 1,
   },
   regionStatLabel: {
     fontSize: "10px",
-    color: "#5a5956",
+    color: "#8A8680",
     textTransform: "uppercase",
     letterSpacing: "0.8px",
     fontWeight: 600,
@@ -529,7 +529,7 @@ const S = {
   regionStatDivider: {
     width: "1px",
     height: "32px",
-    background: "#2e2e2a",
+    background: "#E5E0D8",
     flexShrink: 0,
   },
   assignBtn: {
@@ -538,11 +538,11 @@ const S = {
     justifyContent: "center",
     width: "100%",
     background: "transparent",
-    border: "1px solid #2e2e2a",
+    border: "1px solid #E5E0D8",
     borderRadius: "8px",
     padding: "9px",
     fontSize: "12px",
-    color: "#808180",
+    color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontWeight: 500,
@@ -553,12 +553,12 @@ const S = {
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    background: "rgba(42,79,133,0.1)",
-    border: "1px solid rgba(42,79,133,0.4)",
+    background: "rgba(45,106,79,0.06)",
+    border: "1px solid rgba(45,106,79,0.3)",
     borderRadius: "8px",
     padding: "9px",
     fontSize: "12px",
-    color: "#7ba3d4",
+    color: "#2D6A4F",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontWeight: 500,
@@ -568,27 +568,27 @@ const S = {
   // Icon buttons
   iconBtn: {
     background: "transparent",
-    border: "1px solid #2e2e2a",
+    border: "1px solid #E5E0D8",
     borderRadius: "6px",
     width: "30px",
     height: "30px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    color: "#808180",
+    color: "#7A7670",
     cursor: "pointer",
     transition: "all 0.15s",
   },
   iconBtnDanger: {
     background: "transparent",
-    border: "1px solid #2e2e2a",
+    border: "1px solid #E5E0D8",
     borderRadius: "6px",
     width: "30px",
     height: "30px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    color: "#5a5956",
+    color: "#C0392B",
     cursor: "pointer",
     transition: "all 0.15s",
   },
@@ -597,7 +597,7 @@ const S = {
   overlay: {
     position: "fixed",
     inset: 0,
-    background: "rgba(14,14,12,0.85)",
+    background: "rgba(0,0,0,0.45)",
     backdropFilter: "blur(4px)",
     display: "flex",
     alignItems: "center",
@@ -607,32 +607,34 @@ const S = {
     padding: "20px",
   },
   modal: {
-    background: "#1e1e1c",
-    border: "1px solid #3a3a36",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "14px",
     width: "100%",
     maxWidth: "480px",
     animation: "slideUp 0.25s ease both",
     overflow: "hidden",
+    boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
   },
   confirmBox: {
-    background: "#1e1e1c",
-    border: "1px solid #3a3a36",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "14px",
     width: "100%",
     maxWidth: "380px",
     padding: "28px",
     animation: "slideUp 0.25s ease both",
+    boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
   },
   confirmTitle: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "17px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: "0 0 10px",
   },
   confirmMsg: {
     fontSize: "13px",
-    color: "#808180",
+    color: "#7A7670",
     lineHeight: 1.6,
     margin: "0 0 24px",
   },
@@ -655,20 +657,20 @@ const S = {
   formTitle: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "17px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: 0,
-    letterSpacing: "0.5px",
+    letterSpacing: "0.3px",
   },
   formSubtitle: {
     fontSize: "12px",
-    color: "#808180",
+    color: "#8A8680",
     margin: "4px 0 0",
     fontWeight: 300,
   },
   closeBtn: {
     background: "transparent",
     border: "none",
-    color: "#5a5956",
+    color: "#8A8680",
     fontSize: "16px",
     cursor: "pointer",
     padding: "2px 6px",
@@ -683,17 +685,17 @@ const S = {
   label: {
     fontSize: "11px",
     fontWeight: 600,
-    color: "#808180",
+    color: "#7A7670",
     letterSpacing: "0.8px",
     textTransform: "uppercase",
   },
   input: {
-    background: "#1a1a18",
-    border: "1px solid #3a3a36",
+    background: "#F9F6F1",
+    border: "1px solid #E5E0D8",
     borderRadius: "8px",
     padding: "11px 14px",
     fontSize: "14px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     width: "100%",
@@ -701,12 +703,12 @@ const S = {
     transition: "border-color 0.15s",
   },
   inputFocus: {
-    background: "#1a1a18",
-    border: "1px solid #d5b57e",
+    background: "#F9F6F1",
+    border: "1px solid #C49A3C",
     borderRadius: "8px",
     padding: "11px 14px",
     fontSize: "14px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     width: "100%",
@@ -714,12 +716,12 @@ const S = {
     transition: "border-color 0.15s",
   },
   textarea: {
-    background: "#1a1a18",
-    border: "1px solid #3a3a36",
+    background: "#F9F6F1",
+    border: "1px solid #E5E0D8",
     borderRadius: "8px",
     padding: "11px 14px",
     fontSize: "14px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     width: "100%",
@@ -729,12 +731,12 @@ const S = {
     transition: "border-color 0.15s",
   },
   textareaFocus: {
-    background: "#1a1a18",
-    border: "1px solid #d5b57e",
+    background: "#F9F6F1",
+    border: "1px solid #C49A3C",
     borderRadius: "8px",
     padding: "11px 14px",
     fontSize: "14px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     width: "100%",
@@ -768,7 +770,6 @@ const S = {
     border: "1px solid",
     cursor: "pointer",
     transition: "all 0.15s",
-    background: "#1a1a18",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     textAlign: "left",
   },
@@ -776,7 +777,7 @@ const S = {
     width: "16px",
     height: "16px",
     borderRadius: "50%",
-    border: "2px solid #3a3a36",
+    border: "2px solid #E5E0D8",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -786,7 +787,7 @@ const S = {
     width: "8px",
     height: "8px",
     borderRadius: "50%",
-    background: "#2a4f85",
+    background: "#2D6A4F",
     display: "block",
   },
   pickerInfo: {
@@ -798,32 +799,33 @@ const S = {
   pickerName: {
     fontSize: "13px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#1A1A18",
   },
   pickerMeta: {
     fontSize: "11px",
-    color: "#5a5956",
+    color: "#8A8680",
   },
   pickerActiveBadge: {
     fontSize: "10px",
-    background: "rgba(42,79,133,0.3)",
-    color: "#7ba3d4",
+    background: "rgba(45,106,79,0.12)",
+    color: "#2D6A4F",
     borderRadius: "4px",
     padding: "2px 7px",
     flexShrink: 0,
+    fontWeight: 600,
   },
 
   // Buttons
   btnPrimary: {
     display: "inline-flex",
     alignItems: "center",
-    background: "linear-gradient(135deg, #2a4f85, #1b818a)",
+    background: "linear-gradient(135deg, #2D6A4F, #1b818a)",
     border: "none",
     borderRadius: "8px",
     padding: "10px 18px",
     fontSize: "13px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#FFFFFF",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
@@ -832,28 +834,28 @@ const S = {
   btnPrimaryHover: {
     display: "inline-flex",
     alignItems: "center",
-    background: "linear-gradient(135deg, #175085, #17898b)",
+    background: "linear-gradient(135deg, #235c42, #17898b)",
     border: "none",
     borderRadius: "8px",
     padding: "10px 18px",
     fontSize: "13px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#FFFFFF",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
     letterSpacing: "0.3px",
-    boxShadow: "0 6px 20px rgba(27,129,138,0.3)",
+    boxShadow: "0 6px 20px rgba(45,106,79,0.25)",
   },
   btnGhost: {
     display: "inline-flex",
     alignItems: "center",
     background: "transparent",
-    border: "1px solid #3a3a36",
+    border: "1px solid #E5E0D8",
     borderRadius: "8px",
     padding: "9px 16px",
     fontSize: "13px",
-    color: "#808180",
+    color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
@@ -861,15 +863,16 @@ const S = {
   btnDanger: {
     display: "inline-flex",
     alignItems: "center",
-    background: "rgba(216,58,47,0.15)",
-    border: "1px solid rgba(216,58,47,0.4)",
+    background: "rgba(192,57,43,0.08)",
+    border: "1px solid rgba(192,57,43,0.3)",
     borderRadius: "8px",
     padding: "9px 16px",
     fontSize: "13px",
-    color: "#f2767c",
+    color: "#C0392B",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
+    fontWeight: 600,
   },
 
   // Empty + loading
@@ -884,12 +887,12 @@ const S = {
   emptyTitle: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "18px",
-    color: "#5a5956",
+    color: "#7A7670",
     margin: 0,
   },
   emptyText: {
     fontSize: "13px",
-    color: "#3a3a36",
+    color: "#8A8680",
     margin: "0 0 8px",
     maxWidth: "320px",
     lineHeight: 1.6,
@@ -897,7 +900,7 @@ const S = {
   skeleton: {
     height: "240px",
     borderRadius: "12px",
-    background: "linear-gradient(90deg, #1e1e1c 25%, #252522 50%, #1e1e1c 75%)",
+    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
     backgroundSize: "600px 100%",
     animation: "shimmer 1.4s infinite",
   },

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 import client from "../../api/client"
@@ -11,10 +12,10 @@ const forceUpdate  = (id) => client.post(`/kiosks/${id}/force-update/`)
 
 // ── Helpers ────────────────────────────────────────────────
 const STATUS_CONFIG = {
-  online:          { label: "Online",          bg: "#1a3322", text: "#86ac69", dot: "#418840"  },
-  offline:         { label: "Offline",         bg: "#2e1a1a", text: "#f2767c", dot: "#d83a2f"  },
-  stale:           { label: "Stale Content",   bg: "#2e2510", text: "#dbaf6c", dot: "#b98e52"  },
-  never_connected: { label: "Never Connected", bg: "#222220", text: "#808180", dot: "#5a5956"  },
+  online:          { label: "Online",          bg: "#E8F4EC", text: "#2D6A4F", dot: "#418840"  },
+  offline:         { label: "Offline",         bg: "#FDECEA", text: "#C0392B", dot: "#D83A2F"  },
+  stale:           { label: "Stale Content",   bg: "#FEF5E7", text: "#9B7228", dot: "#C49A3C"  },
+  never_connected: { label: "Never Connected", bg: "#F3F2F0", text: "#6A6860", dot: "#9A9890"  },
 }
 
 function timeSince(dateStr) {
@@ -102,11 +103,12 @@ function KioskMap({ kiosks }) {
               style={{
                 ...styles.legendItem,
                 opacity: activeStatus !== "all" && activeStatus !== key ? 0.4 : 1,
-                background: activeStatus === key ? "rgba(255,249,235,0.05)" : "transparent",
+                background: activeStatus === key ? cfg.bg : "transparent",
+                borderColor: activeStatus === key ? cfg.dot : "#E0DAD0",
               }}
             >
               <span style={{ ...styles.legendDot, background: cfg.dot }} />
-              <span style={styles.legendLabel}>{cfg.label}</span>
+              <span style={{ ...styles.legendLabel, color: activeStatus === key ? cfg.text : "#7A7670" }}>{cfg.label}</span>
             </button>
           ))}
         </div>
@@ -122,7 +124,7 @@ function KioskMap({ kiosks }) {
           <MapContainer
             center={defaultCenter}
             zoom={10}
-            style={{ width: "100%", height: "100%", borderRadius: "10px" }}
+            style={{ width: "100%", height: "100%", borderRadius: "0 0 10px 10px" }}
             zoomControl={true}
           >
             <TileLayer
@@ -178,10 +180,15 @@ function KioskMap({ kiosks }) {
   )
 }
 
-function KioskCard({ kiosk, onForceUpdate, isForcing }) {
+function KioskCard({ kiosk, onForceUpdate, isForcing, navigate }) {
   const cfg = STATUS_CONFIG[kiosk.status] || STATUS_CONFIG.never_connected
   return (
-    <div style={styles.kioskCard}>
+    <div
+      style={styles.kioskCard}
+      onClick={() => navigate(`/kiosks/${kiosk.id}`)}
+      onMouseEnter={e => Object.assign(e.currentTarget.style, styles.kioskCardHover)}
+      onMouseLeave={e => Object.assign(e.currentTarget.style, styles.kioskCard)}
+    >
       <div style={{ ...styles.kioskCardAccent, background: cfg.dot }} />
       <div style={styles.kioskCardInner}>
         <div style={styles.kioskCardHeader}>
@@ -220,11 +227,11 @@ function KioskCard({ kiosk, onForceUpdate, isForcing }) {
           </div>
           {kiosk.status !== "never_connected" && (
             <button
-              onClick={() => onForceUpdate(kiosk.id)}
+              onClick={(e) => { e.stopPropagation(); onForceUpdate(kiosk.id) }}
               disabled={isForcing}
               style={isForcing ? { ...styles.forceBtn, opacity: 0.5 } : styles.forceBtn}
-              onMouseEnter={e => Object.assign(e.currentTarget.style, styles.forceBtnHover)}
-              onMouseLeave={e => Object.assign(e.currentTarget.style, styles.forceBtn)}
+              onMouseEnter={e => { e.stopPropagation(); Object.assign(e.currentTarget.style, styles.forceBtnHover) }}
+              onMouseLeave={e => { e.stopPropagation(); Object.assign(e.currentTarget.style, styles.forceBtn) }}
             >
               {isForcing ? "Sending…" : "Force Update"}
             </button>
@@ -238,6 +245,7 @@ function KioskCard({ kiosk, onForceUpdate, isForcing }) {
 // ── Main Page ──────────────────────────────────────────────
 export default function DashboardPage() {
   const qc = useQueryClient()
+  const navigate = useNavigate()
   const [forcingId, setForcingId] = useState(null)
   const [filter, setFilter] = useState("all")
   const [view, setView] = useState("grid") // "grid" | "map"
@@ -310,10 +318,10 @@ export default function DashboardPage() {
           </div>
         ) : (
           <>
-            <StatCard label="Total Kiosks"      value={summary?.total         ?? 0} color="#d5b57e" icon="▦" />
+            <StatCard label="Total Kiosks"      value={summary?.total         ?? 0} color="#C49A3C" icon="▦" />
             <StatCard label="Online"             value={summary?.online        ?? 0} color="#418840" icon="●" />
-            <StatCard label="Offline"            value={summary?.offline       ?? 0} color="#d83a2f" icon="●" />
-            <StatCard label="Stale Content"      value={summary?.stale         ?? 0} color="#b98e52" icon="◐" />
+            <StatCard label="Offline"            value={summary?.offline       ?? 0} color="#D83A2F" icon="●" />
+            <StatCard label="Stale Content"      value={summary?.stale         ?? 0} color="#C49A3C" icon="◐" />
           </>
         )}
       </div>
@@ -370,6 +378,7 @@ export default function DashboardPage() {
                   kiosk={kiosk}
                   onForceUpdate={(id) => mutation.mutate(id)}
                   isForcing={forcingId === kiosk.id}
+                  navigate={navigate}
                 />
               ))}
             </div>
@@ -384,38 +393,37 @@ export default function DashboardPage() {
           100% { background-position: 400px 0 }
         }
         .leaflet-container {
-          background: #1a1a18 !important;
           font-family: 'Inter', 'Plus Jakarta Sans', sans-serif;
         }
         .leaflet-popup-content-wrapper {
-          background: #2b2b27 !important;
-          border: 1px solid #3a3a36 !important;
+          background: #FFFFFF !important;
+          border: 1px solid #E5E0D8 !important;
           border-radius: 10px !important;
-          box-shadow: 0 8px 24px rgba(0,0,0,0.4) !important;
-          color: #fff9eb !important;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.1) !important;
+          color: #1A1A18 !important;
           padding: 0 !important;
         }
         .leaflet-popup-tip {
-          background: #2b2b27 !important;
+          background: #FFFFFF !important;
         }
         .leaflet-popup-content {
           margin: 0 !important;
         }
         .leaflet-control-zoom a {
-          background: #2b2b27 !important;
-          border-color: #3a3a36 !important;
-          color: #808180 !important;
+          background: #FFFFFF !important;
+          border-color: #E5E0D8 !important;
+          color: #7A7670 !important;
         }
         .leaflet-control-zoom a:hover {
-          background: #333330 !important;
-          color: #fff9eb !important;
+          background: #F5F1EA !important;
+          color: #1A1A18 !important;
         }
         .leaflet-control-attribution {
-          background: rgba(30,30,28,0.8) !important;
-          color: #5a5956 !important;
+          background: rgba(255,255,255,0.8) !important;
+          color: #8A8680 !important;
           font-size: 10px !important;
         }
-        .leaflet-control-attribution a { color: #808180 !important; }
+        .leaflet-control-attribution a { color: #7A7670 !important; }
       `}</style>
     </div>
   )
@@ -442,8 +450,8 @@ function MapPinIcon() {
 const styles = {
   page: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    color: "#fff9eb",
-    maxWidth: "1400px",
+    color: "#1A1A18",
+    width: "100%",
   },
   pageHeader: {
     display: "flex",
@@ -452,16 +460,16 @@ const styles = {
     marginBottom: "32px",
   },
   pageTitle: {
-    fontFamily: "''Inter', 'Plus Jakarta Sans', sans-serif",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "28px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: "0 0 4px",
-    letterSpacing: "1px",
+    letterSpacing: "0.5px",
   },
   pageSubtitle: {
     fontSize: "14px",
-    color: "#808180",
+    color: "#7A7670",
     margin: 0,
     fontWeight: 300,
   },
@@ -472,8 +480,8 @@ const styles = {
   },
   viewToggle: {
     display: "flex",
-    background: "#2b2b27",
-    border: "1px solid #3a3a36",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "8px",
     overflow: "hidden",
   },
@@ -482,21 +490,21 @@ const styles = {
     border: "none",
     padding: "7px 11px",
     cursor: "pointer",
-    color: "#5a5956",
+    color: "#A8A49C",
     display: "flex",
     alignItems: "center",
     transition: "all 0.15s",
   },
   viewBtnActive: {
-    background: "rgba(42,79,133,0.3)",
-    color: "#fff9eb",
+    background: "rgba(45,106,79,0.08)",
+    color: "#2D6A4F",
   },
   refreshNote: {
     display: "flex",
     alignItems: "center",
     gap: "8px",
-    background: "#2b2b27",
-    border: "1px solid #3a3a36",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "20px",
     padding: "6px 14px",
   },
@@ -510,7 +518,7 @@ const styles = {
   },
   refreshText: {
     fontSize: "12px",
-    color: "#808180",
+    color: "#7A7670",
   },
 
   // Stats
@@ -521,11 +529,12 @@ const styles = {
     marginBottom: "28px",
   },
   statCard: {
-    background: "#2b2b27",
-    border: "1px solid #3a3a36",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderTop: "3px solid",
     borderRadius: "10px",
     padding: "20px 24px",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
   },
   statTop: {
     display: "flex",
@@ -535,7 +544,7 @@ const styles = {
   },
   statIcon: {
     fontSize: "18px",
-    color: "#5a5956",
+    color: "#C0BAB0",
   },
   statValue: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
@@ -545,7 +554,7 @@ const styles = {
   },
   statLabel: {
     fontSize: "12px",
-    color: "#808180",
+    color: "#7A7670",
     letterSpacing: "0.5px",
     textTransform: "uppercase",
     fontWeight: 500,
@@ -557,37 +566,38 @@ const styles = {
     display: "block",
     height: "100px",
     borderRadius: "10px",
-    background: "linear-gradient(90deg, #2b2b27 25%, #333330 50%, #2b2b27 75%)",
+    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
     backgroundSize: "800px 100%",
     animation: "shimmer 1.5s infinite",
   },
 
   // Map
   mapSection: {
-    background: "#2b2b27",
-    border: "1px solid #3a3a36",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "10px",
     overflow: "hidden",
     marginBottom: "28px",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
   },
   mapHeader: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     padding: "16px 20px",
-    borderBottom: "1px solid #3a3a36",
+    borderBottom: "1px solid #E5E0D8",
     flexWrap: "wrap",
     gap: "12px",
   },
   mapTitle: {
     fontSize: "15px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: "0 0 2px",
   },
   mapSubtitle: {
     fontSize: "12px",
-    color: "#5a5956",
+    color: "#8A8680",
     margin: 0,
   },
   mapLegend: {
@@ -600,7 +610,7 @@ const styles = {
     alignItems: "center",
     gap: "6px",
     background: "transparent",
-    border: "1px solid #3a3a36",
+    border: "1px solid #E0DAD0",
     borderRadius: "20px",
     padding: "4px 10px",
     cursor: "pointer",
@@ -614,7 +624,6 @@ const styles = {
   },
   legendLabel: {
     fontSize: "11px",
-    color: "#808180",
     whiteSpace: "nowrap",
   },
   mapWrapper: {
@@ -641,7 +650,7 @@ const styles = {
     gap: "8px",
     marginBottom: "10px",
     paddingBottom: "10px",
-    borderBottom: "1px solid #3a3a36",
+    borderBottom: "1px solid #E5E0D8",
   },
   popupDot: {
     width: "8px",
@@ -652,7 +661,7 @@ const styles = {
   popupName: {
     fontSize: "14px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#1A1A18",
   },
   popupGrid: {
     display: "grid",
@@ -662,12 +671,12 @@ const styles = {
   },
   popupKey: {
     fontSize: "11px",
-    color: "#5a5956",
+    color: "#8A8680",
     whiteSpace: "nowrap",
   },
   popupVal: {
     fontSize: "12px",
-    color: "#b2a893",
+    color: "#4A4845",
     fontWeight: 400,
   },
 
@@ -682,53 +691,66 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "8px",
-    background: "transparent",
-    border: "1px solid #3a3a36",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "20px",
     padding: "6px 16px",
     fontSize: "13px",
-    color: "#808180",
+    color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
   },
   filterTabActive: {
-    background: "#2a4f85",
-    border: "1px solid #2a4f85",
-    color: "#fff9eb",
+    background: "#2D6A4F",
+    border: "1px solid #2D6A4F",
+    color: "#FFFFFF",
   },
   filterCount: {
-    background: "#3a3a36",
+    background: "#F0EBE3",
     borderRadius: "10px",
     padding: "1px 7px",
     fontSize: "11px",
-    color: "#808180",
+    color: "#7A7670",
   },
   filterCountActive: {
-    background: "rgba(255,249,235,0.15)",
-    color: "#fff9eb",
+    background: "rgba(255,255,255,0.25)",
+    color: "#FFFFFF",
   },
 
   // Kiosk grid
   kioskGrid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
     gap: "16px",
   },
   kioskSkeleton: {
     height: "200px",
     borderRadius: "10px",
-    background: "linear-gradient(90deg, #2b2b27 25%, #333330 50%, #2b2b27 75%)",
+    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
     backgroundSize: "800px 100%",
     animation: "shimmer 1.5s infinite",
   },
   kioskCard: {
-    background: "#2b2b27",
-    border: "1px solid #3a3a36",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "10px",
     overflow: "hidden",
     position: "relative",
-    transition: "border-color 0.2s",
+    transition: "border-color 0.2s, box-shadow 0.2s, transform 0.15s",
+    cursor: "pointer",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+  },
+  kioskCardHover: {
+    background: "#FFFFFF",
+    border: "1px solid #C49A3C",
+    borderRadius: "10px",
+    overflow: "hidden",
+    position: "relative",
+    transition: "border-color 0.2s, box-shadow 0.2s, transform 0.15s",
+    cursor: "pointer",
+    boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+    transform: "translateY(-1px)",
   },
   kioskCardAccent: {
     position: "absolute",
@@ -749,12 +771,12 @@ const styles = {
   kioskName: {
     fontSize: "15px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: "0 0 3px",
   },
   kioskRegion: {
     fontSize: "12px",
-    color: "#808180",
+    color: "#7A7670",
     margin: 0,
   },
 
@@ -783,7 +805,7 @@ const styles = {
     gridTemplateColumns: "1fr 1fr",
     gap: "10px",
     marginBottom: "16px",
-    background: "#232320",
+    background: "#F9F6F1",
     borderRadius: "8px",
     padding: "12px",
   },
@@ -794,14 +816,14 @@ const styles = {
   },
   kioskMetaLabel: {
     fontSize: "10px",
-    color: "#5a5956",
+    color: "#A8A49C",
     textTransform: "uppercase",
     letterSpacing: "0.5px",
     fontWeight: 500,
   },
   kioskMetaValue: {
     fontSize: "13px",
-    color: "#b2a893",
+    color: "#4A4845",
     fontWeight: 400,
   },
 
@@ -820,31 +842,31 @@ const styles = {
     width: "6px",
     height: "6px",
     borderRadius: "50%",
-    background: "#2a4f85",
+    background: "#2D6A4F",
     flexShrink: 0,
   },
   playlistChipText: {
     fontSize: "12px",
-    color: "#808180",
+    color: "#7A7670",
   },
   forceBtn: {
     background: "transparent",
-    border: "1px solid #3a3a36",
+    border: "1px solid #E5E0D8",
     borderRadius: "6px",
     padding: "5px 12px",
     fontSize: "12px",
-    color: "#808180",
+    color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
   },
   forceBtnHover: {
-    background: "rgba(216,58,47,0.1)",
-    border: "1px solid rgba(216,58,47,0.4)",
+    background: "rgba(216,58,47,0.06)",
+    border: "1px solid rgba(216,58,47,0.3)",
     borderRadius: "6px",
     padding: "5px 12px",
     fontSize: "12px",
-    color: "#f2767c",
+    color: "#C0392B",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
@@ -861,11 +883,11 @@ const styles = {
   },
   emptyIcon: {
     fontSize: "48px",
-    color: "#3a3a36",
+    color: "#D0CAC0",
   },
   emptyText: {
     fontSize: "14px",
-    color: "#5a5956",
+    color: "#8A8680",
     margin: 0,
   },
 }

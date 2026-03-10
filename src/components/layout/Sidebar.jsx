@@ -24,8 +24,8 @@ export default function Sidebar({ collapsed, onToggle }) {
       }}>
         <div style={sidebarStyles.logoMark}>
           <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
-            <polygon points="24,4 44,14 44,34 24,44 4,34 4,14" fill="none" stroke="#d5b57e" strokeWidth="2.5" />
-            <circle cx="24" cy="24" r="6" fill="#d5b57e" />
+            <polygon points="24,4 44,14 44,34 24,44 4,34 4,14" fill="none" stroke="#C49A3C" strokeWidth="2.5" />
+            <circle cx="24" cy="24" r="6" fill="#C49A3C" />
           </svg>
         </div>
         {!collapsed && (
@@ -55,14 +55,14 @@ export default function Sidebar({ collapsed, onToggle }) {
               <>
                 <span style={{
                   ...sidebarStyles.navIcon,
-                  color: isActive ? "#d5b57e" : "#5a5956",
+                  color: isActive ? "#2D6A4F" : "#8A8680",
                 }}>
                   <Icon />
                 </span>
                 {!collapsed && (
                   <span style={{
                     ...sidebarStyles.navLabel2,
-                    color: isActive ? "#fff9eb" : "#808180",
+                    color: isActive ? "#1A1A18" : "#5A5651",
                   }}>
                     {label}
                   </span>
@@ -109,19 +109,20 @@ export default function Sidebar({ collapsed, onToggle }) {
 
 const sidebarStyles = {
   aside: {
-    background: "#1e1e1c",
-    borderRight: "1px solid #2e2e2a",
+    background: "#FFFFFF",
+    borderRight: "1px solid #E5E0D8",
     display: "flex",
     flexDirection: "column",
     flexShrink: 0,
     height: "100vh",
     overflow: "hidden",
+    boxShadow: "2px 0 8px rgba(0,0,0,0.04)",
   },
   logoArea: {
     display: "flex",
     alignItems: "center",
     gap: "12px",
-    borderBottom: "1px solid #2e2e2a",
+    borderBottom: "1px solid #E5E0D8",
   },
   logoMark: { flexShrink: 0 },
   logoText: {
@@ -134,7 +135,7 @@ const sidebarStyles = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "18px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#1A1A18",
     letterSpacing: "1px",
     lineHeight: 1,
     whiteSpace: "nowrap",
@@ -142,14 +143,14 @@ const sidebarStyles = {
   logoSub: {
     fontSize: "9px",
     letterSpacing: "3px",
-    color: "#d5b57e",
+    color: "#C49A3C",
     textTransform: "uppercase",
     fontWeight: 500,
   },
   navLabel: {
     fontSize: "9px",
     letterSpacing: "2px",
-    color: "#3a3a36",
+    color: "#C0BAB0",
     fontWeight: 600,
     padding: "20px 20px 8px",
     textTransform: "uppercase",
@@ -171,7 +172,7 @@ const sidebarStyles = {
     transition: "background 0.15s",
   },
   navItemActive: {
-    background: "rgba(42,79,133,0.2)",
+    background: "rgba(45,106,79,0.08)",
   },
   navIcon: {
     flexShrink: 0,
@@ -195,10 +196,10 @@ const sidebarStyles = {
     width: "4px",
     height: "4px",
     borderRadius: "50%",
-    background: "#d5b57e",
+    background: "#C49A3C",
   },
   bottom: {
-    borderTop: "1px solid #2e2e2a",
+    borderTop: "1px solid #E5E0D8",
   },
   bottomBadge: {
     display: "flex",
@@ -215,13 +216,13 @@ const sidebarStyles = {
   },
   bottomText: {
     fontSize: "11px",
-    color: "#5a5956",
+    color: "#8A8680",
     letterSpacing: "0.5px",
     whiteSpace: "nowrap",
   },
   toggleBtn: {
     background: "transparent",
-    border: "1px solid #2e2e2a",
+    border: "1px solid #E5E0D8",
     borderRadius: "6px",
     width: "28px",
     height: "28px",
@@ -229,14 +230,14 @@ const sidebarStyles = {
     alignItems: "center",
     justifyContent: "center",
     cursor: "pointer",
-    color: "#5a5956",
+    color: "#8A8680",
     padding: 0,
     flexShrink: 0,
     transition: "all 0.15s",
   },
   toggleBtnHover: {
-    background: "rgba(213,181,126,0.1)",
-    border: "1px solid #3a3a36",
+    background: "rgba(196,154,60,0.08)",
+    border: "1px solid #D0CAC0",
     borderRadius: "6px",
     width: "28px",
     height: "28px",
@@ -244,7 +245,7 @@ const sidebarStyles = {
     alignItems: "center",
     justifyContent: "center",
     cursor: "pointer",
-    color: "#d5b57e",
+    color: "#C49A3C",
     padding: 0,
     flexShrink: 0,
     transition: "all 0.15s",

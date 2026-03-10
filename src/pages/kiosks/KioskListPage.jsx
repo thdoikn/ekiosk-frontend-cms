@@ -7,14 +7,13 @@ import client from "../../api/client"
 const fetchKiosks  = () => client.get("/kiosks/").then(r => r.data)
 const fetchRegions = () => client.get("/regions/").then(r => r.data)
 const doForceUpdate = (id) => client.post(`/kiosks/${id}/force-update/`)
-const doToggleActive = ({ id, is_active }) => client.patch(`/kiosks/${id}/`, { is_active })
 
 // ── Helpers ────────────────────────────────────────────────
 const STATUS_CFG = {
-  online:          { label: "Online",          bg: "#1a3322", text: "#86ac69", dot: "#418840" },
-  offline:         { label: "Offline",         bg: "#2e1a1a", text: "#f2767c", dot: "#d83a2f" },
-  stale:           { label: "Stale",           bg: "#2e2510", text: "#dbaf6c", dot: "#b98e52" },
-  never_connected: { label: "Never Connected", bg: "#222220", text: "#808180", dot: "#5a5956" },
+  online:          { label: "Online",          bg: "#E8F4EC", text: "#2D6A4F", dot: "#418840" },
+  offline:         { label: "Offline",         bg: "#FDECEA", text: "#C0392B", dot: "#D83A2F" },
+  stale:           { label: "Stale",           bg: "#FEF5E7", text: "#9B7228", dot: "#C49A3C" },
+  never_connected: { label: "Never Connected", bg: "#F3F2F0", text: "#6A6860", dot: "#9A9890" },
 }
 
 function timeSince(dateStr) {
@@ -43,7 +42,7 @@ function ActionBtn({ onClick, variant = "ghost", disabled, children }) {
       onClick={onClick}
       disabled={disabled}
       style={disabled ? { ...base, opacity: 0.4, cursor: "not-allowed" } : base}
-      onMouseEnter={e => !disabled && (e.currentTarget.style.opacity = "0.8")}
+      onMouseEnter={e => !disabled && (e.currentTarget.style.opacity = "0.7")}
       onMouseLeave={e => !disabled && (e.currentTarget.style.opacity = "1")}
     >
       {children}
@@ -75,11 +74,6 @@ export default function KioskListPage() {
     mutationFn: doForceUpdate,
     onMutate: (id) => setForcingId(id),
     onSettled: () => { setForcingId(null); qc.invalidateQueries(["kiosks"]) },
-  })
-
-  const toggleMut = useMutation({
-    mutationFn: doToggleActive,
-    onSettled: () => qc.invalidateQueries(["kiosks"]),
   })
 
   const kiosks  = kioskData?.results ?? kioskData ?? []
@@ -121,12 +115,12 @@ export default function KioskListPage() {
             onClick={() => setStatus(statusFilter === key ? "all" : key)}
             style={{
               ...S.stripItem,
-              borderColor: statusFilter === key ? cfg.dot : "transparent",
-              background: statusFilter === key ? `${cfg.bg}` : "rgba(255,255,255,0.02)",
+              borderColor: statusFilter === key ? cfg.dot : "#E5E0D8",
+              background: statusFilter === key ? cfg.bg : "#FFFFFF",
             }}
           >
             <span style={{ ...S.stripDot, background: cfg.dot }} />
-            <span style={{ ...S.stripCount, color: cfg.text }}>{counts[key] ?? 0}</span>
+            <span style={{ ...S.stripCount, color: statusFilter === key ? cfg.text : "#1A1A18" }}>{counts[key] ?? 0}</span>
             <span style={S.stripLabel}>{cfg.label}</span>
           </button>
         ))}
@@ -191,14 +185,14 @@ export default function KioskListPage() {
                 <tr
                   key={kiosk.id}
                   style={{ ...S.tr, animationDelay: `${i * 0.04}s` }}
-                  onMouseEnter={e => e.currentTarget.style.background = "#2a2a26"}
+                  onMouseEnter={e => e.currentTarget.style.background = "#F9F6F1"}
                   onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                 >
                   <td style={S.td}>
                     <div style={S.kioskNameCell}>
                       <div style={{
                         ...S.kioskDot,
-                        background: STATUS_CFG[kiosk.status]?.dot ?? "#5a5956"
+                        background: STATUS_CFG[kiosk.status]?.dot ?? "#9A9890"
                       }} />
                       <div>
                         <button
@@ -215,7 +209,7 @@ export default function KioskListPage() {
                   </td>
                   <td style={S.td}>
                     <span style={S.regionChip}>
-                      {kiosk.region?.name ?? <span style={{ color: "#5a5956" }}>—</span>}
+                      {kiosk.region?.name ?? <span style={{ color: "#A8A49C" }}>—</span>}
                     </span>
                   </td>
                   <td style={S.td}>
@@ -223,13 +217,13 @@ export default function KioskListPage() {
                   </td>
                   <td style={S.td}>
                     <span style={S.playlistText}>
-                      {kiosk.active_playlist?.name ?? <span style={{ color: "#5a5956" }}>Tidak ada</span>}
+                      {kiosk.active_playlist?.name ?? <span style={{ color: "#A8A49C" }}>Tidak ada</span>}
                     </span>
                   </td>
                   <td style={S.td}>
                     <span style={{
                       ...S.heartbeatText,
-                      color: kiosk.status === "offline" ? "#f2767c" : "#808180"
+                      color: kiosk.status === "offline" ? "#C0392B" : "#7A7670"
                     }}>
                       {timeSince(kiosk.last_heartbeat)}
                     </span>
@@ -267,7 +261,7 @@ export default function KioskListPage() {
 // ── Icons ──────────────────────────────────────────────────
 function SearchIcon() {
   return (
-    <svg style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#5a5956" }} width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <svg style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#A8A49C" }} width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
       <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
     </svg>
   )
@@ -277,7 +271,6 @@ function RefreshIcon() { return <svg width="12" height="12" viewBox="0 0 24 24" 
 
 // ── Styles ─────────────────────────────────────────────────
 const ANIM_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Mono:wght@400&family=DM+Sans:wght@300;400;500;600&display=swap');
   @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
   @keyframes shimmer { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
 `
@@ -285,8 +278,8 @@ const ANIM_CSS = `
 const S = {
   page: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    color: "#fff9eb",
-    maxWidth: "1400px",
+    color: "#1A1A18",
+    width: "100%",
     animation: "fadeUp 0.4s ease both",
   },
   header: {
@@ -299,13 +292,13 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "26px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: "0 0 4px",
-    letterSpacing: "1px",
+    letterSpacing: "0.5px",
   },
   pageSub: {
     fontSize: "13px",
-    color: "#808180",
+    color: "#7A7670",
     margin: 0,
     fontWeight: 300,
   },
@@ -325,9 +318,9 @@ const S = {
     borderRadius: "8px",
     border: "1px solid",
     cursor: "pointer",
-    background: "rgba(255,255,255,0.02)",
     transition: "all 0.15s",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
   },
   stripDot: {
     width: "8px",
@@ -343,7 +336,7 @@ const S = {
   },
   stripLabel: {
     fontSize: "12px",
-    color: "#808180",
+    color: "#7A7670",
     fontWeight: 400,
   },
 
@@ -360,12 +353,12 @@ const S = {
   },
   searchInput: {
     width: "100%",
-    background: "#1e1e1c",
-    border: "1px solid #3a3a36",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "8px",
     padding: "10px 40px",
     fontSize: "13px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     boxSizing: "border-box",
@@ -377,18 +370,18 @@ const S = {
     transform: "translateY(-50%)",
     background: "none",
     border: "none",
-    color: "#5a5956",
+    color: "#A8A49C",
     cursor: "pointer",
     fontSize: "12px",
     padding: 0,
   },
   select: {
-    background: "#1e1e1c",
-    border: "1px solid #3a3a36",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "8px",
     padding: "10px 14px",
     fontSize: "13px",
-    color: "#b2a893",
+    color: "#4A4845",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     cursor: "pointer",
@@ -397,10 +390,11 @@ const S = {
 
   // Table
   tableWrap: {
-    background: "#1e1e1c",
-    border: "1px solid #2e2e2a",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "12px",
     overflow: "hidden",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
   },
   table: {
     width: "100%",
@@ -410,16 +404,16 @@ const S = {
     padding: "12px 16px",
     fontSize: "10px",
     fontWeight: 600,
-    color: "#5a5956",
+    color: "#8A8680",
     letterSpacing: "1px",
     textTransform: "uppercase",
     textAlign: "left",
-    borderBottom: "1px solid #2e2e2a",
-    background: "#1a1a18",
+    borderBottom: "1px solid #E5E0D8",
+    background: "#F9F6F1",
     whiteSpace: "nowrap",
   },
   tr: {
-    borderBottom: "1px solid #252522",
+    borderBottom: "1px solid #F0EBE3",
     transition: "background 0.1s",
     animation: "fadeUp 0.3s ease both",
   },
@@ -444,7 +438,7 @@ const S = {
   kioskNameBtn: {
     background: "none",
     border: "none",
-    color: "#fff9eb",
+    color: "#1A1A18",
     fontSize: "13px",
     fontWeight: 600,
     cursor: "pointer",
@@ -453,32 +447,33 @@ const S = {
     textAlign: "left",
     display: "block",
     marginBottom: "2px",
+    textDecoration: "none",
   },
   kioskId: {
-    fontFamily: "'DM Mono', monospace",
+    fontFamily: "monospace",
     fontSize: "10px",
-    color: "#5a5956",
+    color: "#A8A49C",
     margin: 0,
   },
   regionChip: {
     fontSize: "12px",
-    color: "#b2a893",
-    background: "#252522",
+    color: "#4A4845",
+    background: "#F0EBE3",
     borderRadius: "4px",
     padding: "3px 8px",
   },
   playlistText: {
     fontSize: "13px",
-    color: "#919088",
+    color: "#5A5651",
   },
   heartbeatText: {
-    fontFamily: "'DM Mono', monospace",
+    fontFamily: "monospace",
     fontSize: "12px",
   },
   ipText: {
-    fontFamily: "'DM Mono', monospace",
+    fontFamily: "monospace",
     fontSize: "12px",
-    color: "#5a5956",
+    color: "#8A8680",
   },
   actionsCell: {
     display: "flex",
@@ -509,11 +504,11 @@ const S = {
     display: "inline-flex",
     alignItems: "center",
     background: "transparent",
-    border: "1px solid #2e2e2a",
+    border: "1px solid #E5E0D8",
     borderRadius: "6px",
     padding: "5px 10px",
     fontSize: "12px",
-    color: "#808180",
+    color: "#5A5651",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     whiteSpace: "nowrap",
@@ -522,12 +517,12 @@ const S = {
   btnPrimary: {
     display: "inline-flex",
     alignItems: "center",
-    background: "rgba(42,79,133,0.3)",
-    border: "1px solid rgba(42,79,133,0.5)",
+    background: "rgba(45,106,79,0.08)",
+    border: "1px solid rgba(45,106,79,0.3)",
     borderRadius: "6px",
     padding: "5px 10px",
     fontSize: "12px",
-    color: "#7ba3d4",
+    color: "#2D6A4F",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     whiteSpace: "nowrap",
@@ -536,12 +531,12 @@ const S = {
   btnDanger: {
     display: "inline-flex",
     alignItems: "center",
-    background: "rgba(216,58,47,0.1)",
-    border: "1px solid rgba(216,58,47,0.3)",
+    background: "rgba(216,58,47,0.06)",
+    border: "1px solid rgba(216,58,47,0.2)",
     borderRadius: "6px",
     padding: "5px 10px",
     fontSize: "12px",
-    color: "#f2767c",
+    color: "#C0392B",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     whiteSpace: "nowrap",
@@ -554,7 +549,7 @@ const S = {
     height: "52px",
     borderRadius: "6px",
     marginBottom: "8px",
-    background: "linear-gradient(90deg, #232320 25%, #2a2a26 50%, #232320 75%)",
+    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
     backgroundSize: "600px 100%",
     animation: "shimmer 1.4s infinite",
   },
@@ -565,15 +560,15 @@ const S = {
     padding: "64px 20px",
     gap: "12px",
   },
-  emptyIcon: { fontSize: "40px", color: "#3a3a36" },
-  emptyText: { fontSize: "14px", color: "#5a5956", margin: 0 },
+  emptyIcon: { fontSize: "40px", color: "#D0CAC0" },
+  emptyText: { fontSize: "14px", color: "#8A8680", margin: 0 },
   emptyReset: {
     background: "transparent",
-    border: "1px solid #3a3a36",
+    border: "1px solid #E5E0D8",
     borderRadius: "6px",
     padding: "7px 16px",
     fontSize: "12px",
-    color: "#808180",
+    color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     marginTop: "4px",

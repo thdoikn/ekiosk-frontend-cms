@@ -13,7 +13,7 @@ const toggleActive   = ({ id, is_active }) => client.patch(`/playlists/${id}/`, 
 function PlusIcon() {
   return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: 6 }}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
 }
-function FilmIcon({ size = 16, color = "#808180" }) {
+function FilmIcon({ size = 16, color = "#8A8680" }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
 }
 function TrashIcon() {
@@ -25,7 +25,6 @@ function BuilderIcon() {
 
 // ── Animation CSS ──────────────────────────────────────────
 const ANIM_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Mono:wght@400&family=DM+Sans:wght@300;400;500;600&display=swap');
   @keyframes fadeUp  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
   @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
   @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
@@ -45,15 +44,15 @@ function CreateModal({ onClose, onSubmit, loading }) {
         </div>
         <div style={S.fieldGroup}>
           <label style={S.label}>
-            Nama Playlist <span style={{ color: "#d83a2f" }}>*</span>
+            Nama Playlist <span style={{ color: "#C0392B" }}>*</span>
           </label>
           <input
             style={S.input}
             value={name}
             onChange={e => setName(e.target.value)}
             placeholder="cth. Konten Lobby Utama"
-            onFocus={e => (e.target.style.borderColor = "#d5b57e")}
-            onBlur={e => (e.target.style.borderColor = "#3a3a36")}
+            onFocus={e => (e.target.style.borderColor = "#C49A3C")}
+            onBlur={e => (e.target.style.borderColor = "#E5E0D8")}
           />
         </div>
         <p style={S.hint}>
@@ -118,7 +117,7 @@ export default function PlaylistListPage() {
         <button
           style={S.btnPrimary}
           onClick={() => setShowCreate(true)}
-          onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 6px 20px rgba(27,129,138,0.3)")}
+          onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 6px 20px rgba(45,106,79,0.25)")}
           onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}
         >
           <PlusIcon /> Buat Playlist
@@ -131,7 +130,7 @@ export default function PlaylistListPage() {
         </div>
       ) : playlists.length === 0 ? (
         <div style={S.empty}>
-          <FilmIcon size={40} color="#3a3a36" />
+          <FilmIcon size={40} color="#C5BFB8" />
           <p style={S.emptyTitle}>Belum ada playlist</p>
           <button style={S.btnPrimary} onClick={() => setShowCreate(true)}>
             <PlusIcon /> Buat Playlist Pertama
@@ -143,12 +142,18 @@ export default function PlaylistListPage() {
             <div
               key={p.id}
               style={{ ...S.card, animationDelay: `${i * 0.05}s` }}
-              onMouseEnter={e => e.currentTarget.style.borderColor = "#3a3a36"}
-              onMouseLeave={e => e.currentTarget.style.borderColor = "#2e2e2a"}
+              onMouseEnter={e => {
+                e.currentTarget.style.borderColor = "#C49A3C"
+                e.currentTarget.style.boxShadow = "0 4px 20px rgba(196,154,60,0.1)"
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.borderColor = "#E5E0D8"
+                e.currentTarget.style.boxShadow = "none"
+              }}
             >
               <div style={S.cardTop}>
                 <div style={S.cardIconWrap}>
-                  <FilmIcon size={18} color={p.is_active ? "#d5b57e" : "#5a5956"} />
+                  <FilmIcon size={18} color={p.is_active ? "#C49A3C" : "#8A8680"} />
                 </div>
                 <div style={S.cardActions}>
                   <button
@@ -163,7 +168,7 @@ export default function PlaylistListPage() {
               <h3 style={S.cardName}>{p.name}</h3>
               <p style={S.cardRegion}>
                 {p.region?.name ?? (
-                  <span style={{ color: "#3a3a36" }}>Belum diassign ke region</span>
+                  <span style={{ color: "#C5BFB8" }}>Belum diassign ke region</span>
                 )}
               </p>
 
@@ -225,8 +230,8 @@ export default function PlaylistListPage() {
 const S = {
   page: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    color: "#fff9eb",
-    maxWidth: "1200px",
+    color: "#1A1A18",
+    width: "100%",
     animation: "fadeUp 0.4s ease both",
   },
   header: {
@@ -239,23 +244,23 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "26px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: "0 0 4px",
-    letterSpacing: "1px",
+    letterSpacing: "0.5px",
   },
-  pageSub: { fontSize: "13px", color: "#808180", margin: 0, fontWeight: 300 },
+  pageSub: { fontSize: "13px", color: "#8A8680", margin: 0, fontWeight: 300 },
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
     gap: "14px",
   },
   card: {
-    background: "#1e1e1c",
-    border: "1px solid #2e2e2a",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "12px",
     padding: "20px",
     animation: "fadeUp 0.4s ease both",
-    transition: "border-color 0.2s",
+    transition: "border-color 0.2s, box-shadow 0.2s",
   },
   cardTop: {
     display: "flex",
@@ -266,8 +271,8 @@ const S = {
   cardIconWrap: {
     width: "36px",
     height: "36px",
-    background: "#252522",
-    border: "1px solid #2e2e2a",
+    background: "#F9F6F1",
+    border: "1px solid #E5E0D8",
     borderRadius: "8px",
     display: "flex",
     alignItems: "center",
@@ -276,19 +281,20 @@ const S = {
   cardActions: { display: "flex", gap: "6px" },
   activeBadge: {
     fontSize: "11px",
-    background: "rgba(65,136,64,0.15)",
-    border: "1px solid rgba(65,136,64,0.3)",
-    color: "#86ac69",
+    background: "rgba(45,106,79,0.1)",
+    border: "1px solid rgba(45,106,79,0.25)",
+    color: "#2D6A4F",
     borderRadius: "20px",
     padding: "3px 10px",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+    fontWeight: 600,
   },
   inactiveBadge: {
     fontSize: "11px",
-    background: "#252522",
-    border: "1px solid #2e2e2a",
-    color: "#5a5956",
+    background: "#F9F6F1",
+    border: "1px solid #E5E0D8",
+    color: "#8A8680",
     borderRadius: "20px",
     padding: "3px 10px",
     cursor: "pointer",
@@ -298,16 +304,16 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "14px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: "0 0 4px",
     letterSpacing: "0.3px",
   },
-  cardRegion: { fontSize: "12px", color: "#808180", margin: "0 0 14px" },
+  cardRegion: { fontSize: "12px", color: "#8A8680", margin: "0 0 14px" },
   cardMeta: {
     display: "flex",
     alignItems: "center",
     gap: "12px",
-    background: "#252522",
+    background: "#F9F6F1",
     borderRadius: "8px",
     padding: "10px 12px",
     marginBottom: "12px",
@@ -322,12 +328,12 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "18px",
     fontWeight: 600,
-    color: "#d5b57e",
+    color: "#C49A3C",
     lineHeight: 1,
   },
   cardMetaLabel: {
     fontSize: "10px",
-    color: "#5a5956",
+    color: "#8A8680",
     textTransform: "uppercase",
     letterSpacing: "0.8px",
     fontWeight: 600,
@@ -335,7 +341,7 @@ const S = {
   cardMetaDivider: {
     width: "1px",
     height: "28px",
-    background: "#2e2e2a",
+    background: "#E5E0D8",
     flexShrink: 0,
   },
   cardFooter: { display: "flex", gap: "8px", alignItems: "center" },
@@ -345,11 +351,11 @@ const S = {
     alignItems: "center",
     justifyContent: "center",
     background: "transparent",
-    border: "1px solid #2e2e2a",
+    border: "1px solid #E5E0D8",
     borderRadius: "7px",
     padding: "8px",
     fontSize: "12px",
-    color: "#808180",
+    color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
@@ -360,12 +366,12 @@ const S = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "rgba(42,79,133,0.1)",
-    border: "1px solid rgba(42,79,133,0.4)",
+    background: "rgba(45,106,79,0.06)",
+    border: "1px solid rgba(45,106,79,0.3)",
     borderRadius: "7px",
     padding: "8px",
     fontSize: "12px",
-    color: "#7ba3d4",
+    color: "#2D6A4F",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
@@ -373,20 +379,20 @@ const S = {
   },
   iconBtnDanger: {
     background: "transparent",
-    border: "1px solid #2e2e2a",
+    border: "1px solid #E5E0D8",
     borderRadius: "7px",
     width: "34px",
     height: "34px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    color: "#5a5956",
+    color: "#C0392B",
     cursor: "pointer",
   },
   overlay: {
     position: "fixed",
     inset: 0,
-    background: "rgba(14,14,12,0.85)",
+    background: "rgba(0,0,0,0.45)",
     backdropFilter: "blur(4px)",
     display: "flex",
     alignItems: "center",
@@ -396,13 +402,14 @@ const S = {
     padding: "20px",
   },
   modal: {
-    background: "#1e1e1c",
-    border: "1px solid #3a3a36",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "14px",
     width: "100%",
     maxWidth: "420px",
     padding: "24px",
     animation: "slideUp 0.25s ease both",
+    boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
   },
   modalHeader: {
     display: "flex",
@@ -413,14 +420,14 @@ const S = {
   modalTitle: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "17px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: 0,
-    letterSpacing: "0.5px",
+    letterSpacing: "0.3px",
   },
   closeBtn: {
     background: "transparent",
     border: "none",
-    color: "#5a5956",
+    color: "#8A8680",
     fontSize: "16px",
     cursor: "pointer",
     padding: "2px 6px",
@@ -435,17 +442,17 @@ const S = {
   label: {
     fontSize: "11px",
     fontWeight: 600,
-    color: "#808180",
+    color: "#7A7670",
     letterSpacing: "0.8px",
     textTransform: "uppercase",
   },
   input: {
-    background: "#1a1a18",
-    border: "1px solid #3a3a36",
+    background: "#F9F6F1",
+    border: "1px solid #E5E0D8",
     borderRadius: "8px",
     padding: "11px 14px",
     fontSize: "14px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     width: "100%",
@@ -454,7 +461,7 @@ const S = {
   },
   hint: {
     fontSize: "12px",
-    color: "#5a5956",
+    color: "#8A8680",
     margin: "0 0 20px",
     lineHeight: 1.5,
   },
@@ -466,13 +473,13 @@ const S = {
   btnPrimary: {
     display: "inline-flex",
     alignItems: "center",
-    background: "linear-gradient(135deg, #2a4f85, #1b818a)",
+    background: "linear-gradient(135deg, #2D6A4F, #1b818a)",
     border: "none",
     borderRadius: "8px",
     padding: "10px 18px",
     fontSize: "13px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#FFFFFF",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
@@ -481,11 +488,11 @@ const S = {
     display: "inline-flex",
     alignItems: "center",
     background: "transparent",
-    border: "1px solid #3a3a36",
+    border: "1px solid #E5E0D8",
     borderRadius: "8px",
     padding: "9px 16px",
     fontSize: "13px",
-    color: "#808180",
+    color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
   },
@@ -499,13 +506,13 @@ const S = {
   emptyTitle: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "18px",
-    color: "#5a5956",
+    color: "#7A7670",
     margin: 0,
   },
   skeleton: {
     height: "220px",
     borderRadius: "12px",
-    background: "linear-gradient(90deg, #1e1e1c 25%, #252522 50%, #1e1e1c 75%)",
+    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
     backgroundSize: "600px 100%",
     animation: "shimmer 1.4s infinite",
   },
