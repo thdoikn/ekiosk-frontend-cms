@@ -7,16 +7,19 @@ import client from "../../api/client"
 const fetchKiosk     = (id) => client.get(`/kiosks/${id}/`).then(r => r.data)
 const fetchLogs      = (id) => client.get(`/kiosks/${id}/logs/`).then(r => r.data)
 const fetchPlaylists = ()   => client.get("/playlists/?is_active=true").then(r => r.data)
+const fetchRegions   = ()   => client.get("/regions/").then(r => r.data)
 const doForceUpdate  = (id) => client.post(`/kiosks/${id}/force-update/`)
 const doOverride     = ({ id, playlist_override }) =>
   client.patch(`/kiosks/${id}/`, { playlist_override })
+const doAssignRegion = ({ id, region }) =>
+  client.patch(`/kiosks/${id}/`, { region })
 
 // ── Helpers ────────────────────────────────────────────────
 const STATUS_CFG = {
-  online:          { label: "Online",          bg: "#1a3322", text: "#86ac69", dot: "#418840", glow: "rgba(65,136,64,0.3)" },
-  offline:         { label: "Offline",         bg: "#2e1a1a", text: "#f2767c", dot: "#d83a2f", glow: "rgba(216,58,47,0.3)" },
-  stale:           { label: "Stale Content",   bg: "#2e2510", text: "#dbaf6c", dot: "#b98e52", glow: "rgba(185,142,82,0.3)" },
-  never_connected: { label: "Never Connected", bg: "#222220", text: "#808180", dot: "#5a5956", glow: "rgba(90,89,86,0.2)"  },
+  online:          { label: "Online",          bg: "#E8F4EC", text: "#2D6A4F", dot: "#418840", glow: "rgba(45,106,79,0.12)"  },
+  offline:         { label: "Offline",         bg: "#FDECEA", text: "#C0392B", dot: "#D83A2F", glow: "rgba(216,58,47,0.12)"  },
+  stale:           { label: "Stale Content",   bg: "#FEF5E7", text: "#9B7228", dot: "#C49A3C", glow: "rgba(196,154,60,0.12)" },
+  never_connected: { label: "Never Connected", bg: "#F3F2F0", text: "#6A6860", dot: "#9A9890", glow: "rgba(154,152,144,0.1)" },
 }
 
 function formatBytes(bytes) {
@@ -53,7 +56,6 @@ function StatusBadge({ status, large }) {
       color: cfg.text,
       fontSize: large ? "13px" : "11px",
       padding: large ? "6px 14px" : "4px 10px",
-      boxShadow: large ? `0 0 20px ${cfg.glow}` : "none",
     }}>
       <span style={{
         ...S.badgeDot,
@@ -73,8 +75,8 @@ function DiagCard({ label, value, mono, accent }) {
       <span style={S.diagLabel}>{label}</span>
       <span style={{
         ...S.diagValue,
-        fontFamily: mono ? "'Inter', 'Plus Jakarta Sans', sans-serif" : "'DM Sans', sans-serif",
-        color: accent ?? "#fff9eb",
+        fontFamily: mono ? "monospace" : "'Inter', sans-serif",
+        color: accent ?? "#1A1A18",
         fontSize: mono ? "13px" : "15px",
       }}>
         {value ?? "—"}
@@ -84,9 +86,9 @@ function DiagCard({ label, value, mono, accent }) {
 }
 
 function StorageBar({ used, total }) {
-  if (!used || !total) return <span style={{ color: "#5a5956" }}>—</span>
+  if (!used || !total) return <span style={{ color: "#A8A49C" }}>—</span>
   const pct = Math.min(100, Math.round((1 - used / total) * 100))
-  const color = pct > 80 ? "#d83a2f" : pct > 60 ? "#b98e52" : "#418840"
+  const color = pct > 80 ? "#D83A2F" : pct > 60 ? "#C49A3C" : "#418840"
   return (
     <div style={S.storageWrap}>
       <div style={S.storageBar}>
@@ -111,9 +113,11 @@ export default function KioskDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
   const qc = useQueryClient()
-  const [forcing, setForcing]         = useState(false)
-  const [overrideId, setOverrideId]   = useState("")
+  const [forcing, setForcing]           = useState(false)
+  const [overrideId, setOverrideId]     = useState("")
   const [showOverride, setShowOverride] = useState(false)
+  const [showRegion, setShowRegion]     = useState(false)
+  const [regionId, setRegionId]         = useState("")
 
   const { data: kiosk, isLoading } = useQuery({
     queryKey: ["kiosk", id],
@@ -132,6 +136,12 @@ export default function KioskDetailPage() {
     enabled: showOverride,
   })
 
+  const { data: regionsData } = useQuery({
+    queryKey: ["regions"],
+    queryFn: fetchRegions,
+    enabled: showRegion,
+  })
+
   const forceMut = useMutation({
     mutationFn: () => doForceUpdate(id),
     onMutate: () => setForcing(true),
@@ -146,8 +156,18 @@ export default function KioskDetailPage() {
     },
   })
 
+  const regionMut = useMutation({
+    mutationFn: (rid) => doAssignRegion({ id, region: rid || null }),
+    onSettled: () => {
+      setShowRegion(false)
+      qc.invalidateQueries(["kiosk", id])
+      qc.invalidateQueries(["kiosks"])
+    },
+  })
+
   const logs      = logsData?.results ?? logsData ?? []
   const playlists = playlistsData?.results ?? playlistsData ?? []
+  const regions   = regionsData?.results ?? regionsData ?? []
   const cfg       = STATUS_CFG[kiosk?.status] || STATUS_CFG.never_connected
 
   if (isLoading) {
@@ -189,7 +209,6 @@ export default function KioskDetailPage() {
 
       {/* Hero card */}
       <div style={{ ...S.heroCard, borderTopColor: cfg.dot }}>
-        {/* Ambient glow */}
         <div style={{ ...S.heroGlow, background: cfg.glow }} />
 
         <div style={S.heroInner}>
@@ -199,7 +218,52 @@ export default function KioskDetailPage() {
             </div>
             <div>
               <h2 style={S.heroName}>{kiosk.name}</h2>
-              <p style={S.heroRegion}>{kiosk.region?.name ?? "Tidak ada region"}</p>
+
+              {/* Region row with edit */}
+              <div style={S.heroRegionRow}>
+                {showRegion ? (
+                  <div style={S.regionEditRow}>
+                    <select
+                      style={S.regionSelect}
+                      value={regionId}
+                      onChange={e => setRegionId(e.target.value)}
+                      autoFocus
+                    >
+                      <option value="">— Tanpa Region —</option>
+                      {regions.map(r => (
+                        <option key={r.id} value={r.id}>{r.name}</option>
+                      ))}
+                    </select>
+                    <button
+                      style={S.saveRegionBtn}
+                      onClick={() => regionMut.mutate(regionId || null)}
+                      disabled={regionMut.isPending}
+                    >
+                      {regionMut.isPending ? "…" : "Simpan"}
+                    </button>
+                    <button
+                      style={S.cancelRegionBtn}
+                      onClick={() => setShowRegion(false)}
+                    >
+                      Batal
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <p style={S.heroRegion}>{kiosk.region?.name ?? "Tidak ada region"}</p>
+                    <button
+                      style={S.editRegionBtn}
+                      onClick={() => {
+                        setRegionId(kiosk.region?.id ?? "")
+                        setShowRegion(true)
+                      }}
+                    >
+                      Ubah Region
+                    </button>
+                  </>
+                )}
+              </div>
+
               <div style={S.heroMeta}>
                 <span style={S.heroMetaItem}>
                   ID: <span style={S.heroMetaMono}>{String(kiosk.id).slice(0, 16)}…</span>
@@ -246,9 +310,9 @@ export default function KioskDetailPage() {
             <SectionHeader title="Diagnostik Perangkat" />
             <div style={S.diagGrid}>
               <DiagCard label="IP Address"    value={kiosk.last_ip_address}   mono />
-              <DiagCard label="App Version"   value={kiosk.last_app_version}  mono accent="#d5b57e" />
+              <DiagCard label="App Version"   value={kiosk.last_app_version}  mono accent="#C49A3C" />
               <DiagCard label="OS Version"    value={kiosk.last_os_version}   mono />
-              <DiagCard label="Heartbeat"     value={timeSince(kiosk.last_heartbeat)} accent={kiosk.status === "offline" ? "#f2767c" : "#86ac69"} />
+              <DiagCard label="Heartbeat"     value={timeSince(kiosk.last_heartbeat)} accent={kiosk.status === "offline" ? "#C0392B" : "#2D6A4F"} />
               <DiagCard label="Storage Bebas" value={formatBytes(kiosk.last_storage_free)} />
               <DiagCard label="Memory Bebas"  value={formatBytes(kiosk.last_memory_free)} />
             </div>
@@ -278,7 +342,7 @@ export default function KioskDetailPage() {
                 <span style={{
                   ...S.hashValue,
                   color: kiosk.last_known_hash === kiosk.active_playlist?.hash
-                    ? "#86ac69" : "#f2767c"
+                    ? "#2D6A4F" : "#C0392B"
                 }}>
                   {kiosk.active_playlist?.hash
                     ? kiosk.active_playlist.hash.slice(0, 24) + "…"
@@ -290,11 +354,11 @@ export default function KioskDetailPage() {
               <div style={{
                 ...S.syncBanner,
                 background: kiosk.last_known_hash === kiosk.active_playlist.hash
-                  ? "rgba(65,136,64,0.1)" : "rgba(216,58,47,0.1)",
+                  ? "#E8F4EC" : "#FDECEA",
                 borderColor: kiosk.last_known_hash === kiosk.active_playlist.hash
                   ? "rgba(65,136,64,0.3)" : "rgba(216,58,47,0.3)",
                 color: kiosk.last_known_hash === kiosk.active_playlist.hash
-                  ? "#86ac69" : "#f2767c",
+                  ? "#2D6A4F" : "#C0392B",
               }}>
                 {kiosk.last_known_hash === kiosk.active_playlist.hash
                   ? "✓ Konten kiosk sudah sinkron"
@@ -327,8 +391,8 @@ export default function KioskDetailPage() {
                 <span style={S.diagLabel}>Sumber</span>
                 <span style={{
                   ...S.sourceBadge,
-                  background: kiosk.playlist_override ? "rgba(27,129,138,0.2)" : "rgba(42,79,133,0.2)",
-                  color: kiosk.playlist_override ? "#1b9b97" : "#7ba3d4",
+                  background: kiosk.playlist_override ? "rgba(27,129,138,0.1)" : "rgba(42,79,133,0.1)",
+                  color: kiosk.playlist_override ? "#1b818a" : "#2A4F85",
                 }}>
                   {kiosk.playlist_override ? "Override Kiosk" : "Dari Region"}
                 </span>
@@ -389,7 +453,7 @@ export default function KioskDetailPage() {
                     <div style={S.logLeft}>
                       <span style={{
                         ...S.logDot,
-                        background: log.is_up_to_date ? "#418840" : "#b98e52"
+                        background: log.is_up_to_date ? "#418840" : "#C49A3C"
                       }} />
                       <div>
                         <span style={S.logTime}>{formatDate(log.checked_at)}</span>
@@ -400,7 +464,7 @@ export default function KioskDetailPage() {
                     </div>
                     <span style={{
                       fontSize: "11px",
-                      color: log.is_up_to_date ? "#86ac69" : "#dbaf6c",
+                      color: log.is_up_to_date ? "#2D6A4F" : "#9B7228",
                     }}>
                       {log.is_up_to_date ? "Sinkron" : "Stale"}
                     </span>
@@ -417,7 +481,7 @@ export default function KioskDetailPage() {
 }
 
 // ── Icons ──────────────────────────────────────────────────
-function MonitorIcon({ color = "#808180" }) {
+function MonitorIcon({ color = "#8A8680" }) {
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.5">
       <rect x="2" y="3" width="20" height="14" rx="2"/>
@@ -445,8 +509,8 @@ const ANIM_CSS = `
 const S = {
   page: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    color: "#fff9eb",
-    maxWidth: "1200px",
+    color: "#1A1A18",
+    width: "100%",
     animation: "fadeUp 0.4s ease both",
   },
   topRow: {
@@ -454,11 +518,11 @@ const S = {
   },
   backBtn: {
     background: "transparent",
-    border: "1px solid #2e2e2a",
+    border: "1px solid #E5E0D8",
     borderRadius: "6px",
     padding: "7px 14px",
     fontSize: "13px",
-    color: "#808180",
+    color: "#5A5651",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "color 0.15s",
@@ -466,14 +530,15 @@ const S = {
 
   // Hero card
   heroCard: {
-    background: "#1e1e1c",
-    border: "1px solid #2e2e2a",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderTop: "3px solid",
     borderRadius: "12px",
     padding: "28px 32px",
     marginBottom: "20px",
     position: "relative",
     overflow: "hidden",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
   },
   heroGlow: {
     position: "absolute",
@@ -502,8 +567,8 @@ const S = {
   heroIconWrap: {
     width: "52px",
     height: "52px",
-    background: "#252522",
-    border: "1px solid #3a3a36",
+    background: "#F9F6F1",
+    border: "1px solid #E5E0D8",
     borderRadius: "12px",
     display: "flex",
     alignItems: "center",
@@ -514,14 +579,69 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "22px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: "0 0 4px",
-    letterSpacing: "0.5px",
+    letterSpacing: "0.3px",
+  },
+  heroRegionRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    marginBottom: "10px",
   },
   heroRegion: {
     fontSize: "13px",
-    color: "#808180",
-    margin: "0 0 10px",
+    color: "#7A7670",
+    margin: 0,
+  },
+  editRegionBtn: {
+    background: "transparent",
+    border: "1px solid #E5E0D8",
+    borderRadius: "4px",
+    padding: "2px 8px",
+    fontSize: "11px",
+    color: "#7A7670",
+    cursor: "pointer",
+    fontFamily: "'Inter', sans-serif",
+    transition: "all 0.15s",
+  },
+  regionEditRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    flexWrap: "wrap",
+  },
+  regionSelect: {
+    background: "#F9F6F1",
+    border: "1px solid #E0DAD0",
+    borderRadius: "6px",
+    padding: "5px 10px",
+    fontSize: "13px",
+    color: "#1A1A18",
+    fontFamily: "'Inter', sans-serif",
+    outline: "none",
+    minWidth: "180px",
+  },
+  saveRegionBtn: {
+    background: "#2D6A4F",
+    border: "none",
+    borderRadius: "6px",
+    padding: "5px 12px",
+    fontSize: "12px",
+    fontWeight: 600,
+    color: "#FFFFFF",
+    cursor: "pointer",
+    fontFamily: "'Inter', sans-serif",
+  },
+  cancelRegionBtn: {
+    background: "transparent",
+    border: "1px solid #E5E0D8",
+    borderRadius: "6px",
+    padding: "5px 10px",
+    fontSize: "12px",
+    color: "#7A7670",
+    cursor: "pointer",
+    fontFamily: "'Inter', sans-serif",
   },
   heroMeta: {
     display: "flex",
@@ -530,14 +650,14 @@ const S = {
   },
   heroMetaItem: {
     fontSize: "11px",
-    color: "#5a5956",
+    color: "#8A8680",
   },
   heroMetaMono: {
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    color: "#808180",
+    fontFamily: "monospace",
+    color: "#7A7670",
   },
   heroMetaDot: {
-    color: "#3a3a36",
+    color: "#D0CAC0",
   },
   heroRight: {
     display: "flex",
@@ -553,48 +673,48 @@ const S = {
   forceBtn: {
     display: "inline-flex",
     alignItems: "center",
-    background: "rgba(42,79,133,0.2)",
-    border: "1px solid rgba(42,79,133,0.4)",
+    background: "rgba(45,106,79,0.08)",
+    border: "1px solid rgba(45,106,79,0.25)",
     borderRadius: "8px",
     padding: "8px 16px",
     fontSize: "13px",
-    color: "#7ba3d4",
+    color: "#2D6A4F",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', sans-serif",
     fontWeight: 500,
     transition: "all 0.15s",
   },
   forceBtnHover: {
     display: "inline-flex",
     alignItems: "center",
-    background: "rgba(42,79,133,0.35)",
-    border: "1px solid rgba(42,79,133,0.6)",
+    background: "rgba(45,106,79,0.15)",
+    border: "1px solid rgba(45,106,79,0.4)",
     borderRadius: "8px",
     padding: "8px 16px",
     fontSize: "13px",
-    color: "#a8c4e8",
+    color: "#2D6A4F",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', sans-serif",
     fontWeight: 500,
     transition: "all 0.15s",
-    boxShadow: "0 4px 16px rgba(42,79,133,0.25)",
+    boxShadow: "0 4px 12px rgba(45,106,79,0.12)",
   },
   pendingChip: {
     display: "inline-flex",
     alignItems: "center",
     gap: "6px",
-    background: "rgba(185,142,82,0.15)",
-    border: "1px solid rgba(185,142,82,0.3)",
+    background: "#FEF5E7",
+    border: "1px solid rgba(196,154,60,0.3)",
     borderRadius: "20px",
     padding: "5px 12px",
     fontSize: "12px",
-    color: "#dbaf6c",
+    color: "#9B7228",
   },
   pendingDot: {
     width: "6px",
     height: "6px",
     borderRadius: "50%",
-    background: "#b98e52",
+    background: "#C49A3C",
     animation: "pulse 1.5s ease infinite",
     display: "inline-block",
   },
@@ -624,10 +744,11 @@ const S = {
 
   // Cards
   card: {
-    background: "#1e1e1c",
-    border: "1px solid #2e2e2a",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "12px",
     padding: "20px 24px",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
   },
   sectionHeader: {
     display: "flex",
@@ -638,20 +759,20 @@ const S = {
   sectionTitle: {
     fontSize: "11px",
     fontWeight: 600,
-    color: "#5a5956",
+    color: "#8A8680",
     letterSpacing: "1.5px",
     textTransform: "uppercase",
     margin: 0,
   },
   editBtn: {
     background: "transparent",
-    border: "1px solid #2e2e2a",
+    border: "1px solid #E5E0D8",
     borderRadius: "6px",
     padding: "4px 10px",
     fontSize: "11px",
-    color: "#808180",
+    color: "#7A7670",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', sans-serif",
   },
 
   // Diag grid
@@ -659,13 +780,13 @@ const S = {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
     gap: "1px",
-    background: "#2e2e2a",
+    background: "#E5E0D8",
     borderRadius: "8px",
     overflow: "hidden",
     marginBottom: "16px",
   },
   diagCard: {
-    background: "#1e1e1c",
+    background: "#F9F6F1",
     padding: "12px 14px",
     display: "flex",
     flexDirection: "column",
@@ -673,7 +794,7 @@ const S = {
   },
   diagLabel: {
     fontSize: "10px",
-    color: "#5a5956",
+    color: "#A8A49C",
     textTransform: "uppercase",
     letterSpacing: "0.8px",
     fontWeight: 600,
@@ -696,7 +817,7 @@ const S = {
   storageBar: {
     flex: 1,
     height: "6px",
-    background: "#2e2e2a",
+    background: "#E5E0D8",
     borderRadius: "3px",
     overflow: "hidden",
   },
@@ -707,7 +828,7 @@ const S = {
   },
   storageLabel: {
     fontSize: "12px",
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+    fontFamily: "monospace",
     flexShrink: 0,
     minWidth: "60px",
   },
@@ -724,19 +845,20 @@ const S = {
     display: "flex",
     flexDirection: "column",
     gap: "6px",
-    background: "#252522",
+    background: "#F9F6F1",
     borderRadius: "8px",
     padding: "12px",
+    border: "1px solid #F0EBE3",
   },
   hashArrow: {
-    color: "#3a3a36",
+    color: "#C8C2B8",
     fontSize: "18px",
     flexShrink: 0,
   },
   hashValue: {
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+    fontFamily: "monospace",
     fontSize: "12px",
-    color: "#808180",
+    color: "#5A5651",
     wordBreak: "break-all",
   },
   syncBanner: {
@@ -768,12 +890,12 @@ const S = {
   playlistName: {
     fontSize: "14px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#1A1A18",
   },
   playlistHash: {
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+    fontFamily: "monospace",
     fontSize: "11px",
-    color: "#5a5956",
+    color: "#A8A49C",
   },
   overridePanel: {
     display: "flex",
@@ -782,43 +904,43 @@ const S = {
   },
   overrideDivider: {
     height: "1px",
-    background: "#2e2e2a",
+    background: "#E5E0D8",
     margin: "4px 0",
   },
   overrideHint: {
     fontSize: "12px",
-    color: "#5a5956",
+    color: "#8A8680",
     margin: 0,
     lineHeight: 1.5,
   },
   overrideSelect: {
-    background: "#1a1a18",
-    border: "1px solid #3a3a36",
+    background: "#F9F6F1",
+    border: "1px solid #E0DAD0",
     borderRadius: "8px",
     padding: "9px 12px",
     fontSize: "13px",
-    color: "#b2a893",
-    fontFamily: "'DM Sans', sans-serif",
+    color: "#1A1A18",
+    fontFamily: "'Inter', sans-serif",
     outline: "none",
     width: "100%",
   },
   saveOverrideBtn: {
-    background: "linear-gradient(135deg, #2a4f85, #1b818a)",
+    background: "linear-gradient(135deg, #2D6A4F, #1b818a)",
     border: "none",
     borderRadius: "8px",
     padding: "10px",
     fontSize: "13px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#FFFFFF",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
+    fontFamily: "'Inter', sans-serif",
     width: "100%",
   },
 
   // Logs
   noLogs: {
     fontSize: "13px",
-    color: "#5a5956",
+    color: "#8A8680",
     textAlign: "center",
     padding: "20px 0",
     margin: 0,
@@ -827,7 +949,7 @@ const S = {
     display: "flex",
     flexDirection: "column",
     gap: "1px",
-    background: "#2e2e2a",
+    background: "#E5E0D8",
     borderRadius: "8px",
     overflow: "hidden",
   },
@@ -836,7 +958,7 @@ const S = {
     alignItems: "center",
     justifyContent: "space-between",
     padding: "10px 12px",
-    background: "#1e1e1c",
+    background: "#FFFFFF",
     transition: "background 0.1s",
   },
   logLeft: {
@@ -852,14 +974,14 @@ const S = {
   },
   logTime: {
     fontSize: "12px",
-    color: "#808180",
+    color: "#5A5651",
     display: "block",
     marginBottom: "2px",
   },
   logHash: {
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+    fontFamily: "monospace",
     fontSize: "10px",
-    color: "#5a5956",
+    color: "#A8A49C",
     display: "block",
   },
 
@@ -872,7 +994,7 @@ const S = {
   skeleton: {
     height: "200px",
     borderRadius: "12px",
-    background: "linear-gradient(90deg, #1e1e1c 25%, #252522 50%, #1e1e1c 75%)",
+    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
     backgroundSize: "600px 100%",
     animation: "shimmer 1.4s infinite",
   },
@@ -883,6 +1005,6 @@ const S = {
     padding: "80px 20px",
     gap: "12px",
   },
-  notFoundIcon: { fontSize: "48px", color: "#3a3a36" },
-  notFoundText: { fontSize: "14px", color: "#5a5956", margin: 0 },
+  notFoundIcon: { fontSize: "48px", color: "#D0CAC0" },
+  notFoundText: { fontSize: "14px", color: "#8A8680", margin: 0 },
 }

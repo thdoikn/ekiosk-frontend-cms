@@ -4,10 +4,6 @@ import client from "../../api/client"
 
 // ── API ────────────────────────────────────────────────────
 const fetchMedia  = () => client.get("/media/").then(r => r.data)
-const uploadMedia = (formData) =>
-  client.post("/media/", formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  })
 const deleteMedia = (id) => client.delete(`/media/${id}/`)
 
 // ── Helpers ────────────────────────────────────────────────
@@ -48,8 +44,8 @@ function UploadZone({ onFiles }) {
     <div
       style={{
         ...S.uploadZone,
-        borderColor: dragging ? "#d5b57e" : "#2e2e2a",
-        background: dragging ? "rgba(213,181,126,0.05)" : "#1a1a18",
+        borderColor: dragging ? "#C49A3C" : "#E5E0D8",
+        background: dragging ? "rgba(196,154,60,0.04)" : "#F9F6F1",
       }}
       onDragOver={e => { e.preventDefault(); setDragging(true) }}
       onDragLeave={() => setDragging(false)}
@@ -88,9 +84,9 @@ function UploadItem({ name, progress, error, done }) {
       <div style={S.uploadItemLeft}>
         <div style={{
           ...S.uploadItemIcon,
-          background: error ? "rgba(216,58,47,0.15)"
-            : done ? "rgba(65,136,64,0.15)"
-            : "rgba(42,79,133,0.15)",
+          background: error ? "rgba(192,57,43,0.1)"
+            : done ? "rgba(45,106,79,0.1)"
+            : "rgba(42,79,133,0.1)",
         }}>
           {error ? "✕" : done ? "✓" : <SpinIcon />}
         </div>
@@ -98,7 +94,7 @@ function UploadItem({ name, progress, error, done }) {
           <p style={S.uploadItemName}>{name}</p>
           <p style={{
             ...S.uploadItemStatus,
-            color: error ? "#f2767c" : done ? "#86ac69" : "#808180",
+            color: error ? "#C0392B" : done ? "#418840" : "#7A7670",
           }}>
             {error ?? (done ? "Selesai" : `${progress}%`)}
           </p>
@@ -134,7 +130,7 @@ function MediaCard({ media, onPreview, onDelete, index }) {
           />
         ) : (
           <div style={S.cardThumbVideo}>
-            <FilmIcon size={32} color="#3a3a36" />
+            <FilmIcon size={32} color="#C5BFB8" />
             <span style={S.videoDuration}>
               {media.duration_seconds ? `${media.duration_seconds}s` : "Video"}
             </span>
@@ -145,7 +141,7 @@ function MediaCard({ media, onPreview, onDelete, index }) {
         <span style={{
           ...S.cardTypeBadge,
           background: media.media_type === "image"
-            ? "rgba(42,79,133,0.85)" : "rgba(97,138,72,0.85)",
+            ? "rgba(42,79,133,0.85)" : "rgba(45,106,79,0.85)",
         }}>
           {media.media_type === "image" ? "IMG" : "VID"}
         </span>
@@ -256,7 +252,7 @@ function DeleteConfirm({ media, onConfirm, onCancel, loading }) {
         </div>
         <h3 style={S.confirmTitle}>Hapus Media?</h3>
         <p style={S.confirmMsg}>
-          <strong style={{ color: "#fff9eb" }}>{media.name}</strong> akan dihapus permanen.
+          <strong style={{ color: "#1A1A18" }}>{media.name}</strong> akan dihapus permanen.
           Jika media ini digunakan dalam playlist, playlist tersebut mungkin bermasalah.
         </p>
         <div style={S.confirmActions}>
@@ -364,17 +360,17 @@ export default function MediaPage() {
         </div>
         <div style={S.statDivider} />
         <div style={S.statItem}>
-          <span style={{ ...S.statValue, color: "#7ba3d4" }}>{imageCount}</span>
+          <span style={{ ...S.statValue, color: "#7BA3D4" }}>{imageCount}</span>
           <span style={S.statLabel}>Gambar</span>
         </div>
         <div style={S.statDivider} />
         <div style={S.statItem}>
-          <span style={{ ...S.statValue, color: "#86ac69" }}>{videoCount}</span>
+          <span style={{ ...S.statValue, color: "#418840" }}>{videoCount}</span>
           <span style={S.statLabel}>Video</span>
         </div>
         <div style={S.statDivider} />
         <div style={S.statItem}>
-          <span style={{ ...S.statValue, color: "#d5b57e" }}>{formatBytes(totalSize)}</span>
+          <span style={{ ...S.statValue, color: "#C49A3C" }}>{formatBytes(totalSize)}</span>
           <span style={S.statLabel}>Total Ukuran</span>
         </div>
       </div>
@@ -465,7 +461,7 @@ export default function MediaPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div style={S.empty}>
-          <ImageIcon size={40} color="#3a3a36" />
+          <ImageIcon size={40} color="#C5BFB8" />
           <p style={S.emptyTitle}>
             {allMedia.length === 0 ? "Belum ada media" : "Tidak ada media yang cocok"}
           </p>
@@ -498,7 +494,7 @@ export default function MediaPage() {
             <div
               key={m.id}
               style={{ ...S.listRow, animationDelay: `${i * 0.03}s` }}
-              onMouseEnter={e => e.currentTarget.style.background = "#252522"}
+              onMouseEnter={e => e.currentTarget.style.background = "#F9F6F1"}
               onMouseLeave={e => e.currentTarget.style.background = "transparent"}
             >
               <div style={S.listNameCell}>
@@ -507,7 +503,7 @@ export default function MediaPage() {
                     <img src={m.file_url || m.file} alt={m.name} style={S.listThumbImg} />
                   ) : (
                     <div style={S.listThumbVideo}>
-                      <FilmIcon size={14} color="#5a5956" />
+                      <FilmIcon size={14} color="#A8A49C" />
                     </div>
                   )}
                 </div>
@@ -516,8 +512,8 @@ export default function MediaPage() {
               <span style={{
                 ...S.listTypeBadge,
                 background: m.media_type === "image"
-                  ? "rgba(42,79,133,0.2)" : "rgba(97,138,72,0.2)",
-                color: m.media_type === "image" ? "#7ba3d4" : "#86ac69",
+                  ? "rgba(42,79,133,0.1)" : "rgba(45,106,79,0.1)",
+                color: m.media_type === "image" ? "#7BA3D4" : "#418840",
               }}>
                 {m.media_type}
               </span>
@@ -528,10 +524,10 @@ export default function MediaPage() {
                   <EyeIcon />
                 </button>
                 <button
-                  style={{ ...S.listActionBtn, color: "#5a5956" }}
+                  style={{ ...S.listActionBtn, color: "#A8A49C" }}
                   onClick={() => setToDelete(m)}
-                  onMouseEnter={e => (e.currentTarget.style.color = "#f2767c")}
-                  onMouseLeave={e => (e.currentTarget.style.color = "#5a5956")}
+                  onMouseEnter={e => (e.currentTarget.style.color = "#C0392B")}
+                  onMouseLeave={e => (e.currentTarget.style.color = "#A8A49C")}
                 >
                   <TrashIcon />
                 </button>
@@ -555,9 +551,9 @@ export default function MediaPage() {
 
 // ── Icons ──────────────────────────────────────────────────
 function UploadIcon() {
-  return <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#5a5956" strokeWidth="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+  return <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#A8A49C" strokeWidth="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
 }
-function FilmIcon({ size = 16, color = "#808180" }) {
+function FilmIcon({ size = 16, color = "#A8A49C" }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
 }
 function EyeIcon() {
@@ -572,7 +568,7 @@ function GridIcon() {
 function ListIcon() {
   return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1" fill="currentColor"/><circle cx="3" cy="12" r="1" fill="currentColor"/><circle cx="3" cy="18" r="1" fill="currentColor"/></svg>
 }
-function ImageIcon({ size = 16, color = "#808180" }) {
+function ImageIcon({ size = 16, color = "#A8A49C" }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
 }
 function SpinIcon() {
@@ -591,7 +587,7 @@ const ANIM_CSS = `
 const S = {
   page: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    color: "#fff9eb",
+    color: "#1A1A18",
     maxWidth: "1400px",
     animation: "fadeUp 0.4s ease both",
   },
@@ -600,22 +596,23 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "26px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: "0 0 4px",
     letterSpacing: "1px",
   },
-  pageSub: { fontSize: "13px", color: "#808180", margin: 0, fontWeight: 300 },
+  pageSub: { fontSize: "13px", color: "#8A8680", margin: 0, fontWeight: 300 },
 
   // Stats
   statsStrip: {
     display: "flex",
     alignItems: "center",
-    background: "#1e1e1c",
-    border: "1px solid #2e2e2a",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "10px",
     padding: "14px 24px",
     marginBottom: "20px",
     gap: "0",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
   },
   statItem: {
     display: "flex",
@@ -628,12 +625,12 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "22px",
     fontWeight: 600,
-    color: "#d5b57e",
+    color: "#C49A3C",
     lineHeight: 1,
   },
   statLabel: {
     fontSize: "10px",
-    color: "#5a5956",
+    color: "#8A8680",
     textTransform: "uppercase",
     letterSpacing: "0.8px",
     fontWeight: 600,
@@ -641,7 +638,7 @@ const S = {
   statDivider: {
     width: "1px",
     height: "36px",
-    background: "#2e2e2a",
+    background: "#E5E0D8",
     flexShrink: 0,
   },
 
@@ -659,10 +656,10 @@ const S = {
   uploadTitle: {
     fontSize: "14px",
     fontWeight: 600,
-    color: "#b2a893",
+    color: "#7A7670",
     margin: "0 0 4px",
   },
-  uploadHint: { fontSize: "12px", color: "#5a5956", margin: 0 },
+  uploadHint: { fontSize: "12px", color: "#8A8680", margin: 0 },
 
   // Upload queue
   uploadQueue: {
@@ -672,13 +669,14 @@ const S = {
     marginBottom: "16px",
   },
   uploadItem: {
-    background: "#1e1e1c",
-    border: "1px solid #2e2e2a",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "8px",
     padding: "10px 14px",
     display: "flex",
     alignItems: "center",
     gap: "12px",
+    boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
   },
   uploadItemLeft: {
     display: "flex",
@@ -696,11 +694,11 @@ const S = {
     justifyContent: "center",
     fontSize: "12px",
     flexShrink: 0,
-    color: "#fff9eb",
+    color: "#1A1A18",
   },
   uploadItemName: {
     fontSize: "13px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: "0 0 2px",
     overflow: "hidden",
     textOverflow: "ellipsis",
@@ -711,14 +709,14 @@ const S = {
   uploadBar: {
     width: "100px",
     height: "4px",
-    background: "#2e2e2a",
+    background: "#E5E0D8",
     borderRadius: "2px",
     overflow: "hidden",
     flexShrink: 0,
   },
   uploadBarFill: {
     height: "100%",
-    background: "linear-gradient(90deg, #2a4f85, #1b818a)",
+    background: "linear-gradient(90deg, #2D6A4F, #1b818a)",
     borderRadius: "2px",
     transition: "width 0.3s ease",
   },
@@ -744,16 +742,16 @@ const S = {
     left: "12px",
     top: "50%",
     transform: "translateY(-50%)",
-    color: "#5a5956",
+    color: "#A8A49C",
     pointerEvents: "none",
   },
   searchInput: {
-    background: "#1e1e1c",
-    border: "1px solid #2e2e2a",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "8px",
     padding: "9px 36px",
     fontSize: "13px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     width: "240px",
@@ -765,7 +763,7 @@ const S = {
     transform: "translateY(-50%)",
     background: "none",
     border: "none",
-    color: "#5a5956",
+    color: "#A8A49C",
     cursor: "pointer",
     fontSize: "12px",
     padding: 0,
@@ -776,39 +774,39 @@ const S = {
     alignItems: "center",
     gap: "6px",
     background: "transparent",
-    border: "1px solid #2e2e2a",
+    border: "1px solid #E5E0D8",
     borderRadius: "20px",
     padding: "6px 14px",
     fontSize: "12px",
-    color: "#808180",
+    color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
   },
   typeTabActive: {
-    background: "rgba(42,79,133,0.2)",
-    border: "1px solid rgba(42,79,133,0.4)",
-    color: "#7ba3d4",
+    background: "rgba(42,79,133,0.08)",
+    border: "1px solid rgba(42,79,133,0.3)",
+    color: "#7BA3D4",
   },
   tabCount: {
-    background: "#252522",
+    background: "#F0EBE3",
     borderRadius: "10px",
     padding: "1px 6px",
     fontSize: "10px",
-    color: "#5a5956",
+    color: "#8A8680",
   },
   tabCountActive: {
-    background: "rgba(42,79,133,0.3)",
+    background: "rgba(42,79,133,0.15)",
     borderRadius: "10px",
     padding: "1px 6px",
     fontSize: "10px",
-    color: "#7ba3d4",
+    color: "#7BA3D4",
   },
   viewToggle: {
     display: "flex",
     gap: "4px",
-    background: "#1e1e1c",
-    border: "1px solid #2e2e2a",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "8px",
     padding: "3px",
   },
@@ -821,13 +819,13 @@ const S = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    color: "#5a5956",
+    color: "#A8A49C",
     cursor: "pointer",
     transition: "all 0.15s",
   },
   viewBtnActive: {
-    background: "#2e2e2a",
-    color: "#d5b57e",
+    background: "#F0EBE3",
+    color: "#C49A3C",
   },
 
   // Grid
@@ -837,17 +835,18 @@ const S = {
     gap: "12px",
   },
   mediaCard: {
-    background: "#1e1e1c",
-    border: "1px solid #2e2e2a",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "10px",
     overflow: "hidden",
     animation: "fadeUp 0.35s ease both",
-    transition: "border-color 0.15s",
+    transition: "border-color 0.15s, box-shadow 0.15s",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
   },
   cardThumb: {
     width: "100%",
     aspectRatio: "16/9",
-    background: "#1a1a18",
+    background: "#F9F6F1",
     position: "relative",
     overflow: "hidden",
   },
@@ -865,12 +864,12 @@ const S = {
     alignItems: "center",
     justifyContent: "center",
     gap: "6px",
-    background: "#161614",
+    background: "#F0EBE3",
   },
   videoDuration: {
     fontFamily: "'DM Mono', monospace",
     fontSize: "10px",
-    color: "#5a5956",
+    color: "#8A8680",
   },
   cardTypeBadge: {
     position: "absolute",
@@ -879,14 +878,14 @@ const S = {
     fontSize: "9px",
     fontWeight: 700,
     letterSpacing: "1px",
-    color: "#fff9eb",
+    color: "#FFFFFF",
     borderRadius: "4px",
     padding: "2px 6px",
   },
   cardOverlay: {
     position: "absolute",
     inset: 0,
-    background: "rgba(14,14,12,0.7)",
+    background: "rgba(26,26,24,0.5)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -897,9 +896,9 @@ const S = {
     width: "36px",
     height: "36px",
     borderRadius: "50%",
-    background: "rgba(255,249,235,0.1)",
-    border: "1px solid rgba(255,249,235,0.2)",
-    color: "#fff9eb",
+    background: "rgba(255,255,255,0.9)",
+    border: "1px solid rgba(255,255,255,0.6)",
+    color: "#1A1A18",
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
@@ -907,15 +906,15 @@ const S = {
     transition: "all 0.15s",
   },
   overlayBtnDanger: {
-    background: "rgba(216,58,47,0.2)",
-    border: "1px solid rgba(216,58,47,0.4)",
-    color: "#f2767c",
+    background: "rgba(192,57,43,0.9)",
+    border: "1px solid rgba(192,57,43,0.6)",
+    color: "#FFFFFF",
   },
   cardInfo: { padding: "10px 12px" },
   cardName: {
     fontSize: "12px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: "0 0 4px",
     overflow: "hidden",
     textOverflow: "ellipsis",
@@ -927,34 +926,35 @@ const S = {
     gap: "4px",
     marginBottom: "3px",
   },
-  cardMetaItem: { fontSize: "11px", color: "#5a5956" },
-  cardMetaDot: { fontSize: "10px", color: "#3a3a36" },
+  cardMetaItem: { fontSize: "11px", color: "#8A8680" },
+  cardMetaDot: { fontSize: "10px", color: "#C5BFB8" },
   cardHash: {
     fontFamily: "'DM Mono', monospace",
     fontSize: "10px",
-    color: "#3a3a36",
+    color: "#C5BFB8",
     margin: 0,
   },
 
   // List view
   listWrap: {
-    background: "#1e1e1c",
-    border: "1px solid #2e2e2a",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "12px",
     overflow: "hidden",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
   },
   listHeader: {
     display: "grid",
     gridTemplateColumns: "2fr 100px 100px 120px 80px",
     padding: "10px 16px",
-    background: "#1a1a18",
-    borderBottom: "1px solid #2e2e2a",
+    background: "#F9F6F1",
+    borderBottom: "1px solid #E5E0D8",
     gap: "12px",
   },
   listHeaderCell: {
     fontSize: "10px",
     fontWeight: 600,
-    color: "#5a5956",
+    color: "#8A8680",
     letterSpacing: "1px",
     textTransform: "uppercase",
   },
@@ -962,7 +962,7 @@ const S = {
     display: "grid",
     gridTemplateColumns: "2fr 100px 100px 120px 80px",
     padding: "10px 16px",
-    borderBottom: "1px solid #252522",
+    borderBottom: "1px solid #F0EBE3",
     alignItems: "center",
     gap: "12px",
     transition: "background 0.1s",
@@ -980,7 +980,7 @@ const S = {
     borderRadius: "4px",
     overflow: "hidden",
     flexShrink: 0,
-    background: "#1a1a18",
+    background: "#F9F6F1",
   },
   listThumbImg: { width: "100%", height: "100%", objectFit: "cover" },
   listThumbVideo: {
@@ -989,10 +989,11 @@ const S = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    background: "#F0EBE3",
   },
   listName: {
     fontSize: "13px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     fontWeight: 500,
     overflow: "hidden",
     textOverflow: "ellipsis",
@@ -1005,12 +1006,12 @@ const S = {
     fontWeight: 500,
     justifySelf: "start",
   },
-  listCell: { fontSize: "12px", color: "#808180" },
+  listCell: { fontSize: "12px", color: "#7A7670" },
   listActions: { display: "flex", gap: "6px" },
   listActionBtn: {
     background: "transparent",
     border: "none",
-    color: "#808180",
+    color: "#7A7670",
     cursor: "pointer",
     padding: "4px",
     display: "flex",
@@ -1022,7 +1023,7 @@ const S = {
   previewOverlay: {
     position: "fixed",
     inset: 0,
-    background: "rgba(10,10,8,0.92)",
+    background: "rgba(0,0,0,0.45)",
     backdropFilter: "blur(6px)",
     display: "flex",
     alignItems: "center",
@@ -1032,34 +1033,35 @@ const S = {
     padding: "20px",
   },
   previewBox: {
-    background: "#1e1e1c",
-    border: "1px solid #3a3a36",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "14px",
     width: "100%",
     maxWidth: "700px",
     maxHeight: "90vh",
     overflowY: "auto",
     animation: "slideUp 0.25s ease both",
+    boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
   },
   previewHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-start",
     padding: "20px 24px 16px",
-    borderBottom: "1px solid #2e2e2a",
+    borderBottom: "1px solid #E5E0D8",
   },
   previewTitle: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "16px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: "0 0 4px",
     letterSpacing: "0.3px",
   },
-  previewMeta: { fontSize: "12px", color: "#808180", margin: 0 },
+  previewMeta: { fontSize: "12px", color: "#7A7670", margin: 0 },
   previewClose: {
     background: "transparent",
     border: "none",
-    color: "#5a5956",
+    color: "#8A8680",
     fontSize: "16px",
     cursor: "pointer",
     padding: "4px 8px",
@@ -1067,7 +1069,7 @@ const S = {
     flexShrink: 0,
   },
   previewMedia: {
-    background: "#141412",
+    background: "#F0EBE3",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -1096,7 +1098,7 @@ const S = {
   },
   previewDetailLabel: {
     fontSize: "11px",
-    color: "#5a5956",
+    color: "#8A8680",
     textTransform: "uppercase",
     letterSpacing: "0.8px",
     fontWeight: 600,
@@ -1105,48 +1107,49 @@ const S = {
   previewDetailValue: {
     fontFamily: "'DM Mono', monospace",
     fontSize: "11px",
-    color: "#808180",
+    color: "#7A7670",
     wordBreak: "break-all",
     textAlign: "right",
   },
   previewLink: {
     fontSize: "12px",
-    color: "#7ba3d4",
+    color: "#7BA3D4",
     textDecoration: "none",
   },
 
   // Confirm delete
   confirmBox: {
-    background: "#1e1e1c",
-    border: "1px solid #3a3a36",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "14px",
     width: "100%",
     maxWidth: "360px",
     padding: "28px",
     textAlign: "center",
     animation: "slideUp 0.25s ease both",
+    boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
   },
   confirmIcon: {
     width: "48px",
     height: "48px",
     borderRadius: "50%",
-    background: "rgba(216,58,47,0.12)",
-    border: "1px solid rgba(216,58,47,0.25)",
+    background: "rgba(192,57,43,0.08)",
+    border: "1px solid rgba(192,57,43,0.25)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     margin: "0 auto 16px",
-    color: "#f2767c",
+    color: "#C0392B",
   },
   confirmTitle: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "17px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: "0 0 10px",
   },
   confirmMsg: {
     fontSize: "13px",
-    color: "#808180",
+    color: "#7A7670",
     lineHeight: 1.6,
     margin: "0 0 24px",
   },
@@ -1157,21 +1160,21 @@ const S = {
   },
   btnGhost: {
     background: "transparent",
-    border: "1px solid #3a3a36",
+    border: "1px solid #E5E0D8",
     borderRadius: "8px",
     padding: "9px 18px",
     fontSize: "13px",
-    color: "#808180",
+    color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
   },
   btnDanger: {
-    background: "rgba(216,58,47,0.15)",
-    border: "1px solid rgba(216,58,47,0.4)",
+    background: "rgba(192,57,43,0.08)",
+    border: "1px solid rgba(192,57,43,0.3)",
     borderRadius: "8px",
     padding: "9px 18px",
     fontSize: "13px",
-    color: "#f2767c",
+    color: "#C0392B",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontWeight: 600,
@@ -1189,14 +1192,14 @@ const S = {
   emptyTitle: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "16px",
-    color: "#5a5956",
+    color: "#7A7670",
     margin: 0,
   },
-  emptyText: { fontSize: "13px", color: "#3a3a36", margin: 0 },
+  emptyText: { fontSize: "13px", color: "#8A8680", margin: 0 },
   skeleton: {
     height: "180px",
     borderRadius: "10px",
-    background: "linear-gradient(90deg, #1e1e1c 25%, #252522 50%, #1e1e1c 75%)",
+    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
     backgroundSize: "600px 100%",
     animation: "shimmer 1.4s infinite",
   },

@@ -29,7 +29,7 @@ const updateItem   = ({ playlistId, itemId, duration }) =>
   client.patch(`/playlists/${playlistId}/items/${itemId}/`, { duration_seconds: duration })
 
 // ── Icons ──────────────────────────────────────────────────
-function FilmIcon({ size = 16, color = "#808180" }) {
+function FilmIcon({ size = 16, color = "#A8A49C" }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
 }
 function DragIcon() {
@@ -78,14 +78,14 @@ function SortableItem({ item, index, onRemove, onDurationChange }) {
           />
         ) : (
           <div style={S.videoThumb}>
-            <FilmIcon size={20} color="#5a5956" />
+            <FilmIcon size={20} color="#A8A49C" />
           </div>
         )}
         <span style={{
           ...S.typeChip,
           background: item.media.media_type === "image"
-            ? "rgba(42,79,133,0.3)" : "rgba(97,138,72,0.3)",
-          color: item.media.media_type === "image" ? "#7ba3d4" : "#86ac69",
+            ? "rgba(42,79,133,0.8)" : "rgba(45,106,79,0.8)",
+          color: "#FFFFFF",
         }}>
           {item.media.media_type}
         </span>
@@ -116,8 +116,8 @@ function SortableItem({ item, index, onRemove, onDurationChange }) {
         style={S.removeBtn}
         onClick={() => onRemove(item.id)}
         title="Hapus dari playlist"
-        onMouseEnter={e => (e.currentTarget.style.color = "#f2767c")}
-        onMouseLeave={e => (e.currentTarget.style.color = "#5a5956")}
+        onMouseEnter={e => (e.currentTarget.style.color = "#C0392B")}
+        onMouseLeave={e => (e.currentTarget.style.color = "#A8A49C")}
       >
         <CloseIcon />
       </button>
@@ -134,7 +134,7 @@ function MediaLibItem({ media, onAdd, isInPlaylist }) {
         opacity: isInPlaylist ? 0.5 : 1,
         cursor: isInPlaylist ? "default" : "pointer",
       }}
-      onMouseEnter={e => !isInPlaylist && (e.currentTarget.style.background = "#252522")}
+      onMouseEnter={e => !isInPlaylist && (e.currentTarget.style.background = "#F9F6F1")}
       onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
     >
       <div style={S.mediaLibThumb}>
@@ -146,7 +146,7 @@ function MediaLibItem({ media, onAdd, isInPlaylist }) {
           />
         ) : (
           <div style={S.mediaLibVideo}>
-            <FilmIcon size={16} color="#5a5956" />
+            <FilmIcon size={16} color="#A8A49C" />
           </div>
         )}
       </div>
@@ -332,7 +332,7 @@ export default function PlaylistBuilderPage() {
           {saveMsg && (
             <span style={{
               ...S.saveMsg,
-              color: saveMsg === "Tersimpan!" ? "#86ac69" : "#f2767c",
+              color: saveMsg === "Tersimpan!" ? "#418840" : "#C0392B",
             }}>
               {saveMsg}
             </span>
@@ -341,7 +341,7 @@ export default function PlaylistBuilderPage() {
             style={saving ? { ...S.saveBtn, opacity: 0.6 } : S.saveBtn}
             disabled={saving}
             onClick={handleSave}
-            onMouseEnter={e => !saving && (e.currentTarget.style.boxShadow = "0 6px 20px rgba(27,129,138,0.3)")}
+            onMouseEnter={e => !saving && (e.currentTarget.style.boxShadow = "0 6px 20px rgba(45,106,79,0.25)")}
             onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}
           >
             {saving ? "Menyimpan…" : "Simpan Urutan & Durasi"}
@@ -402,7 +402,7 @@ export default function PlaylistBuilderPage() {
                 {activeItem && (
                   <div style={{
                     ...S.sortableItem,
-                    boxShadow: "0 12px 40px rgba(0,0,0,0.5)",
+                    boxShadow: "0 12px 40px rgba(0,0,0,0.15)",
                     opacity: 0.95,
                     margin: "0 8px",
                   }}>
@@ -416,7 +416,7 @@ export default function PlaylistBuilderPage() {
                         />
                       ) : (
                         <div style={S.videoThumb}>
-                          <FilmIcon size={20} color="#5a5956" />
+                          <FilmIcon size={20} color="#A8A49C" />
                         </div>
                       )}
                     </div>
@@ -437,8 +437,8 @@ export default function PlaylistBuilderPage() {
                 {items.map((item, i) => {
                   const pct   = (item.duration_seconds / totalDuration) * 100
                   const color = item.media.media_type === "image"
-                    ? `hsl(${210 + i * 20}, 60%, ${40 + i * 5}%)`
-                    : `hsl(${130 + i * 15}, 50%, ${35 + i * 5}%)`
+                    ? `hsl(${210 + i * 20}, 60%, ${50 + i * 3}%)`
+                    : `hsl(${130 + i * 15}, 50%, ${45 + i * 3}%)`
                   return (
                     <div
                       key={item.id}
@@ -499,7 +499,7 @@ export default function PlaylistBuilderPage() {
             </div>
           ) : filteredMedia.length === 0 ? (
             <div style={S.libEmpty}>
-              <p style={{ color: "#5a5956", fontSize: "13px", margin: 0 }}>
+              <p style={{ color: "#8A8680", fontSize: "13px", margin: 0 }}>
                 {allMedia.length === 0
                   ? "Belum ada media. Upload di halaman Media."
                   : "Tidak ada media yang cocok."}
@@ -527,7 +527,7 @@ export default function PlaylistBuilderPage() {
 const S = {
   page: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    color: "#fff9eb",
+    color: "#1A1A18",
     maxWidth: "1400px",
     animation: "fadeUp 0.35s ease both",
   },
@@ -543,11 +543,11 @@ const S = {
   topRight: { display: "flex", alignItems: "center", gap: "12px" },
   backBtn: {
     background: "transparent",
-    border: "1px solid #2e2e2a",
+    border: "1px solid #E5E0D8",
     borderRadius: "6px",
     padding: "7px 14px",
     fontSize: "13px",
-    color: "#808180",
+    color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     flexShrink: 0,
@@ -558,35 +558,35 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "22px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#1A1A18",
     margin: 0,
     letterSpacing: "0.5px",
   },
   titleMeta: { display: "flex", gap: "8px", flexWrap: "wrap" },
   metaChip: {
     fontSize: "11px",
-    background: "#252522",
-    border: "1px solid #2e2e2a",
+    background: "#F0EBE3",
+    border: "1px solid #E5E0D8",
     borderRadius: "20px",
     padding: "3px 10px",
-    color: "#808180",
+    color: "#7A7670",
   },
   regionChip: {
     fontSize: "11px",
-    background: "rgba(42,79,133,0.2)",
-    border: "1px solid rgba(42,79,133,0.3)",
+    background: "rgba(42,79,133,0.08)",
+    border: "1px solid rgba(42,79,133,0.25)",
     borderRadius: "20px",
     padding: "3px 10px",
-    color: "#7ba3d4",
+    color: "#7BA3D4",
   },
   saveBtn: {
-    background: "linear-gradient(135deg, #2a4f85, #1b818a)",
+    background: "linear-gradient(135deg, #2D6A4F, #1b818a)",
     border: "none",
     borderRadius: "8px",
     padding: "10px 20px",
     fontSize: "13px",
     fontWeight: 600,
-    color: "#fff9eb",
+    color: "#FFFFFF",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "box-shadow 0.2s",
@@ -597,15 +597,15 @@ const S = {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-    background: "#1a1a18",
-    border: "1px solid #2e2e2a",
+    background: "#F9F6F1",
+    border: "1px solid #E5E0D8",
     borderRadius: "8px",
     padding: "9px 14px",
     marginBottom: "16px",
   },
   hashLabel: {
     fontSize: "10px",
-    color: "#5a5956",
+    color: "#8A8680",
     textTransform: "uppercase",
     letterSpacing: "1px",
     fontWeight: 600,
@@ -614,7 +614,7 @@ const S = {
   hashValue: {
     fontFamily: "'DM Mono', monospace",
     fontSize: "11px",
-    color: "#808180",
+    color: "#7A7670",
     wordBreak: "break-all",
   },
   panels: {
@@ -624,38 +624,40 @@ const S = {
     alignItems: "start",
   },
   leftPanel: {
-    background: "#1e1e1c",
-    border: "1px solid #2e2e2a",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "12px",
     overflow: "hidden",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
   },
   rightPanel: {
-    background: "#1e1e1c",
-    border: "1px solid #2e2e2a",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     borderRadius: "12px",
     overflow: "hidden",
     position: "sticky",
     top: "16px",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
   },
   panelHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     padding: "16px 20px",
-    borderBottom: "1px solid #2e2e2a",
-    background: "#1a1a18",
+    borderBottom: "1px solid #E5E0D8",
+    background: "#F9F6F1",
   },
   panelTitle: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontSize: "12px",
     fontWeight: 600,
-    color: "#808180",
+    color: "#7A7670",
     letterSpacing: "1.5px",
     textTransform: "uppercase",
     margin: 0,
   },
-  panelHint: { fontSize: "11px", color: "#3a3a36" },
-  panelCount: { fontSize: "12px", color: "#5a5956" },
+  panelHint: { fontSize: "11px", color: "#A8A49C" },
+  panelCount: { fontSize: "12px", color: "#8A8680" },
 
   // Sequence
   sequenceList: {
@@ -668,14 +670,14 @@ const S = {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-    background: "#252522",
-    border: "1px solid #2e2e2a",
+    background: "#F9F6F1",
+    border: "1px solid #E5E0D8",
     borderRadius: "8px",
     padding: "8px 10px",
     userSelect: "none",
   },
   dragHandle: {
-    color: "#3a3a36",
+    color: "#C5BFB8",
     cursor: "grab",
     flexShrink: 0,
     padding: "4px",
@@ -685,13 +687,13 @@ const S = {
     width: "22px",
     height: "22px",
     borderRadius: "50%",
-    background: "#1e1e1c",
-    border: "1px solid #2e2e2a",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     fontSize: "11px",
-    color: "#5a5956",
+    color: "#8A8680",
     fontFamily: "'DM Mono', monospace",
     flexShrink: 0,
   },
@@ -702,7 +704,7 @@ const S = {
     overflow: "hidden",
     flexShrink: 0,
     position: "relative",
-    background: "#1e1e1c",
+    background: "#F0EBE3",
   },
   thumbImg: { width: "100%", height: "100%", objectFit: "cover" },
   videoThumb: {
@@ -711,7 +713,7 @@ const S = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "#1a1a18",
+    background: "#F0EBE3",
   },
   typeChip: {
     position: "absolute",
@@ -726,7 +728,7 @@ const S = {
   itemInfo: { flex: 1, minWidth: 0 },
   itemName: {
     fontSize: "13px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     fontWeight: 500,
     display: "block",
     overflow: "hidden",
@@ -735,7 +737,7 @@ const S = {
   },
   itemSize: {
     fontSize: "11px",
-    color: "#5a5956",
+    color: "#8A8680",
     display: "block",
     marginTop: "2px",
   },
@@ -747,21 +749,21 @@ const S = {
   },
   durationInput: {
     width: "52px",
-    background: "#1a1a18",
-    border: "1px solid #3a3a36",
+    background: "#FFFFFF",
+    border: "1px solid #D0CAC0",
     borderRadius: "6px",
     padding: "5px 8px",
     fontSize: "12px",
-    color: "#d5b57e",
+    color: "#C49A3C",
     fontFamily: "'DM Mono', monospace",
     outline: "none",
     textAlign: "center",
   },
-  durationUnit: { fontSize: "11px", color: "#5a5956", flexShrink: 0 },
+  durationUnit: { fontSize: "11px", color: "#8A8680", flexShrink: 0 },
   removeBtn: {
     background: "transparent",
     border: "none",
-    color: "#5a5956",
+    color: "#A8A49C",
     cursor: "pointer",
     padding: "4px",
     transition: "color 0.15s",
@@ -777,10 +779,10 @@ const S = {
     gap: "12px",
     textAlign: "center",
   },
-  emptySequenceIcon: { fontSize: "36px", color: "#2e2e2a" },
+  emptySequenceIcon: { fontSize: "36px", color: "#D0CAC0" },
   emptySequenceText: {
     fontSize: "13px",
-    color: "#5a5956",
+    color: "#8A8680",
     lineHeight: 1.6,
     maxWidth: "280px",
     margin: 0,
@@ -789,12 +791,12 @@ const S = {
   // Timeline
   timeline: {
     padding: "14px 20px 16px",
-    borderTop: "1px solid #2e2e2a",
-    background: "#1a1a18",
+    borderTop: "1px solid #E5E0D8",
+    background: "#F9F6F1",
   },
   timelineLabel: {
     fontSize: "10px",
-    color: "#5a5956",
+    color: "#8A8680",
     textTransform: "uppercase",
     letterSpacing: "1px",
     marginBottom: "8px",
@@ -805,7 +807,7 @@ const S = {
     height: "10px",
     borderRadius: "5px",
     overflow: "hidden",
-    background: "#252522",
+    background: "#E5E0D8",
     gap: "1px",
   },
   timelineSegment: {
@@ -818,7 +820,7 @@ const S = {
     justifyContent: "space-between",
     marginTop: "4px",
     fontSize: "10px",
-    color: "#3a3a36",
+    color: "#A8A49C",
     fontFamily: "'DM Mono', monospace",
   },
 
@@ -828,7 +830,7 @@ const S = {
     display: "flex",
     flexDirection: "column",
     gap: "8px",
-    borderBottom: "1px solid #2e2e2a",
+    borderBottom: "1px solid #E5E0D8",
   },
   libSearchWrap: { position: "relative" },
   libSearchIcon: {
@@ -836,17 +838,17 @@ const S = {
     left: "10px",
     top: "50%",
     transform: "translateY(-50%)",
-    color: "#5a5956",
+    color: "#A8A49C",
     pointerEvents: "none",
   },
   libSearch: {
     width: "100%",
-    background: "#1a1a18",
-    border: "1px solid #2e2e2a",
+    background: "#F9F6F1",
+    border: "1px solid #E5E0D8",
     borderRadius: "7px",
     padding: "8px 10px 8px 30px",
     fontSize: "12px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     boxSizing: "border-box",
@@ -855,19 +857,19 @@ const S = {
   typeTab: {
     flex: 1,
     background: "transparent",
-    border: "1px solid #2e2e2a",
+    border: "1px solid #E5E0D8",
     borderRadius: "6px",
     padding: "5px",
     fontSize: "11px",
-    color: "#808180",
+    color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "all 0.15s",
   },
   typeTabActive: {
-    background: "rgba(42,79,133,0.2)",
-    border: "1px solid rgba(42,79,133,0.4)",
-    color: "#7ba3d4",
+    background: "rgba(42,79,133,0.08)",
+    border: "1px solid rgba(42,79,133,0.3)",
+    color: "#7BA3D4",
   },
   mediaLibList: {
     display: "flex",
@@ -880,7 +882,7 @@ const S = {
     alignItems: "center",
     gap: "10px",
     padding: "10px 12px",
-    borderBottom: "1px solid #252522",
+    borderBottom: "1px solid #F0EBE3",
     transition: "background 0.1s",
   },
   mediaLibThumb: {
@@ -889,7 +891,7 @@ const S = {
     borderRadius: "5px",
     overflow: "hidden",
     flexShrink: 0,
-    background: "#1a1a18",
+    background: "#F9F6F1",
   },
   mediaLibImg: { width: "100%", height: "100%", objectFit: "cover" },
   mediaLibVideo: {
@@ -898,11 +900,12 @@ const S = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    background: "#F0EBE3",
   },
   mediaLibInfo: { flex: 1, minWidth: 0 },
   mediaLibName: {
     fontSize: "12px",
-    color: "#fff9eb",
+    color: "#1A1A18",
     fontWeight: 500,
     display: "block",
     overflow: "hidden",
@@ -911,7 +914,7 @@ const S = {
   },
   mediaLibMeta: {
     fontSize: "10px",
-    color: "#5a5956",
+    color: "#8A8680",
     display: "block",
     marginTop: "2px",
   },
@@ -919,9 +922,9 @@ const S = {
     width: "28px",
     height: "28px",
     borderRadius: "50%",
-    background: "rgba(42,79,133,0.2)",
-    border: "1px solid rgba(42,79,133,0.4)",
-    color: "#7ba3d4",
+    background: "rgba(42,79,133,0.08)",
+    border: "1px solid rgba(42,79,133,0.3)",
+    color: "#7BA3D4",
     fontSize: "16px",
     cursor: "pointer",
     display: "flex",
@@ -936,9 +939,9 @@ const S = {
     width: "28px",
     height: "28px",
     borderRadius: "50%",
-    background: "rgba(65,136,64,0.15)",
-    border: "1px solid rgba(65,136,64,0.3)",
-    color: "#86ac69",
+    background: "rgba(45,106,79,0.08)",
+    border: "1px solid rgba(45,106,79,0.3)",
+    color: "#418840",
     fontSize: "14px",
     cursor: "default",
     display: "flex",
@@ -956,7 +959,7 @@ const S = {
   },
   mediaSkeleton: {
     height: "54px",
-    background: "linear-gradient(90deg, #1e1e1c 25%, #252522 50%, #1e1e1c 75%)",
+    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
     backgroundSize: "600px 100%",
     animation: "shimmer 1.4s infinite",
   },
@@ -970,7 +973,7 @@ const S = {
   skeleton: {
     height: "400px",
     borderRadius: "12px",
-    background: "linear-gradient(90deg, #1e1e1c 25%, #252522 50%, #1e1e1c 75%)",
+    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
     backgroundSize: "600px 100%",
     animation: "shimmer 1.4s infinite",
   },
