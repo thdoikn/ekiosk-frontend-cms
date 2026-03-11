@@ -40,11 +40,11 @@ function FitBounds({ kiosks }) {
     const points = kiosks.filter(k => k.latitude != null && k.longitude != null)
     if (points.length === 0) return
     if (points.length === 1) {
-      map.setView([points[0].latitude, points[0].longitude], 13)
+      map.setView([parseFloat(points[0].latitude), parseFloat(points[0].longitude)], 13)
       return
     }
-    const lats = points.map(k => k.latitude)
-    const lngs = points.map(k => k.longitude)
+    const lats = points.map(k => parseFloat(k.latitude))
+    const lngs = points.map(k => parseFloat(k.longitude))
     map.fitBounds(
       [[Math.min(...lats), Math.min(...lngs)], [Math.max(...lats), Math.max(...lngs)]],
       { padding: [40, 40] }
@@ -82,9 +82,10 @@ function KioskMap({ kiosks }) {
   const mapped = kiosks.filter(k => k.latitude != null && k.longitude != null)
   const filtered = activeStatus === "all" ? mapped : mapped.filter(k => k.status === activeStatus)
 
+  const IKN_CENTER = [-0.787281, 116.680908]
   const defaultCenter = mapped.length > 0
-    ? [mapped[0].latitude, mapped[0].longitude]
-    : [-0.787281, 116.680908] // IKN default
+    ? [parseFloat(mapped[0].latitude), parseFloat(mapped[0].longitude)]
+    : IKN_CENTER
 
   return (
     <div style={styles.mapSection}>
@@ -115,66 +116,78 @@ function KioskMap({ kiosks }) {
       </div>
 
       <div style={styles.mapWrapper}>
-        {mapped.length === 0 ? (
-          <div style={styles.mapEmpty}>
-            <span style={styles.emptyIcon}>◫</span>
-            <p style={styles.emptyText}>Belum ada kiosk dengan koordinat GPS</p>
-          </div>
-        ) : (
-          <MapContainer
-            center={defaultCenter}
-            zoom={10}
-            style={{ width: "100%", height: "100%", borderRadius: "0 0 10px 10px" }}
-            zoomControl={true}
-          >
-            <TileLayer
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            <FitBounds kiosks={mapped} />
-            {filtered.map(kiosk => {
-              const cfg = STATUS_CONFIG[kiosk.status] || STATUS_CONFIG.never_connected
-              return (
-                <CircleMarker
-                  key={kiosk.id}
-                  center={[kiosk.latitude, kiosk.longitude]}
-                  radius={10}
-                  pathOptions={{
-                    color: cfg.dot,
-                    fillColor: cfg.dot,
-                    fillOpacity: 0.85,
-                    weight: 2,
-                  }}
-                >
-                  <Popup>
-                    <div style={styles.popupContent}>
-                      <div style={styles.popupHeader}>
-                        <span style={{ ...styles.popupDot, background: cfg.dot }} />
-                        <strong style={styles.popupName}>{kiosk.name}</strong>
-                      </div>
-                      <div style={styles.popupGrid}>
-                        <span style={styles.popupKey}>Status</span>
-                        <span style={{ ...styles.popupVal, color: cfg.dot }}>{cfg.label}</span>
-                        <span style={styles.popupKey}>Region</span>
-                        <span style={styles.popupVal}>{kiosk.region?.name ?? "—"}</span>
-                        <span style={styles.popupKey}>Last Heartbeat</span>
-                        <span style={styles.popupVal}>{timeSince(kiosk.last_heartbeat)}</span>
-                        <span style={styles.popupKey}>IP Address</span>
-                        <span style={styles.popupVal}>{kiosk.last_ip_address ?? "—"}</span>
-                        <span style={styles.popupKey}>Playlist</span>
-                        <span style={styles.popupVal}>{kiosk.active_playlist?.name ?? "None"}</span>
-                        <span style={styles.popupKey}>Storage Free</span>
-                        <span style={styles.popupVal}>{formatBytes(kiosk.last_storage_free)}</span>
-                        <span style={styles.popupKey}>Coordinates</span>
-                        <span style={styles.popupVal}>{kiosk.latitude.toFixed(5)}, {kiosk.longitude.toFixed(5)}</span>
-                      </div>
+        <MapContainer
+          center={defaultCenter}
+          zoom={mapped.length === 0 ? 12 : 10}
+          style={{ width: "100%", height: "100%", borderRadius: "0 0 10px 10px" }}
+          zoomControl={true}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          {mapped.length > 0 && <FitBounds kiosks={mapped} />}
+          {filtered.map(kiosk => {
+            const cfg = STATUS_CONFIG[kiosk.status] || STATUS_CONFIG.never_connected
+            return (
+              <CircleMarker
+                key={kiosk.id}
+                center={[parseFloat(kiosk.latitude), parseFloat(kiosk.longitude)]}
+                radius={10}
+                pathOptions={{
+                  color: cfg.dot,
+                  fillColor: cfg.dot,
+                  fillOpacity: 0.85,
+                  weight: 2,
+                }}
+              >
+                <Popup>
+                  <div style={styles.popupContent}>
+                    <div style={styles.popupHeader}>
+                      <span style={{ ...styles.popupDot, background: cfg.dot }} />
+                      <strong style={styles.popupName}>{kiosk.name}</strong>
                     </div>
-                  </Popup>
-                </CircleMarker>
-              )
-            })}
-          </MapContainer>
-        )}
+                    <div style={styles.popupGrid}>
+                      <span style={styles.popupKey}>Status</span>
+                      <span style={{ ...styles.popupVal, color: cfg.dot }}>{cfg.label}</span>
+                      <span style={styles.popupKey}>Region</span>
+                      <span style={styles.popupVal}>{kiosk.region?.name ?? "—"}</span>
+                      <span style={styles.popupKey}>Last Heartbeat</span>
+                      <span style={styles.popupVal}>{timeSince(kiosk.last_heartbeat)}</span>
+                      <span style={styles.popupKey}>IP Address</span>
+                      <span style={styles.popupVal}>{kiosk.last_ip_address ?? "—"}</span>
+                      <span style={styles.popupKey}>Playlist</span>
+                      <span style={styles.popupVal}>{kiosk.active_playlist?.name ?? "None"}</span>
+                      <span style={styles.popupKey}>Storage Free</span>
+                      <span style={styles.popupVal}>{formatBytes(kiosk.last_storage_free)}</span>
+                      <span style={styles.popupKey}>Coordinates</span>
+                      <span style={styles.popupVal}>{parseFloat(kiosk.latitude).toFixed(5)}, {parseFloat(kiosk.longitude).toFixed(5)}</span>
+                    </div>
+                  </div>
+                </Popup>
+              </CircleMarker>
+            )
+          })}
+          {mapped.length === 0 && (
+            <div style={{
+              position: "absolute",
+              bottom: "12px",
+              left: "50%",
+              transform: "translateX(-50%)",
+              background: "rgba(255,255,255,0.92)",
+              border: "1px solid #E5E0D8",
+              borderRadius: "20px",
+              padding: "6px 14px",
+              fontSize: "12px",
+              color: "#8A8680",
+              zIndex: 1000,
+              pointerEvents: "none",
+              whiteSpace: "nowrap",
+            }}>
+              Belum ada kiosk dengan koordinat GPS
+            </div>
+          )}
+        </MapContainer>
       </div>
     </div>
   )
