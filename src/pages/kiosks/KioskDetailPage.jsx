@@ -128,6 +128,7 @@ export default function KioskDetailPage() {
   const { data: logsData } = useQuery({
     queryKey: ["kiosk-logs", id],
     queryFn: () => fetchLogs(id),
+    refetchInterval: 30000,
   })
 
   const { data: playlistsData } = useQuery({
@@ -443,33 +444,60 @@ export default function KioskDetailPage() {
 
           {/* Heartbeat log */}
           <div style={S.card}>
-            <SectionHeader title="Log Heartbeat Terakhir" />
+            <SectionHeader
+              title="Log Heartbeat Terakhir"
+              action={
+                <span style={S.logCountBadge}>{logs.length} entri</span>
+              }
+            />
             {logs.length === 0 ? (
               <p style={S.noLogs}>Belum ada log heartbeat</p>
             ) : (
-              <div style={S.logsList}>
-                {logs.slice(0, 10).map((log, i) => (
-                  <div key={log.id ?? i} style={S.logRow}>
-                    <div style={S.logLeft}>
-                      <span style={{
-                        ...S.logDot,
-                        background: log.is_up_to_date ? "#418840" : "#C49A3C"
-                      }} />
-                      <div>
-                        <span style={S.logTime}>{formatDate(log.checked_at)}</span>
-                        <span style={S.logHash}>
-                          {log.reported_hash?.slice(0, 12) ?? "—"}…
-                        </span>
-                      </div>
-                    </div>
-                    <span style={{
-                      fontSize: "11px",
-                      color: log.is_up_to_date ? "#2D6A4F" : "#9B7228",
-                    }}>
-                      {log.is_up_to_date ? "Sinkron" : "Stale"}
-                    </span>
-                  </div>
-                ))}
+              <div style={S.logTableWrap}>
+                <table style={S.logTable}>
+                  <thead>
+                    <tr style={S.logThead}>
+                      <th style={S.logTh}>Waktu</th>
+                      <th style={S.logTh}>Konten</th>
+                      <th style={S.logTh}>IP</th>
+                      <th style={S.logTh}>App Ver</th>
+                      <th style={S.logTh}>Storage</th>
+                      <th style={S.logTh}>Mem</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {logs.slice(0, 50).map((log, i) => (
+                      <tr
+                        key={log.id ?? i}
+                        style={{ ...S.logTr, background: i % 2 === 0 ? "#FFFFFF" : "#FAFAF8" }}
+                      >
+                        <td style={S.logTd}>
+                          <div style={S.logTimeMain}>{formatDate(log.checked_at)}</div>
+                        </td>
+                        <td style={S.logTd}>
+                          <span style={{
+                            ...S.logStatusPill,
+                            background: log.is_up_to_date ? "#E8F4EC" : "#FEF5E7",
+                            color: log.is_up_to_date ? "#2D6A4F" : "#9B7228",
+                          }}>
+                            <span style={{
+                              ...S.logDot,
+                              background: log.is_up_to_date ? "#418840" : "#C49A3C",
+                            }} />
+                            {log.is_up_to_date ? "Sinkron" : "Stale"}
+                          </span>
+                          <div style={S.logHashSmall}>
+                            {log.reported_hash ? log.reported_hash.slice(0, 10) + "…" : "—"}
+                          </div>
+                        </td>
+                        <td style={{ ...S.logTd, ...S.logMono }}>{log.ip_address ?? "—"}</td>
+                        <td style={{ ...S.logTd, ...S.logMono }}>{log.app_version || "—"}</td>
+                        <td style={S.logTd}>{formatBytes(log.storage_free)}</td>
+                        <td style={S.logTd}>{formatBytes(log.memory_free)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             )}
           </div>
@@ -945,44 +973,75 @@ const S = {
     padding: "20px 0",
     margin: 0,
   },
-  logsList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1px",
-    background: "#E5E0D8",
+  logCountBadge: {
+    fontSize: "11px",
+    color: "#8A8680",
+    background: "#F0EBE3",
+    borderRadius: "10px",
+    padding: "2px 8px",
+  },
+  logTableWrap: {
+    overflowX: "auto",
     borderRadius: "8px",
-    overflow: "hidden",
+    border: "1px solid #E5E0D8",
   },
-  logRow: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: "10px 12px",
-    background: "#FFFFFF",
-    transition: "background 0.1s",
+  logTable: {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontSize: "12px",
   },
-  logLeft: {
-    display: "flex",
+  logThead: {
+    background: "#F9F6F1",
+    borderBottom: "1px solid #E5E0D8",
+  },
+  logTh: {
+    padding: "8px 12px",
+    textAlign: "left",
+    fontSize: "10px",
+    fontWeight: 600,
+    color: "#A8A49C",
+    textTransform: "uppercase",
+    letterSpacing: "0.6px",
+    whiteSpace: "nowrap",
+  },
+  logTr: {
+    borderBottom: "1px solid #F0EBE3",
+  },
+  logTd: {
+    padding: "9px 12px",
+    color: "#5A5651",
+    verticalAlign: "middle",
+    whiteSpace: "nowrap",
+  },
+  logTimeMain: {
+    fontSize: "12px",
+    color: "#4A4845",
+  },
+  logStatusPill: {
+    display: "inline-flex",
     alignItems: "center",
-    gap: "10px",
+    gap: "5px",
+    borderRadius: "10px",
+    padding: "2px 8px",
+    fontSize: "11px",
+    fontWeight: 500,
   },
   logDot: {
-    width: "7px",
-    height: "7px",
+    width: "6px",
+    height: "6px",
     borderRadius: "50%",
     flexShrink: 0,
+    display: "inline-block",
   },
-  logTime: {
-    fontSize: "12px",
-    color: "#5A5651",
-    display: "block",
-    marginBottom: "2px",
-  },
-  logHash: {
+  logHashSmall: {
     fontFamily: "monospace",
     fontSize: "10px",
-    color: "#A8A49C",
-    display: "block",
+    color: "#B8B2A8",
+    marginTop: "2px",
+  },
+  logMono: {
+    fontFamily: "monospace",
+    fontSize: "11px",
   },
 
   // Loading states
