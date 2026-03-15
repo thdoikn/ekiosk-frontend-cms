@@ -5,7 +5,7 @@ import client from "../../api/client"
 
 // ── API ────────────────────────────────────────────────────
 const fetchKiosk     = (id) => client.get(`/kiosks/${id}/`).then(r => r.data)
-const fetchLogs      = (id) => client.get(`/kiosks/${id}/logs/`).then(r => r.data)
+const fetchLogs      = (id, page) => client.get(`/kiosks/${id}/logs/?page=${page}`).then(r => r.data)
 const fetchPlaylists = ()   => client.get("/playlists/?is_active=true").then(r => r.data)
 const fetchRegions   = ()   => client.get("/regions/").then(r => r.data)
 const doForceUpdate  = (id) => client.post(`/kiosks/${id}/force-update/`)
@@ -15,6 +15,12 @@ const doAssignRegion = ({ id, region }) =>
   client.patch(`/kiosks/${id}/`, { region })
 
 // ── Helpers ────────────────────────────────────────────────
+const APP_STATE_CFG = {
+  foreground: { label: "Aktif",          sub: "Layar sedang menyala",          icon: "▶", color: "#2D6A4F", bg: "#E8F4EC" },
+  background: { label: "Latar Belakang", sub: "Berjalan di balik layar",       icon: "◑", color: "#1b818a", bg: "#E6F4F5" },
+  terminated: { label: "Tidak Aktif",    sub: "Aplikasi dihentikan/crash",     icon: "■", color: "#C0392B", bg: "#FDECEA" },
+}
+
 const STATUS_CFG = {
   online:          { label: "Online",          bg: "#E8F4EC", text: "#2D6A4F", dot: "#418840", glow: "rgba(45,106,79,0.12)"  },
   offline:         { label: "Offline",         bg: "#FDECEA", text: "#C0392B", dot: "#D83A2F", glow: "rgba(216,58,47,0.12)"  },
@@ -118,6 +124,11 @@ export default function KioskDetailPage() {
   const [showOverride, setShowOverride] = useState(false)
   const [showRegion, setShowRegion]     = useState(false)
   const [regionId, setRegionId]         = useState("")
+  const [logPage, setLogPage]           = useState(1)
+
+  // Reset log page when navigating to a different kiosk
+  const prevId = useState(id)[0]
+  if (prevId !== id) setLogPage(1)
 
   const { data: kiosk, isLoading } = useQuery({
     queryKey: ["kiosk", id],
@@ -126,8 +137,8 @@ export default function KioskDetailPage() {
   })
 
   const { data: logsData } = useQuery({
-    queryKey: ["kiosk-logs", id],
-    queryFn: () => fetchLogs(id),
+    queryKey: ["kiosk-logs", id, logPage],
+    queryFn: () => fetchLogs(id, logPage),
     refetchInterval: 30000,
   })
 
@@ -166,7 +177,9 @@ export default function KioskDetailPage() {
     },
   })
 
-  const logs      = logsData?.results ?? logsData ?? []
+  const logs      = logsData?.results ?? []
+  const logCount  = logsData?.count ?? 0
+  const logTotalPages = Math.max(1, Math.ceil(logCount / 20))
   const playlists = playlistsData?.results ?? playlistsData ?? []
   const regions   = regionsData?.results ?? regionsData ?? []
   const cfg       = STATUS_CFG[kiosk?.status] || STATUS_CFG.never_connected
@@ -312,7 +325,15 @@ export default function KioskDetailPage() {
             <div style={S.diagGrid}>
               <DiagCard label="IP Address"    value={kiosk.last_ip_address}   mono />
               <DiagCard label="App Version"   value={kiosk.last_app_version}  mono accent="#C49A3C" />
-              <DiagCard label="OS Version"    value={kiosk.last_os_version}   mono />
+              <DiagCard
+                label="Status Aplikasi"
+                value={
+                  APP_STATE_CFG[kiosk.last_app_state]
+                    ? `${APP_STATE_CFG[kiosk.last_app_state].icon} ${APP_STATE_CFG[kiosk.last_app_state].label}`
+                    : "—"
+                }
+                accent={APP_STATE_CFG[kiosk.last_app_state]?.color}
+              />
               <DiagCard label="Heartbeat"     value={timeSince(kiosk.last_heartbeat)} accent={kiosk.status === "offline" ? "#C0392B" : "#2D6A4F"} />
               <DiagCard label="Storage Bebas" value={formatBytes(kiosk.last_storage_free)} />
               <DiagCard label="Memory Bebas"  value={formatBytes(kiosk.last_memory_free)} />
@@ -447,58 +468,93 @@ export default function KioskDetailPage() {
             <SectionHeader
               title="Log Heartbeat Terakhir"
               action={
-                <span style={S.logCountBadge}>{logs.length} entri</span>
+                <span style={S.logCountBadge}>{logCount} entri</span>
               }
             />
             {logs.length === 0 ? (
               <p style={S.noLogs}>Belum ada log heartbeat</p>
             ) : (
-              <div style={S.logTableWrap}>
-                <table style={S.logTable}>
-                  <thead>
-                    <tr style={S.logThead}>
-                      <th style={S.logTh}>Waktu</th>
-                      <th style={S.logTh}>Konten</th>
-                      <th style={S.logTh}>IP</th>
-                      <th style={S.logTh}>App Ver</th>
-                      <th style={S.logTh}>Storage</th>
-                      <th style={S.logTh}>Mem</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {logs.slice(0, 50).map((log, i) => (
-                      <tr
-                        key={log.id ?? i}
-                        style={{ ...S.logTr, background: i % 2 === 0 ? "#FFFFFF" : "#FAFAF8" }}
-                      >
-                        <td style={S.logTd}>
-                          <div style={S.logTimeMain}>{formatDate(log.checked_at)}</div>
-                        </td>
-                        <td style={S.logTd}>
-                          <span style={{
-                            ...S.logStatusPill,
-                            background: log.is_up_to_date ? "#E8F4EC" : "#FEF5E7",
-                            color: log.is_up_to_date ? "#2D6A4F" : "#9B7228",
-                          }}>
-                            <span style={{
-                              ...S.logDot,
-                              background: log.is_up_to_date ? "#418840" : "#C49A3C",
-                            }} />
-                            {log.is_up_to_date ? "Sinkron" : "Stale"}
-                          </span>
-                          <div style={S.logHashSmall}>
-                            {log.reported_hash ? log.reported_hash.slice(0, 10) + "…" : "—"}
-                          </div>
-                        </td>
-                        <td style={{ ...S.logTd, ...S.logMono }}>{log.ip_address ?? "—"}</td>
-                        <td style={{ ...S.logTd, ...S.logMono }}>{log.app_version || "—"}</td>
-                        <td style={S.logTd}>{formatBytes(log.storage_free)}</td>
-                        <td style={S.logTd}>{formatBytes(log.memory_free)}</td>
+              <>
+                <div style={S.logTableWrap}>
+                  <table style={S.logTable}>
+                    <thead>
+                      <tr style={S.logThead}>
+                        <th style={S.logTh}>Waktu</th>
+                        <th style={S.logTh}>Konten</th>
+                        <th style={S.logTh}>IP</th>
+                        <th style={S.logTh}>Status App</th>
+                        <th style={S.logTh}>Storage</th>
+                        <th style={S.logTh}>Mem</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {logs.map((log, i) => {
+                        const asCfg = APP_STATE_CFG[log.app_state]
+                        return (
+                          <tr
+                            key={log.id ?? i}
+                            style={{ ...S.logTr, background: i % 2 === 0 ? "#FFFFFF" : "#FAFAF8" }}
+                          >
+                            <td style={S.logTd}>
+                              <div style={S.logTimeMain}>{formatDate(log.checked_at)}</div>
+                            </td>
+                            <td style={S.logTd}>
+                              <span style={{
+                                ...S.logStatusPill,
+                                background: log.is_up_to_date ? "#E8F4EC" : "#FEF5E7",
+                                color: log.is_up_to_date ? "#2D6A4F" : "#9B7228",
+                              }}>
+                                <span style={{
+                                  ...S.logDot,
+                                  background: log.is_up_to_date ? "#418840" : "#C49A3C",
+                                }} />
+                                {log.is_up_to_date ? "Sinkron" : "Stale"}
+                              </span>
+                              <div style={S.logHashSmall}>
+                                {log.reported_hash ? log.reported_hash.slice(0, 10) + "…" : "—"}
+                              </div>
+                            </td>
+                            <td style={{ ...S.logTd, ...S.logMono }}>{log.ip_address ?? "—"}</td>
+                            <td style={S.logTd}>
+                              {asCfg ? (
+                                <span style={{
+                                  ...S.logStatusPill,
+                                  background: asCfg.bg,
+                                  color: asCfg.color,
+                                }}>
+                                  {asCfg.icon} {asCfg.label}
+                                </span>
+                              ) : (
+                                <span style={{ color: "#C0BAB0", fontSize: "11px" }}>—</span>
+                              )}
+                            </td>
+                            <td style={S.logTd}>{formatBytes(log.storage_free)}</td>
+                            <td style={S.logTd}>{formatBytes(log.memory_free)}</td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+                {/* Pagination controls */}
+                <div style={S.logPagination}>
+                  <button
+                    style={{ ...S.logPageBtn, opacity: logPage <= 1 ? 0.35 : 1 }}
+                    disabled={logPage <= 1}
+                    onClick={() => setLogPage(p => p - 1)}
+                  >
+                    ← Prev
+                  </button>
+                  <span style={S.logPageInfo}>Hal {logPage} / {logTotalPages}</span>
+                  <button
+                    style={{ ...S.logPageBtn, opacity: logPage >= logTotalPages ? 0.35 : 1 }}
+                    disabled={logPage >= logTotalPages}
+                    onClick={() => setLogPage(p => p + 1)}
+                  >
+                    Next →
+                  </button>
+                </div>
+              </>
             )}
           </div>
 
@@ -1042,6 +1098,30 @@ const S = {
   logMono: {
     fontFamily: "monospace",
     fontSize: "11px",
+  },
+  logPagination: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "12px",
+    marginTop: "12px",
+  },
+  logPageBtn: {
+    background: "transparent",
+    border: "1px solid #E5E0D8",
+    borderRadius: "6px",
+    padding: "5px 12px",
+    fontSize: "12px",
+    color: "#5A5651",
+    cursor: "pointer",
+    fontFamily: "'Inter', sans-serif",
+    transition: "all 0.15s",
+  },
+  logPageInfo: {
+    fontSize: "12px",
+    color: "#8A8680",
+    minWidth: "80px",
+    textAlign: "center",
   },
 
   // Loading states
