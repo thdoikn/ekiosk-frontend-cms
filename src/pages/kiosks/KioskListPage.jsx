@@ -16,6 +16,15 @@ const STATUS_CFG = {
   never_connected: { label: "Never Connected", bg: "#F3F2F0", text: "#6A6860", dot: "#9A9890" },
 }
 
+// foreground = app is open on screen
+// background = app running but screen is off / another app on front
+// terminated = app was force-closed or crashed
+const APP_STATE_CFG = {
+  foreground: { label: "Aktif",          sub: "Layar menyala",          icon: "▶", color: "#2D6A4F", bg: "#E8F4EC" },
+  background: { label: "Latar Belakang", sub: "Berjalan di balik layar", icon: "◑", color: "#1b818a", bg: "#E6F4F5" },
+  terminated: { label: "Tidak Aktif",    sub: "Aplikasi dihentikan",    icon: "■", color: "#C0392B", bg: "#FDECEA" },
+}
+
 function timeSince(dateStr) {
   if (!dateStr) return "Never"
   const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000)
@@ -214,6 +223,24 @@ export default function KioskListPage() {
                   </td>
                   <td style={S.td}>
                     <StatusBadge status={kiosk.status} />
+                    {kiosk.last_app_state && APP_STATE_CFG[kiosk.last_app_state] && (
+                      <div style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: "4px",
+                        marginTop: "4px",
+                        background: APP_STATE_CFG[kiosk.last_app_state].bg,
+                        color: APP_STATE_CFG[kiosk.last_app_state].color,
+                        borderRadius: "10px",
+                        padding: "2px 8px",
+                        fontSize: "10px",
+                        fontWeight: 500,
+                        whiteSpace: "nowrap",
+                      }}>
+                        <span>{APP_STATE_CFG[kiosk.last_app_state].icon}</span>
+                        <span>{APP_STATE_CFG[kiosk.last_app_state].label}</span>
+                      </div>
+                    )}
                   </td>
                   <td style={S.td}>
                     <span style={S.playlistText}>
