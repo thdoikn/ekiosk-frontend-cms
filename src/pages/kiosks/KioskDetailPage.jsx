@@ -11,8 +11,10 @@ const fetchRegions   = ()   => client.get("/regions/").then(r => r.data)
 const doForceUpdate  = (id) => client.post(`/kiosks/${id}/force-update/`)
 const doOverride     = ({ id, playlist_override }) =>
   client.patch(`/kiosks/${id}/`, { playlist_override })
-const doAssignRegion = ({ id, region }) =>
-  client.patch(`/kiosks/${id}/`, { region })
+const doAssignRegion = ({ id, region_id }) =>
+  client.patch(`/kiosks/${id}/`, { region_id })
+const doEditStopId   = ({ id, stop_id }) =>
+  client.patch(`/kiosks/${id}/`, { stop_id })
 
 // ── Helpers ────────────────────────────────────────────────
 const APP_STATE_CFG = {
@@ -124,6 +126,8 @@ export default function KioskDetailPage() {
   const [showOverride, setShowOverride] = useState(false)
   const [showRegion, setShowRegion]     = useState(false)
   const [regionId, setRegionId]         = useState("")
+  const [showStopId, setShowStopId]     = useState(false)
+  const [stopIdVal, setStopIdVal]       = useState("")
   const [logPage, setLogPage]           = useState(1)
 
   // Reset log page when navigating to a different kiosk
@@ -169,11 +173,19 @@ export default function KioskDetailPage() {
   })
 
   const regionMut = useMutation({
-    mutationFn: (rid) => doAssignRegion({ id, region: rid || null }),
+    mutationFn: (rid) => doAssignRegion({ id, region_id: rid || null }),
     onSettled: () => {
       setShowRegion(false)
       qc.invalidateQueries(["kiosk", id])
       qc.invalidateQueries(["kiosks"])
+    },
+  })
+
+  const stopIdMut = useMutation({
+    mutationFn: (val) => doEditStopId({ id, stop_id: val || null }),
+    onSettled: () => {
+      setShowStopId(false)
+      qc.invalidateQueries(["kiosk", id])
     },
   })
 
@@ -273,6 +285,53 @@ export default function KioskDetailPage() {
                       }}
                     >
                       Ubah Region
+                    </button>
+                  </>
+                )}
+              </div>
+
+              {/* Stop ID row with edit */}
+              <div style={S.heroRegionRow}>
+                {showStopId ? (
+                  <div style={S.regionEditRow}>
+                    <input
+                      style={S.stopIdInput}
+                      type="text"
+                      maxLength={10}
+                      placeholder="Maks. 10 karakter"
+                      value={stopIdVal}
+                      onChange={e => setStopIdVal(e.target.value)}
+                      autoFocus
+                    />
+                    <button
+                      style={S.saveRegionBtn}
+                      onClick={() => stopIdMut.mutate(stopIdVal || null)}
+                      disabled={stopIdMut.isPending}
+                    >
+                      {stopIdMut.isPending ? "…" : "Simpan"}
+                    </button>
+                    <button
+                      style={S.cancelRegionBtn}
+                      onClick={() => setShowStopId(false)}
+                    >
+                      Batal
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <p style={S.heroRegion}>
+                      Stop ID: <span style={{ fontFamily: "monospace", color: kiosk.stop_id ? "#1A1A18" : "#A8A49C" }}>
+                        {kiosk.stop_id || "—"}
+                      </span>
+                    </p>
+                    <button
+                      style={S.editRegionBtn}
+                      onClick={() => {
+                        setStopIdVal(kiosk.stop_id ?? "")
+                        setShowStopId(true)
+                      }}
+                    >
+                      {kiosk.stop_id ? "Ubah Stop ID" : "Tambah Stop ID"}
                     </button>
                   </>
                 )}
@@ -726,6 +785,17 @@ const S = {
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', sans-serif",
+  },
+  stopIdInput: {
+    background: "#F9F6F1",
+    border: "1px solid #E0DAD0",
+    borderRadius: "6px",
+    padding: "5px 10px",
+    fontSize: "13px",
+    color: "#1A1A18",
+    fontFamily: "monospace",
+    outline: "none",
+    width: "140px",
   },
   heroMeta: {
     display: "flex",
