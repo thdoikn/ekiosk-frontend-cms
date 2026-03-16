@@ -167,9 +167,10 @@ export default function PlaylistListPage() {
 
               <h3 style={S.cardName}>{p.name}</h3>
               <p style={S.cardRegion}>
-                {p.region?.name ?? (
-                  <span style={{ color: "#C5BFB8" }}>Belum diassign ke region</span>
-                )}
+                {p.assigned_regions?.length > 0
+                  ? p.assigned_regions.map(r => r.name).join(', ')
+                  : <span style={{ color: "#C5BFB8" }}>Belum diassign ke region</span>
+                }
               </p>
 
               <div style={S.cardMeta}>
