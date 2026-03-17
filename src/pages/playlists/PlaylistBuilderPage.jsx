@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useParams, useNavigate } from "react-router-dom"
 import {
@@ -191,13 +191,16 @@ export default function PlaylistBuilderPage() {
   const { data: playlist, isLoading: plLoading } = useQuery({
     queryKey: ["playlist", id],
     queryFn: () => fetchPlaylist(id),
-    onSuccess: (data) => {
-      // always sync from server, but only if no local edits are pending
-      // (addMut and removeMut keep localItems in sync themselves,
-      //  so we only reset here on fresh page load i.e. localItems is null)
-      setLocalItems(prev => prev === null ? (data.items ?? []) : prev)
-    },
   })
+
+  // TanStack Query v5 removed onSuccess from useQuery — use useEffect instead.
+  // Only sync from server on fresh load (localItems === null); addMut/removeMut
+  // keep localItems in sync themselves after that.
+  useEffect(() => {
+    if (playlist && localItems === null) {
+      setLocalItems(playlist.items ?? [])
+    }
+  }, [playlist])
 
   const { data: mediaData, isLoading: mediaLoading } = useQuery({
     queryKey: ["media"],
@@ -281,9 +284,11 @@ export default function PlaylistBuilderPage() {
           updateItem({ playlistId: id, itemId: item.id, duration: item.duration_seconds })
         )
       )
-      await qc.invalidateQueries(["playlist", id])
       setSaveMsg("Tersimpan!")
       setTimeout(() => setSaveMsg(""), 2500)
+      // fire-and-forget: don't await — in TanStack Query v5 an awaited invalidateQueries
+      // rejects if the triggered refetch fails, causing a false "Gagal menyimpan."
+      qc.invalidateQueries({ queryKey: ["playlist", id] })
     } catch {
       setSaveMsg("Gagal menyimpan.")
     } finally {

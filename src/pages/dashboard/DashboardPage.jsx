@@ -34,10 +34,16 @@ function formatBytes(bytes) {
 }
 
 // ── Map helpers ─────────────────────────────────────────────
+function hasValidCoords(k) {
+  const lat = parseFloat(k.latitude)
+  const lng = parseFloat(k.longitude)
+  return k.latitude != null && k.longitude != null && (lat !== 0 || lng !== 0)
+}
+
 function FitBounds({ kiosks }) {
   const map = useMap()
   useEffect(() => {
-    const points = kiosks.filter(k => k.latitude != null && k.longitude != null)
+    const points = kiosks.filter(hasValidCoords)
     if (points.length === 0) return
     if (points.length === 1) {
       map.setView([parseFloat(points[0].latitude), parseFloat(points[0].longitude)], 13)
@@ -79,7 +85,7 @@ function StatusBadge({ status }) {
 function KioskMap({ kiosks }) {
   const [activeStatus, setActiveStatus] = useState("all")
 
-  const mapped = kiosks.filter(k => k.latitude != null && k.longitude != null)
+  const mapped = kiosks.filter(hasValidCoords)
   const filtered = activeStatus === "all" ? mapped : mapped.filter(k => k.status === activeStatus)
 
   const IKN_CENTER = [-0.787281, 116.680908]
