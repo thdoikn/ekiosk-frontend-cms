@@ -290,7 +290,12 @@ export default function DashboardPage() {
     },
   })
 
-  const kiosks = kioskData?.results ?? kioskData ?? []
+  const kiosks = [...(kioskData?.results ?? kioskData ?? [])].sort((a, b) => {
+    if (!a.last_heartbeat && !b.last_heartbeat) return 0
+    if (!a.last_heartbeat) return 1
+    if (!b.last_heartbeat) return -1
+    return new Date(b.last_heartbeat) - new Date(a.last_heartbeat)
+  })
   const filtered = filter === "all" ? kiosks : kiosks.filter(k => k.status === filter)
 
   return (
