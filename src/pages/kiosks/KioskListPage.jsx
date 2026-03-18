@@ -85,7 +85,12 @@ export default function KioskListPage() {
     onSettled: () => { setForcingId(null); qc.invalidateQueries(["kiosks"]) },
   })
 
-  const kiosks  = kioskData?.results ?? kioskData ?? []
+  const kiosks  = [...(kioskData?.results ?? kioskData ?? [])].sort((a, b) => {
+    const ra = a.region?.name ?? ''
+    const rb = b.region?.name ?? ''
+    if (ra !== rb) return ra.localeCompare(rb, 'id')
+    return a.name.localeCompare(b.name, 'id')
+  })
   const regions = regionData?.results ?? regionData ?? []
 
   const filtered = kiosks.filter(k => {
