@@ -1,19 +1,23 @@
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
 import client from "../../api/client"
 
 // ── API ────────────────────────────────────────────────────
-const fetchKiosks  = () => client.get("/kiosks/").then(r => r.data)
-const fetchRegions = () => client.get("/regions/").then(r => r.data)
-const doForceUpdate = (id) => client.post(`/kiosks/${id}/force-update/`)
+const fetchKiosks    = () => client.get("/kiosks/").then(r => r.data)
+const fetchRegions   = () => client.get("/regions/").then(r => r.data)
+const doForceUpdate  = (id) => client.post(`/kiosks/${id}/force-update/`)
+const doSetStatus    = ({ id, operational_status }) =>
+  client.post(`/kiosks/${id}/set-status/`, { operational_status })
 
 // ── Helpers ────────────────────────────────────────────────
 const STATUS_CFG = {
-  online:          { label: "Online",          bg: "#E8F4EC", text: "#2D6A4F", dot: "#418840" },
-  offline:         { label: "Offline",         bg: "#FDECEA", text: "#C0392B", dot: "#D83A2F" },
-  stale:           { label: "Stale",           bg: "#FEF5E7", text: "#9B7228", dot: "#C49A3C" },
-  never_connected: { label: "Never Connected", bg: "#F3F2F0", text: "#6A6860", dot: "#9A9890" },
+  operational:  { label: "Operational",  bg: "#E8F4EC", text: "#2D6A4F", dot: "#418840" },
+  stale:        { label: "Stale",        bg: "#FEF5E7", text: "#9B7228", dot: "#C49A3C" },
+  maintenance:  { label: "Maintenance",  bg: "#E3F2FD", text: "#1565C0", dot: "#1976D2" },
+  out_of_order: { label: "Out of Order", bg: "#FDECEA", text: "#C0392B", dot: "#D83A2F" },
+  disconnected: { label: "Disconnected", bg: "#F3F2F0", text: "#6A6860", dot: "#9A9890" },
+  pending:      { label: "Pending",      bg: "#FAFAFA", text: "#9E9E9E", dot: "#BDBDBD" },
 }
 
 // foreground = app is open on screen
@@ -35,7 +39,7 @@ function timeSince(dateStr) {
 }
 
 function StatusBadge({ status }) {
-  const cfg = STATUS_CFG[status] || STATUS_CFG.never_connected
+  const cfg = STATUS_CFG[status] || STATUS_CFG.pending
   return (
     <span style={{ ...S.badge, background: cfg.bg, color: cfg.text }}>
       <span style={{ ...S.badgeDot, background: cfg.dot }} />
@@ -67,6 +71,7 @@ export default function KioskListPage() {
   const [regionFilter, setRegion] = useState("all")
   const [statusFilter, setStatus] = useState("all")
   const [forcingId, setForcingId] = useState(null)
+  const [statusMenuId, setStatusMenuId] = useState(null)
 
   const { data: kioskData, isLoading } = useQuery({
     queryKey: ["kiosks"],
@@ -85,12 +90,20 @@ export default function KioskListPage() {
     onSettled: () => { setForcingId(null); qc.invalidateQueries(["kiosks"]) },
   })
 
-  const kiosks  = [...(kioskData?.results ?? kioskData ?? [])].sort((a, b) => {
-    const ra = a.region?.name ?? ''
-    const rb = b.region?.name ?? ''
-    if (ra !== rb) return ra.localeCompare(rb, 'id')
-    return a.name.localeCompare(b.name, 'id')
+  const statusMut = useMutation({
+    mutationFn: doSetStatus,
+    onSettled: () => { setStatusMenuId(null); qc.invalidateQueries(["kiosks"]) },
   })
+
+  const kiosks = useMemo(() =>
+    [...(kioskData?.results ?? kioskData ?? [])].sort((a, b) => {
+      const ra = a.region?.name ?? ''
+      const rb = b.region?.name ?? ''
+      if (ra !== rb) return ra.localeCompare(rb, 'id')
+      return a.name.localeCompare(b.name, 'id')
+    }),
+    [kioskData]
+  )
   const regions = regionData?.results ?? regionData ?? []
 
   const filtered = kiosks.filter(k => {
@@ -255,7 +268,7 @@ export default function KioskListPage() {
                   <td style={S.td}>
                     <span style={{
                       ...S.heartbeatText,
-                      color: kiosk.status === "offline" ? "#C0392B" : "#7A7670"
+                      color: kiosk.status === "disconnected" ? "#C0392B" : "#7A7670"
                     }}>
                       {timeSince(kiosk.last_heartbeat)}
                     </span>
@@ -273,11 +286,41 @@ export default function KioskListPage() {
                       </ActionBtn>
                       <ActionBtn
                         onClick={() => forceMut.mutate(kiosk.id)}
-                        disabled={forcingId === kiosk.id || kiosk.status === "never_connected"}
+                        disabled={forcingId === kiosk.id || kiosk.status === "pending"}
                         variant="ghost"
                       >
                         {forcingId === kiosk.id ? "…" : <><RefreshIcon /> Update</>}
                       </ActionBtn>
+                      <div style={{ position: "relative" }}>
+                        <ActionBtn
+                          onClick={() => setStatusMenuId(statusMenuId === kiosk.id ? null : kiosk.id)}
+                          variant="ghost"
+                        >
+                          <WrenchIcon /> Status
+                        </ActionBtn>
+                        {statusMenuId === kiosk.id && (
+                          <div style={S.statusMenu}>
+                            <button
+                              style={S.statusMenuItem}
+                              onClick={() => statusMut.mutate({ id: kiosk.id, operational_status: null })}
+                            >
+                              <span style={{ ...S.menuDot, background: "#418840" }} /> Otomatis
+                            </button>
+                            <button
+                              style={S.statusMenuItem}
+                              onClick={() => statusMut.mutate({ id: kiosk.id, operational_status: "maintenance" })}
+                            >
+                              <span style={{ ...S.menuDot, background: "#1976D2" }} /> Maintenance
+                            </button>
+                            <button
+                              style={S.statusMenuItem}
+                              onClick={() => statusMut.mutate({ id: kiosk.id, operational_status: "out_of_order" })}
+                            >
+                              <span style={{ ...S.menuDot, background: "#D83A2F" }} /> Out of Order
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </td>
                 </tr>
@@ -300,6 +343,7 @@ function SearchIcon() {
 }
 function DetailIcon()  { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight:4}}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> }
 function RefreshIcon() { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight:4}}><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> }
+function WrenchIcon() { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight:4}}><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg> }
 
 // ── Styles ─────────────────────────────────────────────────
 const ANIM_CSS = `
@@ -604,5 +648,41 @@ const S = {
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     marginTop: "4px",
+  },
+
+  statusMenu: {
+    position: "absolute",
+    top: "100%",
+    right: 0,
+    marginTop: "4px",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
+    borderRadius: "8px",
+    boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+    zIndex: 100,
+    minWidth: "160px",
+    padding: "4px 0",
+    overflow: "hidden",
+  },
+  statusMenuItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    width: "100%",
+    padding: "8px 14px",
+    border: "none",
+    background: "transparent",
+    fontSize: "12px",
+    color: "#4A4845",
+    cursor: "pointer",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+    textAlign: "left",
+    transition: "background 0.1s",
+  },
+  menuDot: {
+    width: "7px",
+    height: "7px",
+    borderRadius: "50%",
+    flexShrink: 0,
   },
 }

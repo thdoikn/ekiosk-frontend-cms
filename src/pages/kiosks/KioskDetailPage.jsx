@@ -15,6 +15,8 @@ const doAssignRegion = ({ id, region_id }) =>
   client.patch(`/kiosks/${id}/`, { region_id })
 const doEditStopId   = ({ id, stop_id }) =>
   client.patch(`/kiosks/${id}/`, { stop_id })
+const doSetStatus    = ({ id, operational_status }) =>
+  client.post(`/kiosks/${id}/set-status/`, { operational_status })
 
 // ── Helpers ────────────────────────────────────────────────
 const APP_STATE_CFG = {
@@ -24,10 +26,12 @@ const APP_STATE_CFG = {
 }
 
 const STATUS_CFG = {
-  online:          { label: "Online",          bg: "#E8F4EC", text: "#2D6A4F", dot: "#418840", glow: "rgba(45,106,79,0.12)"  },
-  offline:         { label: "Offline",         bg: "#FDECEA", text: "#C0392B", dot: "#D83A2F", glow: "rgba(216,58,47,0.12)"  },
-  stale:           { label: "Stale Content",   bg: "#FEF5E7", text: "#9B7228", dot: "#C49A3C", glow: "rgba(196,154,60,0.12)" },
-  never_connected: { label: "Never Connected", bg: "#F3F2F0", text: "#6A6860", dot: "#9A9890", glow: "rgba(154,152,144,0.1)" },
+  operational:  { label: "Operational",  bg: "#E8F4EC", text: "#2D6A4F", dot: "#418840", glow: "rgba(45,106,79,0.12)"  },
+  stale:        { label: "Stale",        bg: "#FEF5E7", text: "#9B7228", dot: "#C49A3C", glow: "rgba(196,154,60,0.12)" },
+  maintenance:  { label: "Maintenance",  bg: "#E3F2FD", text: "#1565C0", dot: "#1976D2", glow: "rgba(25,118,210,0.12)" },
+  out_of_order: { label: "Out of Order", bg: "#FDECEA", text: "#C0392B", dot: "#D83A2F", glow: "rgba(216,58,47,0.12)"  },
+  disconnected: { label: "Disconnected", bg: "#F3F2F0", text: "#6A6860", dot: "#9A9890", glow: "rgba(154,152,144,0.1)" },
+  pending:      { label: "Pending",      bg: "#FAFAFA", text: "#9E9E9E", dot: "#BDBDBD", glow: "rgba(189,189,189,0.1)" },
 }
 
 function formatBytes(bytes) {
@@ -56,7 +60,7 @@ function timeSince(dateStr) {
 
 // ── Sub-components ─────────────────────────────────────────
 function StatusBadge({ status, large }) {
-  const cfg = STATUS_CFG[status] || STATUS_CFG.never_connected
+  const cfg = STATUS_CFG[status] || STATUS_CFG.pending
   return (
     <span style={{
       ...S.badge,
@@ -70,7 +74,7 @@ function StatusBadge({ status, large }) {
         background: cfg.dot,
         width: large ? "8px" : "6px",
         height: large ? "8px" : "6px",
-        animation: status === "online" ? "pulse 2s ease infinite" : "none",
+        animation: status === "operational" ? "pulse 2s ease infinite" : "none",
       }} />
       {cfg.label}
     </span>
@@ -128,6 +132,7 @@ export default function KioskDetailPage() {
   const [regionId, setRegionId]         = useState("")
   const [showStopId, setShowStopId]     = useState(false)
   const [stopIdVal, setStopIdVal]       = useState("")
+  const [showStatusMenu, setShowStatusMenu] = useState(false)
   const [logPage, setLogPage]           = useState(1)
 
   // Reset log page when navigating to a different kiosk
@@ -189,12 +194,21 @@ export default function KioskDetailPage() {
     },
   })
 
+  const statusMut = useMutation({
+    mutationFn: (val) => doSetStatus({ id, operational_status: val }),
+    onSettled: () => {
+      setShowStatusMenu(false)
+      qc.invalidateQueries(["kiosk", id])
+      qc.invalidateQueries(["kiosks"])
+    },
+  })
+
   const logs      = logsData?.results ?? []
   const logCount  = logsData?.count ?? 0
   const logTotalPages = Math.max(1, Math.ceil(logCount / 20))
   const playlists = playlistsData?.results ?? playlistsData ?? []
   const regions   = regionsData?.results ?? regionsData ?? []
-  const cfg       = STATUS_CFG[kiosk?.status] || STATUS_CFG.never_connected
+  const cfg       = STATUS_CFG[kiosk?.status] || STATUS_CFG.pending
 
   if (isLoading) {
     return (
@@ -350,7 +364,56 @@ export default function KioskDetailPage() {
           </div>
 
           <div style={S.heroRight}>
-            <StatusBadge status={kiosk.status} large />
+            <div style={S.statusRow}>
+              <StatusBadge status={kiosk.status} large />
+              <div style={{ position: "relative" }}>
+                <button
+                  style={S.setStatusBtn}
+                  onClick={() => setShowStatusMenu(!showStatusMenu)}
+                >
+                  {kiosk.operational_status ? "Ubah Status" : "Set Status"}
+                </button>
+                {showStatusMenu && (
+                  <div style={S.statusDropdown}>
+                    <button
+                      style={S.statusDropdownItem}
+                      onClick={() => statusMut.mutate(null)}
+                    >
+                      <span style={{ ...S.dropdownDot, background: "#418840" }} />
+                      <div>
+                        <div style={S.dropdownLabel}>Otomatis</div>
+                        <div style={S.dropdownSub}>Deteksi dari heartbeat</div>
+                      </div>
+                    </button>
+                    <button
+                      style={S.statusDropdownItem}
+                      onClick={() => statusMut.mutate("maintenance")}
+                    >
+                      <span style={{ ...S.dropdownDot, background: "#1976D2" }} />
+                      <div>
+                        <div style={S.dropdownLabel}>Maintenance</div>
+                        <div style={S.dropdownSub}>Pemeliharaan terjadwal</div>
+                      </div>
+                    </button>
+                    <button
+                      style={S.statusDropdownItem}
+                      onClick={() => statusMut.mutate("out_of_order")}
+                    >
+                      <span style={{ ...S.dropdownDot, background: "#D83A2F" }} />
+                      <div>
+                        <div style={S.dropdownLabel}>Out of Order</div>
+                        <div style={S.dropdownSub}>Rusak / error perangkat</div>
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+            {kiosk.operational_status && (
+              <span style={S.operatorChip}>
+                Diatur oleh operator
+              </span>
+            )}
             <div style={S.heroActions}>
               <button
                 style={forcing ? { ...S.forceBtn, opacity: 0.5 } : S.forceBtn}
@@ -393,7 +456,7 @@ export default function KioskDetailPage() {
                 }
                 accent={APP_STATE_CFG[kiosk.last_app_state]?.color}
               />
-              <DiagCard label="Heartbeat"     value={timeSince(kiosk.last_heartbeat)} accent={kiosk.status === "offline" ? "#C0392B" : "#2D6A4F"} />
+              <DiagCard label="Heartbeat"     value={timeSince(kiosk.last_heartbeat)} accent={kiosk.status === "disconnected" ? "#C0392B" : "#2D6A4F"} />
               <DiagCard label="Storage Bebas" value={formatBytes(kiosk.last_storage_free)} />
               <DiagCard label="Memory Bebas"  value={formatBytes(kiosk.last_memory_free)} />
             </div>
@@ -818,6 +881,74 @@ const S = {
     flexDirection: "column",
     alignItems: "flex-end",
     gap: "12px",
+  },
+  statusRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+  },
+  setStatusBtn: {
+    background: "transparent",
+    border: "1px solid #E5E0D8",
+    borderRadius: "6px",
+    padding: "5px 12px",
+    fontSize: "11px",
+    color: "#7A7670",
+    cursor: "pointer",
+    fontFamily: "'Inter', sans-serif",
+    transition: "all 0.15s",
+    whiteSpace: "nowrap",
+  },
+  statusDropdown: {
+    position: "absolute",
+    top: "100%",
+    right: 0,
+    marginTop: "6px",
+    background: "#FFFFFF",
+    border: "1px solid #E5E0D8",
+    borderRadius: "10px",
+    boxShadow: "0 8px 28px rgba(0,0,0,0.12)",
+    zIndex: 100,
+    minWidth: "200px",
+    padding: "6px 0",
+    overflow: "hidden",
+  },
+  statusDropdownItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    width: "100%",
+    padding: "10px 16px",
+    border: "none",
+    background: "transparent",
+    cursor: "pointer",
+    fontFamily: "'Inter', sans-serif",
+    textAlign: "left",
+    transition: "background 0.1s",
+  },
+  dropdownDot: {
+    width: "8px",
+    height: "8px",
+    borderRadius: "50%",
+    flexShrink: 0,
+  },
+  dropdownLabel: {
+    fontSize: "13px",
+    fontWeight: 500,
+    color: "#1A1A18",
+  },
+  dropdownSub: {
+    fontSize: "11px",
+    color: "#8A8680",
+    marginTop: "1px",
+  },
+  operatorChip: {
+    fontSize: "11px",
+    color: "#1565C0",
+    background: "#E3F2FD",
+    borderRadius: "10px",
+    padding: "3px 10px",
+    fontWeight: 500,
   },
   heroActions: {
     display: "flex",

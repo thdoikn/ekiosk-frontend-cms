@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
@@ -12,10 +12,12 @@ const forceUpdate  = (id) => client.post(`/kiosks/${id}/force-update/`)
 
 // ── Helpers ────────────────────────────────────────────────
 const STATUS_CONFIG = {
-  online:          { label: "Online",          bg: "#E8F4EC", text: "#2D6A4F", dot: "#418840"  },
-  offline:         { label: "Offline",         bg: "#FDECEA", text: "#C0392B", dot: "#D83A2F"  },
-  stale:           { label: "Stale Content",   bg: "#FEF5E7", text: "#9B7228", dot: "#C49A3C"  },
-  never_connected: { label: "Never Connected", bg: "#F3F2F0", text: "#6A6860", dot: "#9A9890"  },
+  operational:  { label: "Operational",  bg: "#E8F4EC", text: "#2D6A4F", dot: "#418840"  },
+  stale:        { label: "Stale",        bg: "#FEF5E7", text: "#9B7228", dot: "#C49A3C"  },
+  maintenance:  { label: "Maintenance",  bg: "#E3F2FD", text: "#1565C0", dot: "#1976D2"  },
+  out_of_order: { label: "Out of Order", bg: "#FDECEA", text: "#C0392B", dot: "#D83A2F"  },
+  disconnected: { label: "Disconnected", bg: "#F3F2F0", text: "#6A6860", dot: "#9A9890"  },
+  pending:      { label: "Pending",      bg: "#FAFAFA", text: "#9E9E9E", dot: "#BDBDBD"  },
 }
 
 function timeSince(dateStr) {
@@ -73,7 +75,7 @@ function StatCard({ label, value, color, icon }) {
 }
 
 function StatusBadge({ status }) {
-  const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.never_connected
+  const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.pending
   return (
     <span style={{ ...styles.badge, background: cfg.bg, color: cfg.text }}>
       <span style={{ ...styles.badgeDot, background: cfg.dot }} />
@@ -134,7 +136,7 @@ function KioskMap({ kiosks }) {
           />
           {mapped.length > 0 && <FitBounds kiosks={mapped} />}
           {filtered.map(kiosk => {
-            const cfg = STATUS_CONFIG[kiosk.status] || STATUS_CONFIG.never_connected
+            const cfg = STATUS_CONFIG[kiosk.status] || STATUS_CONFIG.pending
             return (
               <CircleMarker
                 key={kiosk.id}
@@ -200,7 +202,7 @@ function KioskMap({ kiosks }) {
 }
 
 function KioskCard({ kiosk, onForceUpdate, isForcing, navigate }) {
-  const cfg = STATUS_CONFIG[kiosk.status] || STATUS_CONFIG.never_connected
+  const cfg = STATUS_CONFIG[kiosk.status] || STATUS_CONFIG.pending
   return (
     <div
       style={styles.kioskCard}
@@ -244,7 +246,7 @@ function KioskCard({ kiosk, onForceUpdate, isForcing, navigate }) {
               {kiosk.active_playlist?.name ?? "No Playlist"}
             </span>
           </div>
-          {kiosk.status !== "never_connected" && (
+          {kiosk.status !== "pending" && (
             <button
               onClick={(e) => { e.stopPropagation(); onForceUpdate(kiosk.id) }}
               disabled={isForcing}
@@ -290,12 +292,15 @@ export default function DashboardPage() {
     },
   })
 
-  const kiosks = [...(kioskData?.results ?? kioskData ?? [])].sort((a, b) => {
-    if (!a.last_heartbeat && !b.last_heartbeat) return 0
-    if (!a.last_heartbeat) return 1
-    if (!b.last_heartbeat) return -1
-    return new Date(b.last_heartbeat) - new Date(a.last_heartbeat)
-  })
+  const kiosks = useMemo(() =>
+    [...(kioskData?.results ?? kioskData ?? [])].sort((a, b) => {
+      if (!a.last_heartbeat && !b.last_heartbeat) return 0
+      if (!a.last_heartbeat) return 1
+      if (!b.last_heartbeat) return -1
+      return new Date(b.last_heartbeat) - new Date(a.last_heartbeat)
+    }),
+    [kioskData]
+  )
   const filtered = filter === "all" ? kiosks : kiosks.filter(k => k.status === filter)
 
   return (
@@ -343,9 +348,9 @@ export default function DashboardPage() {
         ) : (
           <>
             <StatCard label="Total Kiosks"      value={summary?.total         ?? 0} color="#C49A3C" icon="▦" />
-            <StatCard label="Online"             value={summary?.online        ?? 0} color="#418840" icon="●" />
-            <StatCard label="Offline"            value={summary?.offline       ?? 0} color="#D83A2F" icon="●" />
-            <StatCard label="Stale Content"      value={summary?.stale         ?? 0} color="#C49A3C" icon="◐" />
+            <StatCard label="Operational"        value={summary?.operational   ?? 0} color="#418840" icon="●" />
+            <StatCard label="Disconnected"       value={summary?.disconnected  ?? 0} color="#9A9890" icon="●" />
+            <StatCard label="Issues"             value={(summary?.maintenance ?? 0) + (summary?.out_of_order ?? 0) + (summary?.stale ?? 0)} color="#D83A2F" icon="◐" />
           </>
         )}
       </div>
@@ -361,11 +366,13 @@ export default function DashboardPage() {
           {/* Filter tabs */}
           <div style={styles.filterRow}>
             {[
-              { key: "all",            label: "Semua" },
-              { key: "online",         label: "Online" },
-              { key: "offline",        label: "Offline" },
-              { key: "stale",          label: "Stale" },
-              { key: "never_connected",label: "Belum Terhubung" },
+              { key: "all",          label: "Semua" },
+              { key: "operational",  label: "Operational" },
+              { key: "stale",        label: "Konten Usang" },
+              { key: "maintenance",  label: "Pemeliharaan" },
+              { key: "out_of_order", label: "Rusak" },
+              { key: "disconnected", label: "Terputus" },
+              { key: "pending",      label: "Belum Terhubung" },
             ].map(({ key, label }) => (
               <button
                 key={key}
