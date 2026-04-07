@@ -247,9 +247,12 @@ export default function KioskDetailPage() {
         </button>
       </div>
 
-      {/* Hero card */}
+      {/* Hero card — overflow:visible so the status dropdown isn't clipped.
+           The glow is wrapped in its own overflow:hidden layer instead. */}
       <div style={{ ...S.heroCard, borderTopColor: cfg.dot }}>
-        <div style={{ ...S.heroGlow, background: cfg.glow }} />
+        <div style={S.heroGlowClip}>
+          <div style={{ ...S.heroGlow, background: cfg.glow }} />
+        </div>
 
         <div style={S.heroInner}>
           <div style={S.heroLeft}>
@@ -743,8 +746,16 @@ const S = {
     padding: "28px 32px",
     marginBottom: "20px",
     position: "relative",
-    overflow: "hidden",
+    // overflow must stay visible so absolutely-positioned dropdowns aren't clipped
     boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+  },
+  // Clip only the glow, not the whole card
+  heroGlowClip: {
+    position: "absolute",
+    inset: 0,
+    borderRadius: "12px",
+    overflow: "hidden",
+    pointerEvents: "none",
   },
   heroGlow: {
     position: "absolute",

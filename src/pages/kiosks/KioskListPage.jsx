@@ -202,8 +202,11 @@ export default function KioskListPage() {
           <table style={S.table}>
             <thead>
               <tr>
-                {["Nama Kiosk", "Region", "Status", "Playlist Aktif", "Heartbeat Terakhir", "IP Address", "Aksi"].map(h => (
-                  <th key={h} style={S.th}>{h}</th>
+                {["Nama Kiosk", "Region", "Status", "Playlist Aktif", "Heartbeat Terakhir", "IP Address", "Aksi"].map((h, hi, arr) => (
+                  <th key={h} style={{
+                    ...S.th,
+                    borderRadius: hi === 0 ? "12px 0 0 0" : hi === arr.length - 1 ? "0 12px 0 0" : undefined,
+                  }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -211,7 +214,13 @@ export default function KioskListPage() {
               {filtered.map((kiosk, i) => (
                 <tr
                   key={kiosk.id}
-                  style={{ ...S.tr, animationDelay: `${i * 0.04}s` }}
+                  style={{
+                    ...S.tr,
+                    // Do NOT put animation here — transform in keyframes creates a stacking
+                    // context per row that traps absolutely-positioned dropdowns inside it.
+                    position: statusMenuId === kiosk.id ? "relative" : undefined,
+                    zIndex:   statusMenuId === kiosk.id ? 10 : undefined,
+                  }}
                   onMouseEnter={e => e.currentTarget.style.background = "#F9F6F1"}
                   onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                 >
@@ -469,12 +478,15 @@ const S = {
     background: "#FFFFFF",
     border: "1px solid #E5E0D8",
     borderRadius: "12px",
-    overflow: "hidden",
+    // overflow must be visible so the status dropdown isn't clipped.
+    // border-radius on the table itself handles corner rounding.
+    overflow: "visible",
     boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
   },
   table: {
     width: "100%",
-    borderCollapse: "collapse",
+    borderCollapse: "separate",
+    borderSpacing: 0,
   },
   th: {
     padding: "12px 16px",
@@ -491,7 +503,6 @@ const S = {
   tr: {
     borderBottom: "1px solid #F0EBE3",
     transition: "background 0.1s",
-    animation: "fadeUp 0.3s ease both",
   },
   td: {
     padding: "14px 16px",
