@@ -38,7 +38,7 @@ export const useAuthStore = create((set) => ({
       const logoutEndpoint = authority.replace('/protocol/openid-connect/auth', '/protocol/openid-connect/logout')
       const params = new URLSearchParams({
         id_token_hint:            idToken,
-        post_logout_redirect_uri: window.location.origin + '/login',
+        post_logout_redirect_uri: window.location.origin + '/login?logged_out=1',
       })
       window.location.replace(`${logoutEndpoint}?${params.toString()}`)
     }
