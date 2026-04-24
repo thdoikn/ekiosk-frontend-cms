@@ -2,8 +2,9 @@ import { create } from 'zustand'
 import { jwtDecode } from 'jwt-decode'
 
 export const useAuthStore = create((set) => ({
-  token: localStorage.getItem('access_token') || null,
-  user: null,
+  token:   localStorage.getItem('access_token') || null,
+  idToken: localStorage.getItem('id_token') || null,
+  user:    null,
 
   login: (access, refresh) => {
     localStorage.setItem('access_token', access)
@@ -12,9 +13,28 @@ export const useAuthStore = create((set) => ({
     set({ token: access, user: decoded })
   },
 
+  setAuth: ({ user, access, refresh, id_token }) => {
+    localStorage.setItem('access_token', access)
+    localStorage.setItem('refresh_token', refresh)
+    if (id_token) localStorage.setItem('id_token', id_token)
+    set({ token: access, idToken: id_token || null, user })
+  },
+
   logout: () => {
+    const idToken = localStorage.getItem('id_token')
     localStorage.removeItem('access_token')
     localStorage.removeItem('refresh_token')
-    set({ token: null, user: null })
+    localStorage.removeItem('id_token')
+    set({ token: null, idToken: null, user: null })
+
+    const authority = import.meta.env.VITE_OIDC_AUTHORITY
+    if (idToken && authority) {
+      const logoutEndpoint = authority.replace('/protocol/openid-connect/auth', '/protocol/openid-connect/logout')
+      const params = new URLSearchParams({
+        id_token_hint:            idToken,
+        post_logout_redirect_uri: window.location.origin + '/login',
+      })
+      window.location.replace(`${logoutEndpoint}?${params.toString()}`)
+    }
   },
 }))

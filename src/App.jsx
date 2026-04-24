@@ -4,6 +4,7 @@ import { useAuthStore } from './store/authStore'
 
 import AppLayout from './components/layout/AppLayout'
 import LoginPage from './pages/auth/LoginPage'
+import OidcCallbackPage from './pages/auth/OidcCallbackPage'
 import DashboardPage from './pages/dashboard/DashboardPage'
 import KioskListPage from './pages/kiosks/KioskListPage'
 import KioskDetailPage from './pages/kiosks/KioskDetailPage'
@@ -27,6 +28,7 @@ export default function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/auth/callback" element={<OidcCallbackPage />} />
           <Route
             path="/"
             element={

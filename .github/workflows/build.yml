@@ -38,5 +38,8 @@ jobs:
           tags: |
             ${{ env.IMAGE_NAME }}:latest
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          build-args: |
+            VITE_OIDC_AUTHORITY=${{ secrets.VITE_OIDC_AUTHORITY }}
+            VITE_OIDC_CLIENT_ID=${{ secrets.VITE_OIDC_CLIENT_ID }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

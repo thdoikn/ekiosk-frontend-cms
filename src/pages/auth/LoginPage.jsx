@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAuthStore } from "../../store/authStore"
+import { buildAuthorizationUrl, isSsoEnabled } from "../../utils/oidc"
 import axios from "axios"
 
 export default function LoginPage() {
@@ -126,6 +127,28 @@ export default function LoginPage() {
                 ) : "Masuk"}
               </button>
             </form>
+
+            {isSsoEnabled() && (
+              <>
+                <div style={styles.ssoSeparator}>
+                  <span style={styles.ssoSeparatorLine} />
+                  <span style={styles.ssoSeparatorText}>atau</span>
+                  <span style={styles.ssoSeparatorLine} />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { window.location.href = buildAuthorizationUrl() }}
+                  style={styles.ssoBtn}
+                  onMouseEnter={(e) => Object.assign(e.target.style, styles.ssoBtnHover)}
+                  onMouseLeave={(e) => Object.assign(e.target.style, styles.ssoBtn)}
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                  Masuk dengan SSO
+                </button>
+              </>
+            )}
 
             <div style={styles.formFooter}>
               <span style={styles.formFooterText}>
@@ -436,6 +459,60 @@ const styles = {
     borderRadius: "50%",
     display: "inline-block",
     animation: "spin 0.7s linear infinite",
+  },
+  ssoSeparator: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    margin: "24px 0 0",
+  },
+  ssoSeparatorLine: {
+    flex: 1,
+    height: "1px",
+    background: "#3a3a36",
+  },
+  ssoSeparatorText: {
+    fontSize: "12px",
+    color: "#5a5956",
+    whiteSpace: "nowrap",
+  },
+  ssoBtn: {
+    marginTop: "12px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "10px",
+    background: "transparent",
+    border: "1px solid #3a3a36",
+    borderRadius: "8px",
+    padding: "13px 14px",
+    fontSize: "14px",
+    fontWeight: 500,
+    color: "#b2a893",
+    cursor: "pointer",
+    transition: "all 0.2s",
+    fontFamily: "'DM Sans', sans-serif",
+    width: "100%",
+    boxSizing: "border-box",
+  },
+  ssoBtnHover: {
+    marginTop: "12px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "10px",
+    background: "rgba(213,181,126,0.06)",
+    border: "1px solid #d5b57e",
+    borderRadius: "8px",
+    padding: "13px 14px",
+    fontSize: "14px",
+    fontWeight: 500,
+    color: "#d5b57e",
+    cursor: "pointer",
+    transition: "all 0.2s",
+    fontFamily: "'DM Sans', sans-serif",
+    width: "100%",
+    boxSizing: "border-box",
   },
   formFooter: {
     marginTop: "24px",
