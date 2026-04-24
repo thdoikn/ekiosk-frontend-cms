@@ -1,10 +1,16 @@
 import { create } from 'zustand'
 import { jwtDecode } from 'jwt-decode'
 
+function hydrateUser() {
+  const token = localStorage.getItem('access_token')
+  if (!token) return null
+  try { return jwtDecode(token) } catch { return null }
+}
+
 export const useAuthStore = create((set) => ({
   token:   localStorage.getItem('access_token') || null,
   idToken: localStorage.getItem('id_token') || null,
-  user:    null,
+  user:    hydrateUser(),
 
   login: (access, refresh) => {
     localStorage.setItem('access_token', access)
