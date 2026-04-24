@@ -22,6 +22,11 @@ function ProtectedRoute({ children }) {
   return token ? children : <Navigate to="/login" replace />
 }
 
+function StaffRoute({ children }) {
+  const user = useAuthStore((s) => s.user)
+  return user?.is_staff ? children : <Navigate to="/dashboard" replace />
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -39,14 +44,14 @@ export default function App() {
           >
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="kiosks" element={<KioskListPage />} />
-            <Route path="kiosks/:id" element={<KioskDetailPage />} />
-            <Route path="regions" element={<RegionListPage />} />
-            <Route path="playlists" element={<PlaylistListPage />} />
-            <Route path="playlists/:id" element={<PlaylistBuilderPage />} />
-            <Route path="media" element={<MediaPage />} />
-            <Route path="interactive" element={<InteractivePage />} />
-            <Route path="settings" element={<SettingsPage />} />
+            <Route path="kiosks" element={<StaffRoute><KioskListPage /></StaffRoute>} />
+            <Route path="kiosks/:id" element={<StaffRoute><KioskDetailPage /></StaffRoute>} />
+            <Route path="regions" element={<StaffRoute><RegionListPage /></StaffRoute>} />
+            <Route path="playlists" element={<StaffRoute><PlaylistListPage /></StaffRoute>} />
+            <Route path="playlists/:id" element={<StaffRoute><PlaylistBuilderPage /></StaffRoute>} />
+            <Route path="media" element={<StaffRoute><MediaPage /></StaffRoute>} />
+            <Route path="interactive" element={<StaffRoute><InteractivePage /></StaffRoute>} />
+            <Route path="settings" element={<StaffRoute><SettingsPage /></StaffRoute>} />
           </Route>
         </Routes>
       </BrowserRouter>

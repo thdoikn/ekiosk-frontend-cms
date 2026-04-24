@@ -1,16 +1,20 @@
 import { NavLink } from "react-router-dom"
+import { useAuthStore } from "../../store/authStore"
 
-const NAV_ITEMS = [
-  { to: "/dashboard",   label: "Dashboard",   icon: DashIcon   },
-  { to: "/kiosks",      label: "Kiosks",      icon: MonitorIcon },
-  { to: "/regions",     label: "Regions",     icon: MapIcon    },
-  { to: "/playlists",   label: "Playlists",   icon: ListIcon   },
-  { to: "/media",       label: "Media",       icon: ImageIcon  },
-  { to: "/interactive", label: "Interactive", icon: ClickIcon  },
-  { to: "/settings",    label: "Settings",    icon: GearIcon   },
+const ALL_NAV_ITEMS = [
+  { to: "/dashboard",   label: "Dashboard",   icon: DashIcon,   staffOnly: false },
+  { to: "/kiosks",      label: "Kiosks",      icon: MonitorIcon, staffOnly: true  },
+  { to: "/regions",     label: "Regions",     icon: MapIcon,    staffOnly: true  },
+  { to: "/playlists",   label: "Playlists",   icon: ListIcon,   staffOnly: true  },
+  { to: "/media",       label: "Media",       icon: ImageIcon,  staffOnly: true  },
+  { to: "/interactive", label: "Interactive", icon: ClickIcon,  staffOnly: true  },
+  { to: "/settings",    label: "Settings",    icon: GearIcon,   staffOnly: true  },
 ]
 
 export default function Sidebar({ collapsed, onToggle }) {
+  const user = useAuthStore((s) => s.user)
+  const isPublic = !user?.is_staff
+  const NAV_ITEMS = isPublic ? ALL_NAV_ITEMS.filter(i => !i.staffOnly) : ALL_NAV_ITEMS
   return (
     <aside style={{
       ...sidebarStyles.aside,

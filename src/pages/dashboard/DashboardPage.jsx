@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useState, useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
+import { useAuthStore } from "../../store/authStore"
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 import client from "../../api/client"
@@ -201,7 +202,7 @@ function KioskMap({ kiosks }) {
   )
 }
 
-function KioskCard({ kiosk, onForceUpdate, isForcing, navigate }) {
+function KioskCard({ kiosk, onForceUpdate, isForcing, navigate, isPublic }) {
   const cfg = STATUS_CONFIG[kiosk.status] || STATUS_CONFIG.pending
   return (
     <div
@@ -246,7 +247,7 @@ function KioskCard({ kiosk, onForceUpdate, isForcing, navigate }) {
               {kiosk.active_playlist?.name ?? "No Playlist"}
             </span>
           </div>
-          {kiosk.status !== "pending" && (
+          {!isPublic && kiosk.status !== "pending" && (
             <button
               onClick={(e) => { e.stopPropagation(); onForceUpdate(kiosk.id) }}
               disabled={isForcing}
@@ -267,6 +268,8 @@ function KioskCard({ kiosk, onForceUpdate, isForcing, navigate }) {
 export default function DashboardPage() {
   const qc = useQueryClient()
   const navigate = useNavigate()
+  const user = useAuthStore((s) => s.user)
+  const isPublic = !user?.is_staff
   const [forcingId, setForcingId] = useState(null)
   const [filter, setFilter] = useState("all")
   const [view, setView] = useState("grid") // "grid" | "map"
@@ -410,6 +413,7 @@ export default function DashboardPage() {
                   onForceUpdate={(id) => mutation.mutate(id)}
                   isForcing={forcingId === kiosk.id}
                   navigate={navigate}
+                  isPublic={isPublic}
                 />
               ))}
             </div>
