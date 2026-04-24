@@ -31,11 +31,7 @@ export default function LoginPage() {
         <div style={s.left}>
           <div style={s.leftInner}>
             <div style={s.logoMark}>
-              <svg width="52" height="52" viewBox="0 0 48 48" fill="none">
-                <polygon points="24,4 44,14 44,34 24,44 4,34 4,14" fill="none" stroke="#d5b57e" strokeWidth="2" />
-                <polygon points="24,10 38,17 38,31 24,38 10,31 10,17" fill="none" stroke="#d5b57e" strokeOpacity="0.4" strokeWidth="1" />
-                <circle cx="24" cy="24" r="6" fill="#d5b57e" />
-              </svg>
+              <img src="/logo.png" alt="Nusantara" style={{ width: "64px", height: "64px", objectFit: "contain" }} />
             </div>
             <div style={s.brandBlock}>
               <span style={s.brandOrg}>OTORITA IBU KOTA NUSANTARA</span>
@@ -72,7 +68,7 @@ export default function LoginPage() {
               <>
                 <div style={s.cardHeader}>
                   <div style={s.ssoIcon}>
-                    <ShieldIcon />
+                    <img src="/logo.png" alt="Nusantara" style={{ width: "40px", height: "40px", objectFit: "contain" }} />
                   </div>
                   <h2 style={s.cardTitle}>Masuk ke eKiosk</h2>
                   <p style={s.cardSub}>

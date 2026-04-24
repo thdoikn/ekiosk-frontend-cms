@@ -27,10 +27,7 @@ export default function Sidebar({ collapsed, onToggle }) {
         padding: collapsed ? "24px 0" : "24px 20px",
       }}>
         <div style={sidebarStyles.logoMark}>
-          <svg width="28" height="28" viewBox="0 0 48 48" fill="none">
-            <polygon points="24,4 44,14 44,34 24,44 4,34 4,14" fill="none" stroke="#C49A3C" strokeWidth="2.5" />
-            <circle cx="24" cy="24" r="6" fill="#C49A3C" />
-          </svg>
+          <img src="/logo.png" alt="Nusantara" style={{ width: "32px", height: "32px", objectFit: "contain" }} />
         </div>
         {!collapsed && (
           <div style={sidebarStyles.logoText}>
