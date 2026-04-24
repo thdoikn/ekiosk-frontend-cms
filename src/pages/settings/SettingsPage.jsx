@@ -16,9 +16,21 @@ function formatDate(str) {
     day: "2-digit", month: "short", year: "numeric",
   })
 }
+function toTitleCase(str) {
+  if (!str) return ""
+  return str.replace(/\S+/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+}
+function displayName(user) {
+  const full = `${user.first_name || ""} ${user.last_name || ""}`.trim()
+  return full ? toTitleCase(full) : user.username
+}
 function initials(user) {
-  const name = user.first_name || user.username || "?"
-  return name.charAt(0).toUpperCase()
+  return displayName(user).charAt(0).toUpperCase()
+}
+function roleRank(u) {
+  if (u.is_superuser) return 0
+  if (u.is_staff)     return 1
+  return 2
 }
 
 const ANIM_CSS = `
@@ -323,9 +335,7 @@ function UserRow({ user, onDeactivate, onReactivate, isActing, index }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "2px" }}>
           <span style={{ fontSize: "13px", fontWeight: 600, color: active ? "#1A1A18" : "#8A8680" }}>
-            {(user.first_name || user.last_name)
-              ? `${user.first_name} ${user.last_name}`.trim()
-              : user.username}
+            {displayName(user)}
           </span>
           {user.is_superuser && (
             <span style={{ fontSize: "9px", background: "rgba(192,57,43,0.08)", border: "1px solid rgba(192,57,43,0.3)", color: "#C0392B", borderRadius: "4px", padding: "1px 6px", fontWeight: 700, letterSpacing: "0.5px" }}>SUPER</span>
@@ -385,8 +395,6 @@ function UserRow({ user, onDeactivate, onReactivate, isActing, index }) {
 // ── Main Page ──────────────────────────────────────────────
 export default function SettingsPage() {
   const qc = useQueryClient()
-  const [showCreate, setShowCreate] = useState(false)
-  const [createError, setCreateError] = useState("")
   const [actingId, setActingId] = useState(null)
   const [userToast, setUserToast] = useState({ msg: "", type: "" })
 
@@ -398,25 +406,6 @@ export default function SettingsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["users"],
     queryFn: fetchUsers,
-  })
-
-  const createMut = useMutation({
-    mutationFn: createUser,
-    onSuccess: () => {
-      qc.invalidateQueries(["users"])
-      setShowCreate(false)
-      setCreateError("")
-      showUserToast("Akun berhasil dibuat.", "success")
-    },
-    onError: (err) => {
-      const d = err.response?.data
-      if (d && typeof d === "object") {
-        const first = Object.values(d)[0]
-        setCreateError(Array.isArray(first) ? first[0] : String(first))
-      } else {
-        setCreateError("Gagal membuat akun.")
-      }
-    },
   })
 
   const deactivateMut = useMutation({
@@ -433,7 +422,7 @@ export default function SettingsPage() {
     onError: () => { setActingId(null); showUserToast("Gagal mengaktifkan akun.", "error") },
   })
 
-  const users        = data?.results ?? data ?? []
+  const users        = [...(data?.results ?? data ?? [])].sort((a, b) => roleRank(a) - roleRank(b))
   const activeCount  = users.filter(u => u.is_active).length
   const staffCount   = users.filter(u => u.is_staff).length
 
@@ -513,28 +502,6 @@ export default function SettingsPage() {
               <Toast msg={userToast.msg} type={userToast.type} onClose={() => setUserToast({ msg: "", type: "" })} />
             )}
 
-            {/* Add user button */}
-            <div style={{ marginBottom: "14px" }}>
-              <button
-                style={{
-                  display: "inline-flex", alignItems: "center",
-                  background: "linear-gradient(135deg, #2D6A4F, #1b818a)",
-                  border: "none", borderRadius: "8px", padding: "10px 18px",
-                  fontSize: "13px", fontWeight: 600, color: "#FFFFFF",
-                  cursor: "pointer", fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-                  transition: "box-shadow 0.2s",
-                }}
-                onClick={() => { setShowCreate(true); setCreateError("") }}
-                onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 6px 20px rgba(45,106,79,0.25)")}
-                onMouseLeave={e => (e.currentTarget.style.boxShadow = "none")}
-              >
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ marginRight: 6 }}>
-                  <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-                Tambah Pengguna
-              </button>
-            </div>
-
             {/* User list */}
             {isLoading ? (
               <div>
@@ -571,15 +538,6 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Create modal */}
-      {showCreate && (
-        <CreateUserModal
-          onClose={() => { setShowCreate(false); setCreateError("") }}
-          onSubmit={createMut.mutate}
-          loading={createMut.isPending}
-          error={createError}
-        />
-      )}
     </div>
   )
 }
