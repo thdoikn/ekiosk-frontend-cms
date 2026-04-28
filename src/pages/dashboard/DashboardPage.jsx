@@ -315,26 +315,25 @@ export default function DashboardPage() {
           <p style={styles.pageSubtitle}>Monitoring dan kontrol semua eKiosk IKN</p>
         </div>
         <div style={styles.headerRight}>
-          {/* View toggle */}
-          <div style={styles.viewToggle}>
-            <button
-              onClick={() => setView("grid")}
-              style={view === "grid" ? { ...styles.viewBtn, ...styles.viewBtnActive } : styles.viewBtn}
-              title="Grid view"
-            >
-              <GridIcon />
-            </button>
-            <button
-              onClick={() => setView("map")}
-              style={view === "map" ? { ...styles.viewBtn, ...styles.viewBtnActive } : styles.viewBtn}
-              title="Map view"
-            >
-              <MapPinIcon />
-            </button>
+          {/* View toggle — prominent segmented control */}
+          <div style={styles.viewSegment}>
+            {[
+              { key: "grid", icon: <GridIcon />,   label: "Daftar Kiosk" },
+              { key: "map",  icon: <MapPinIcon />, label: "Peta Sebaran" },
+            ].map(({ key, icon, label }) => (
+              <button
+                key={key}
+                onClick={() => setView(key)}
+                style={view === key ? { ...styles.viewSegBtn, ...styles.viewSegBtnActive } : styles.viewSegBtn}
+              >
+                {icon}
+                <span>{label}</span>
+              </button>
+            ))}
           </div>
           <div style={styles.refreshNote}>
             <span style={styles.refreshDot} />
-            <span style={styles.refreshText}>Auto-refresh setiap 30 detik</span>
+            <span style={styles.refreshText}>Refresh 30 detik</span>
           </div>
         </div>
       </div>
@@ -481,67 +480,85 @@ function MapPinIcon() {
   )
 }
 
+// ── Neumorphic tokens ───────────────────────────────────────
+const NM   = "#E4E0DB"
+const NM_U = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"
+const NM_S = "4px 4px 10px #C4BFB8, -4px -4px 10px #FFFFFF"
+const NM_I = "inset 4px 4px 10px #C4BFB8, inset -4px -4px 10px #FFFFFF"
+const NM_I_SM = "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF"
+
 // ── Styles ─────────────────────────────────────────────────
 const styles = {
   page: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    color: "#1A1A18",
+    color: "#2A2520",
     width: "100%",
   },
   pageHeader: {
     display: "flex",
     alignItems: "flex-start",
     justifyContent: "space-between",
-    marginBottom: "32px",
+    marginBottom: "28px",
   },
   pageTitle: {
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    fontSize: "28px",
-    fontWeight: 600,
-    color: "#1A1A18",
-    margin: "0 0 4px",
-    letterSpacing: "0.5px",
+    fontSize: "26px",
+    fontWeight: 700,
+    color: "#2A2520",
+    margin: "0 0 3px",
+    letterSpacing: "0.3px",
   },
   pageSubtitle: {
-    fontSize: "14px",
-    color: "#7A7670",
+    fontSize: "13px",
+    color: "#9A9590",
     margin: 0,
-    fontWeight: 300,
+    fontWeight: 400,
   },
   headerRight: {
     display: "flex",
     alignItems: "center",
     gap: "12px",
   },
-  viewToggle: {
+
+  // View segment control — prominent, labeled
+  viewSegment: {
     display: "flex",
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "8px",
-    overflow: "hidden",
+    background: NM,
+    boxShadow: NM_I,
+    borderRadius: "14px",
+    padding: "4px",
+    gap: "4px",
   },
-  viewBtn: {
-    background: "transparent",
-    border: "none",
-    padding: "7px 11px",
-    cursor: "pointer",
-    color: "#A8A49C",
+  viewSegBtn: {
     display: "flex",
     alignItems: "center",
-    transition: "all 0.15s",
+    gap: "7px",
+    background: NM,
+    border: "none",
+    borderRadius: "10px",
+    padding: "8px 16px",
+    fontSize: "12px",
+    fontWeight: 500,
+    color: "#9A9590",
+    cursor: "pointer",
+    fontFamily: "'Inter', sans-serif",
+    transition: "all 0.2s",
+    boxShadow: "none",
   },
-  viewBtnActive: {
-    background: "rgba(45,106,79,0.08)",
+  viewSegBtnActive: {
+    background: NM,
     color: "#2D6A4F",
+    fontWeight: 700,
+    boxShadow: NM_S,
   },
+
   refreshNote: {
     display: "flex",
     alignItems: "center",
-    gap: "8px",
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
+    gap: "7px",
+    background: NM,
+    boxShadow: NM_I_SM,
     borderRadius: "20px",
-    padding: "6px 14px",
+    padding: "7px 14px",
   },
   refreshDot: {
     width: "7px",
@@ -550,10 +567,12 @@ const styles = {
     background: "#418840",
     animation: "pulse 2s ease infinite",
     display: "inline-block",
+    boxShadow: "0 0 5px rgba(65,136,64,0.5)",
   },
   refreshText: {
-    fontSize: "12px",
-    color: "#7A7670",
+    fontSize: "11px",
+    color: "#9A9590",
+    fontWeight: 500,
   },
 
   // Stats
@@ -561,38 +580,37 @@ const styles = {
     display: "grid",
     gridTemplateColumns: "repeat(4, 1fr)",
     gap: "16px",
-    marginBottom: "28px",
+    marginBottom: "24px",
   },
   statCard: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderTop: "3px solid",
-    borderRadius: "10px",
-    padding: "20px 24px",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+    background: NM,
+    borderRadius: "16px",
+    padding: "22px 24px",
+    boxShadow: NM_U,
+    position: "relative",
+    overflow: "hidden",
   },
   statTop: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: "10px",
+    marginBottom: "12px",
   },
   statIcon: {
-    fontSize: "18px",
+    fontSize: "20px",
     color: "#C0BAB0",
   },
   statValue: {
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    fontSize: "36px",
-    fontWeight: 600,
+    fontSize: "38px",
+    fontWeight: 700,
     lineHeight: 1,
   },
   statLabel: {
-    fontSize: "12px",
-    color: "#7A7670",
-    letterSpacing: "0.5px",
+    fontSize: "11px",
+    color: "#9A9590",
+    letterSpacing: "1px",
     textTransform: "uppercase",
-    fontWeight: 500,
+    fontWeight: 600,
   },
   loadingRow: {
     display: "contents",
@@ -600,56 +618,56 @@ const styles = {
   skeletonCard: {
     display: "block",
     height: "100px",
-    borderRadius: "10px",
-    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
-    backgroundSize: "800px 100%",
+    borderRadius: "16px",
+    background: NM,
+    boxShadow: NM_U,
     animation: "shimmer 1.5s infinite",
   },
 
   // Map
   mapSection: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "10px",
+    background: NM,
+    borderRadius: "16px",
     overflow: "hidden",
-    marginBottom: "28px",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+    marginBottom: "24px",
+    boxShadow: NM_U,
   },
   mapHeader: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     padding: "16px 20px",
-    borderBottom: "1px solid #E5E0D8",
+    borderBottom: "1px solid rgba(196,191,184,0.4)",
     flexWrap: "wrap",
     gap: "12px",
   },
   mapTitle: {
-    fontSize: "15px",
-    fontWeight: 600,
-    color: "#1A1A18",
+    fontSize: "14px",
+    fontWeight: 700,
+    color: "#2A2520",
     margin: "0 0 2px",
   },
   mapSubtitle: {
     fontSize: "12px",
-    color: "#8A8680",
+    color: "#9A9590",
     margin: 0,
   },
   mapLegend: {
     display: "flex",
-    gap: "4px",
+    gap: "6px",
     flexWrap: "wrap",
   },
   legendItem: {
     display: "flex",
     alignItems: "center",
     gap: "6px",
-    background: "transparent",
-    border: "1px solid #E0DAD0",
+    background: NM,
+    border: "none",
     borderRadius: "20px",
-    padding: "4px 10px",
+    padding: "5px 12px",
     cursor: "pointer",
-    transition: "all 0.15s",
+    transition: "all 0.18s",
+    boxShadow: NM_S,
   },
   legendDot: {
     width: "7px",
@@ -660,6 +678,8 @@ const styles = {
   legendLabel: {
     fontSize: "11px",
     whiteSpace: "nowrap",
+    color: "#7A7670",
+    fontWeight: 500,
   },
   mapWrapper: {
     height: "420px",
@@ -685,7 +705,7 @@ const styles = {
     gap: "8px",
     marginBottom: "10px",
     paddingBottom: "10px",
-    borderBottom: "1px solid #E5E0D8",
+    borderBottom: "1px solid rgba(196,191,184,0.4)",
   },
   popupDot: {
     width: "8px",
@@ -696,7 +716,7 @@ const styles = {
   popupName: {
     fontSize: "14px",
     fontWeight: 600,
-    color: "#1A1A18",
+    color: "#2A2520",
   },
   popupGrid: {
     display: "grid",
@@ -706,13 +726,13 @@ const styles = {
   },
   popupKey: {
     fontSize: "11px",
-    color: "#8A8680",
+    color: "#9A9590",
     whiteSpace: "nowrap",
   },
   popupVal: {
     fontSize: "12px",
     color: "#4A4845",
-    fontWeight: 400,
+    fontWeight: 500,
   },
 
   // Filter tabs
@@ -726,66 +746,67 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "8px",
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
+    background: NM,
+    border: "none",
     borderRadius: "20px",
-    padding: "6px 16px",
-    fontSize: "13px",
+    padding: "8px 18px",
+    fontSize: "12px",
+    fontWeight: 500,
     color: "#7A7670",
     cursor: "pointer",
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    transition: "all 0.15s",
+    fontFamily: "'Inter', sans-serif",
+    transition: "all 0.18s",
+    boxShadow: NM_S,
   },
   filterTabActive: {
-    background: "#2D6A4F",
-    border: "1px solid #2D6A4F",
-    color: "#FFFFFF",
+    boxShadow: NM_I,
+    color: "#2D6A4F",
+    fontWeight: 700,
   },
   filterCount: {
-    background: "#F0EBE3",
+    background: "rgba(196,191,184,0.3)",
     borderRadius: "10px",
     padding: "1px 7px",
-    fontSize: "11px",
-    color: "#7A7670",
+    fontSize: "10px",
+    color: "#9A9590",
+    fontWeight: 600,
   },
   filterCountActive: {
-    background: "rgba(255,255,255,0.25)",
-    color: "#FFFFFF",
+    background: "rgba(45,106,79,0.15)",
+    color: "#2D6A4F",
   },
 
   // Kiosk grid
   kioskGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-    gap: "16px",
+    gap: "18px",
   },
   kioskSkeleton: {
     height: "200px",
-    borderRadius: "10px",
-    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
-    backgroundSize: "800px 100%",
+    borderRadius: "16px",
+    background: NM,
+    boxShadow: NM_U,
     animation: "shimmer 1.5s infinite",
   },
   kioskCard: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "10px",
+    background: NM,
+    borderRadius: "16px",
     overflow: "hidden",
     position: "relative",
-    transition: "border-color 0.2s, box-shadow 0.2s, transform 0.15s",
+    transition: "box-shadow 0.2s, transform 0.18s",
     cursor: "pointer",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+    boxShadow: NM_S,
   },
   kioskCardHover: {
-    background: "#FFFFFF",
-    border: "1px solid #C49A3C",
-    borderRadius: "10px",
+    background: NM,
+    borderRadius: "16px",
     overflow: "hidden",
     position: "relative",
-    transition: "border-color 0.2s, box-shadow 0.2s, transform 0.15s",
+    transition: "box-shadow 0.2s, transform 0.18s",
     cursor: "pointer",
-    boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-    transform: "translateY(-1px)",
+    boxShadow: NM_U,
+    transform: "translateY(-2px)",
   },
   kioskCardAccent: {
     position: "absolute",
@@ -793,6 +814,7 @@ const styles = {
     left: 0,
     right: 0,
     height: "3px",
+    borderRadius: "16px 16px 0 0",
   },
   kioskCardInner: {
     padding: "20px",
@@ -804,14 +826,14 @@ const styles = {
     marginBottom: "16px",
   },
   kioskName: {
-    fontSize: "15px",
-    fontWeight: 600,
-    color: "#1A1A18",
+    fontSize: "14px",
+    fontWeight: 700,
+    color: "#2A2520",
     margin: "0 0 3px",
   },
   kioskRegion: {
     fontSize: "12px",
-    color: "#7A7670",
+    color: "#9A9590",
     margin: 0,
   },
 
@@ -823,8 +845,8 @@ const styles = {
     borderRadius: "20px",
     padding: "4px 10px",
     fontSize: "11px",
-    fontWeight: 500,
-    letterSpacing: "0.3px",
+    fontWeight: 600,
+    letterSpacing: "0.2px",
     whiteSpace: "nowrap",
   },
   badgeDot: {
@@ -840,26 +862,27 @@ const styles = {
     gridTemplateColumns: "1fr 1fr",
     gap: "10px",
     marginBottom: "16px",
-    background: "#F9F6F1",
-    borderRadius: "8px",
+    background: NM,
+    borderRadius: "12px",
     padding: "12px",
+    boxShadow: NM_I_SM,
   },
   kioskMetaItem: {
     display: "flex",
     flexDirection: "column",
-    gap: "2px",
+    gap: "3px",
   },
   kioskMetaLabel: {
-    fontSize: "10px",
-    color: "#A8A49C",
+    fontSize: "9px",
+    color: "#B0AAA2",
     textTransform: "uppercase",
-    letterSpacing: "0.5px",
-    fontWeight: 500,
+    letterSpacing: "0.8px",
+    fontWeight: 700,
   },
   kioskMetaValue: {
-    fontSize: "13px",
+    fontSize: "12px",
     color: "#4A4845",
-    fontWeight: 400,
+    fontWeight: 500,
   },
 
   // Footer
@@ -879,32 +902,38 @@ const styles = {
     borderRadius: "50%",
     background: "#2D6A4F",
     flexShrink: 0,
+    boxShadow: "0 0 4px rgba(45,106,79,0.5)",
   },
   playlistChipText: {
-    fontSize: "12px",
-    color: "#7A7670",
+    fontSize: "11px",
+    color: "#9A9590",
+    fontWeight: 500,
   },
   forceBtn: {
-    background: "transparent",
-    border: "1px solid #E5E0D8",
-    borderRadius: "6px",
-    padding: "5px 12px",
-    fontSize: "12px",
+    background: NM,
+    border: "none",
+    borderRadius: "8px",
+    padding: "6px 12px",
+    fontSize: "11px",
+    fontWeight: 600,
     color: "#7A7670",
     cursor: "pointer",
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    transition: "all 0.15s",
+    fontFamily: "'Inter', sans-serif",
+    boxShadow: NM_S,
+    transition: "all 0.18s",
   },
   forceBtnHover: {
-    background: "rgba(216,58,47,0.06)",
-    border: "1px solid rgba(216,58,47,0.3)",
-    borderRadius: "6px",
-    padding: "5px 12px",
-    fontSize: "12px",
+    background: NM,
+    border: "none",
+    borderRadius: "8px",
+    padding: "6px 12px",
+    fontSize: "11px",
+    fontWeight: 600,
     color: "#C0392B",
     cursor: "pointer",
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    transition: "all 0.15s",
+    fontFamily: "'Inter', sans-serif",
+    boxShadow: NM_I_SM,
+    transition: "all 0.18s",
   },
 
   // Empty state
@@ -918,11 +947,11 @@ const styles = {
   },
   emptyIcon: {
     fontSize: "48px",
-    color: "#D0CAC0",
+    color: "#C4BFB8",
   },
   emptyText: {
     fontSize: "14px",
-    color: "#8A8680",
+    color: "#9A9590",
     margin: 0,
   },
 }

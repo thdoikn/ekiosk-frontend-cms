@@ -11,8 +11,14 @@ const PAGE_TITLES = {
   "/settings":    "Settings",
 }
 
+function toTitleCase(str) {
+  if (!str) return ""
+  return str.replace(/\S+/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+}
+
 export default function Topbar() {
-  const logout = useAuthStore((s) => s.logout)
+  const logout   = useAuthStore((s) => s.logout)
+  const user     = useAuthStore((s) => s.user)
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -25,104 +31,160 @@ export default function Topbar() {
     navigate("/login")
   }
 
+  const fullName = toTitleCase(
+    [user?.first_name, user?.last_name].filter(Boolean).join(" ") || user?.username || "User"
+  )
+  const initials = fullName.split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase()
+
   return (
-    <header style={topbarStyles.header}>
-      <div>
-        <h2 style={topbarStyles.title}>{title}</h2>
+    <header style={s.header}>
+      <div style={s.left}>
+        <h2 style={s.title}>{title}</h2>
+        <span style={s.breadcrumb}>eKiosk IKN · Nusantara</span>
       </div>
-      <div style={topbarStyles.right}>
-        <div style={topbarStyles.userChip}>
-          <div style={topbarStyles.avatar}>A</div>
-          <span style={topbarStyles.userName}>Admin</span>
+
+      <div style={s.right}>
+        <div style={s.userPill}>
+          <div style={s.avatar}>{initials}</div>
+          <div style={s.userInfo}>
+            <span style={s.userName}>{fullName}</span>
+            <span style={s.userRole}>{user?.is_superuser ? "Superadmin" : user?.is_staff ? "Staff" : "Publik"}</span>
+          </div>
         </div>
+
         <button
           onClick={handleLogout}
-          style={topbarStyles.logoutBtn}
-          onMouseEnter={e => Object.assign(e.currentTarget.style, topbarStyles.logoutBtnHover)}
-          onMouseLeave={e => Object.assign(e.currentTarget.style, topbarStyles.logoutBtn)}
+          style={s.logoutBtn}
+          onMouseEnter={e => Object.assign(e.currentTarget.style, s.logoutBtnHover)}
+          onMouseLeave={e => Object.assign(e.currentTarget.style, s.logoutBtn)}
+          title="Keluar"
         >
           <LogoutIcon />
-          Keluar
+          <span>Keluar</span>
         </button>
       </div>
     </header>
   )
 }
 
-const topbarStyles = {
+const s = {
   header: {
-    height: "60px",
-    background: "#FFFFFF",
-    borderBottom: "1px solid #E5E0D8",
+    height: "64px",
+    background: "#E4E0DB",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     padding: "0 32px",
     flexShrink: 0,
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+    boxShadow: "0 4px 12px rgba(0,0,0,0.06)",
+    position: "relative",
+    zIndex: 10,
+  },
+  left: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "1px",
   },
   title: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    fontSize: "15px",
-    fontWeight: 600,
-    color: "#4A4845",
+    fontSize: "16px",
+    fontWeight: 700,
+    color: "#2A2520",
+    letterSpacing: "0.2px",
+    margin: 0,
+  },
+  breadcrumb: {
+    fontSize: "11px",
+    color: "#A8A49C",
     letterSpacing: "0.3px",
+    fontWeight: 400,
   },
   right: {
     display: "flex",
     alignItems: "center",
-    gap: "16px",
+    gap: "12px",
   },
-  userChip: {
+  userPill: {
     display: "flex",
     alignItems: "center",
-    gap: "8px",
+    gap: "10px",
+    background: "#E4E0DB",
+    boxShadow: "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF",
+    borderRadius: "30px",
+    padding: "6px 14px 6px 6px",
   },
   avatar: {
-    width: "28px",
-    height: "28px",
+    width: "32px",
+    height: "32px",
     borderRadius: "50%",
     background: "linear-gradient(135deg, #2D6A4F, #C49A3C)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    fontSize: "12px",
-    fontWeight: 600,
+    fontSize: "11px",
+    fontWeight: 700,
     color: "#FFFFFF",
+    flexShrink: 0,
+    boxShadow: "2px 2px 5px rgba(0,0,0,0.15)",
+  },
+  userInfo: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "1px",
   },
   userName: {
-    fontSize: "13px",
-    color: "#7A7670",
-    fontWeight: 500,
+    fontSize: "12px",
+    fontWeight: 600,
+    color: "#2A2520",
+    lineHeight: 1,
+    whiteSpace: "nowrap",
+  },
+  userRole: {
+    fontSize: "10px",
+    color: "#A8A49C",
+    lineHeight: 1,
+    fontWeight: 400,
   },
   logoutBtn: {
     display: "flex",
     alignItems: "center",
     gap: "6px",
-    background: "transparent",
-    border: "1px solid #E5E0D8",
-    borderRadius: "6px",
-    padding: "6px 12px",
+    background: "#E4E0DB",
+    border: "none",
+    borderRadius: "10px",
+    padding: "8px 14px",
     fontSize: "12px",
+    fontWeight: 500,
     color: "#7A7670",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
-    transition: "all 0.15s",
+    fontFamily: "'Inter', sans-serif",
+    boxShadow: "3px 3px 7px #C4BFB8, -3px -3px 7px #FFFFFF",
+    transition: "all 0.18s",
   },
   logoutBtnHover: {
     display: "flex",
     alignItems: "center",
     gap: "6px",
-    background: "rgba(216,58,47,0.06)",
-    border: "1px solid rgba(216,58,47,0.2)",
-    borderRadius: "6px",
-    padding: "6px 12px",
+    background: "#E4E0DB",
+    border: "none",
+    borderRadius: "10px",
+    padding: "8px 14px",
     fontSize: "12px",
+    fontWeight: 500,
     color: "#C0392B",
     cursor: "pointer",
-    fontFamily: "'DM Sans', sans-serif",
-    transition: "all 0.15s",
+    fontFamily: "'Inter', sans-serif",
+    boxShadow: "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF",
+    transition: "all 0.18s",
   },
 }
 
-function LogoutIcon() { return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg> }
+function LogoutIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/>
+      <polyline points="16 17 21 12 16 7"/>
+      <line x1="21" y1="12" x2="9" y2="12"/>
+    </svg>
+  )
+}
