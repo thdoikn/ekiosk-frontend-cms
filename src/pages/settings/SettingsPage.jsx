@@ -10,10 +10,11 @@ const reactivateUser = (id) => client.post(`/users/${id}/activate/`)
 const changePassword = (data) => client.post("/users/change-password/", data)
 
 // ── Helpers ────────────────────────────────────────────────
-function formatDate(str) {
+function formatDateTime(str) {
   if (!str) return "—"
-  return new Date(str).toLocaleDateString("id-ID", {
+  return new Date(str).toLocaleString("id-ID", {
     day: "2-digit", month: "short", year: "numeric",
+    hour: "2-digit", minute: "2-digit",
   })
 }
 function toTitleCase(str) {
@@ -359,8 +360,8 @@ function UserRow({ user, onDeactivate, onReactivate, isActing, index }) {
 
       {/* Dates */}
       <div style={{ display: "flex", flexDirection: "column", gap: "2px", minWidth: "90px" }}>
-        <span style={{ fontSize: "9px", color: "#A8A49C", textTransform: "uppercase", letterSpacing: "0.5px", fontWeight: 600 }}>Login</span>
-        <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "11px", color: "#8A8680" }}>{formatDate(user.last_login)}</span>
+        <span style={{ fontSize: "9px", color: "#A8A49C", textTransform: "uppercase", letterSpacing: "0.5px", fontWeight: 600 }}>Login Terakhir</span>
+        <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "11px", color: "#8A8680" }}>{formatDateTime(user.last_login)}</span>
       </div>
 
       {/* Status badge */}
