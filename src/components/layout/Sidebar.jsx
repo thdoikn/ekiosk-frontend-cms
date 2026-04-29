@@ -7,7 +7,7 @@ const ALL_NAV_ITEMS = [
   { to: "/regions",     label: "Regions",     icon: MapIcon,     staffOnly: true  },
   { to: "/playlists",   label: "Playlists",   icon: ListIcon,    staffOnly: true  },
   { to: "/media",       label: "Media",       icon: ImageIcon,   staffOnly: true  },
-  { to: "/interactive", label: "Interactive", icon: ClickIcon,   staffOnly: true  },
+  // { to: "/interactive", label: "Interactive", icon: ClickIcon,   staffOnly: true  },
   { to: "/settings",    label: "Settings",    icon: GearIcon,    staffOnly: true  },
 ]
 

@@ -126,8 +126,8 @@ function AssignModal({ region, playlists, onAssign, onClose, loading }) {
             onClick={() => setSelected(p.id)}
             style={{
               ...S.playlistPickerItem,
-              borderColor: selected === p.id ? "#2D6A4F" : "#E5E0D8",
-              background: selected === p.id ? "rgba(45,106,79,0.06)" : "#F9F6F1",
+              boxShadow: selected === p.id ? NM_I_SM : NM_S,
+              color: selected === p.id ? "#2D6A4F" : "#7A7670",
             }}
           >
             <div style={S.pickerCheck}>
@@ -176,8 +176,8 @@ function RegionCard({ region, index, onEdit, onDelete, onAssign }) {
   return (
     <div
       style={{ ...S.regionCard, animationDelay: `${index * 0.06}s` }}
-      onMouseEnter={e => e.currentTarget.style.borderColor = "#C49A3C"}
-      onMouseLeave={e => e.currentTarget.style.borderColor = "#E5E0D8"}
+      onMouseEnter={e => e.currentTarget.style.boxShadow = "8px 8px 18px #C4BFB8, -8px -8px 18px #FFFFFF"}
+      onMouseLeave={e => e.currentTarget.style.boxShadow = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"}
     >
       {/* Top accent stripe */}
       <div style={{
@@ -402,6 +402,13 @@ function PlaylistIcon() {
   return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
 }
 
+// ── Neuromorphic tokens ────────────────────────────────────
+const NM   = "#E4E0DB"
+const NM_U = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"
+const NM_S = "4px 4px 10px #C4BFB8, -4px -4px 10px #FFFFFF"
+const NM_I = "inset 4px 4px 10px #C4BFB8, inset -4px -4px 10px #FFFFFF"
+const NM_I_SM = "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF"
+
 // ── Styles ─────────────────────────────────────────────────
 const ANIM_CSS = `
   @keyframes fadeUp   { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
@@ -442,18 +449,19 @@ const S = {
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-    gap: "16px",
+    gap: "20px",
   },
 
   // Region card
   regionCard: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "12px",
+    background: NM,
+    border: "none",
+    borderRadius: "14px",
     overflow: "hidden",
-    transition: "border-color 0.2s, box-shadow 0.2s",
+    transition: "box-shadow 0.22s",
     animation: "fadeUp 0.4s ease both",
     position: "relative",
+    boxShadow: NM_U,
   },
   regionStripe: {
     height: "3px",
@@ -501,10 +509,11 @@ const S = {
     display: "flex",
     alignItems: "center",
     gap: "16px",
-    background: "#F9F6F1",
-    borderRadius: "8px",
+    background: NM,
+    borderRadius: "10px",
     padding: "10px 14px",
     marginBottom: "14px",
+    boxShadow: NM_I_SM,
   },
   regionStat: {
     display: "flex",
@@ -529,7 +538,7 @@ const S = {
   regionStatDivider: {
     width: "1px",
     height: "32px",
-    background: "#E5E0D8",
+    background: "#C4BFB8",
     flexShrink: 0,
   },
   assignBtn: {
@@ -537,39 +546,41 @@ const S = {
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    background: "transparent",
-    border: "1px solid #E5E0D8",
-    borderRadius: "8px",
+    background: NM,
+    border: "none",
+    borderRadius: "10px",
     padding: "9px",
     fontSize: "12px",
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontWeight: 500,
-    transition: "all 0.15s",
+    transition: "box-shadow 0.18s",
+    boxShadow: NM_S,
   },
   assignBtnHover: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    background: "rgba(45,106,79,0.06)",
-    border: "1px solid rgba(45,106,79,0.3)",
-    borderRadius: "8px",
+    background: NM,
+    border: "none",
+    borderRadius: "10px",
     padding: "9px",
     fontSize: "12px",
     color: "#2D6A4F",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontWeight: 500,
-    transition: "all 0.15s",
+    transition: "box-shadow 0.18s",
+    boxShadow: NM_I_SM,
   },
 
   // Icon buttons
   iconBtn: {
-    background: "transparent",
-    border: "1px solid #E5E0D8",
-    borderRadius: "6px",
+    background: NM,
+    border: "none",
+    borderRadius: "8px",
     width: "30px",
     height: "30px",
     display: "flex",
@@ -577,12 +588,13 @@ const S = {
     justifyContent: "center",
     color: "#7A7670",
     cursor: "pointer",
-    transition: "all 0.15s",
+    transition: "box-shadow 0.18s",
+    boxShadow: NM_S,
   },
   iconBtnDanger: {
-    background: "transparent",
-    border: "1px solid #E5E0D8",
-    borderRadius: "6px",
+    background: NM,
+    border: "none",
+    borderRadius: "8px",
     width: "30px",
     height: "30px",
     display: "flex",
@@ -590,7 +602,8 @@ const S = {
     justifyContent: "center",
     color: "#C0392B",
     cursor: "pointer",
-    transition: "all 0.15s",
+    transition: "box-shadow 0.18s",
+    boxShadow: NM_S,
   },
 
   // Modal overlay
@@ -607,24 +620,24 @@ const S = {
     padding: "20px",
   },
   modal: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "14px",
+    background: NM,
+    border: "none",
+    borderRadius: "16px",
     width: "100%",
     maxWidth: "480px",
     animation: "slideUp 0.25s ease both",
     overflow: "hidden",
-    boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+    boxShadow: NM_U,
   },
   confirmBox: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "14px",
+    background: NM,
+    border: "none",
+    borderRadius: "16px",
     width: "100%",
     maxWidth: "380px",
     padding: "28px",
     animation: "slideUp 0.25s ease both",
-    boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+    boxShadow: NM_U,
   },
   confirmTitle: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
@@ -690,9 +703,9 @@ const S = {
     textTransform: "uppercase",
   },
   input: {
-    background: "#F9F6F1",
-    border: "1px solid #E5E0D8",
-    borderRadius: "8px",
+    background: NM,
+    border: "none",
+    borderRadius: "10px",
     padding: "11px 14px",
     fontSize: "14px",
     color: "#1A1A18",
@@ -700,12 +713,12 @@ const S = {
     outline: "none",
     width: "100%",
     boxSizing: "border-box",
-    transition: "border-color 0.15s",
+    boxShadow: NM_I_SM,
   },
   inputFocus: {
-    background: "#F9F6F1",
-    border: "1px solid #C49A3C",
-    borderRadius: "8px",
+    background: NM,
+    border: "none",
+    borderRadius: "10px",
     padding: "11px 14px",
     fontSize: "14px",
     color: "#1A1A18",
@@ -713,12 +726,12 @@ const S = {
     outline: "none",
     width: "100%",
     boxSizing: "border-box",
-    transition: "border-color 0.15s",
+    boxShadow: "inset 3px 3px 7px #B8B4AE, inset -3px -3px 7px #FFFFFF",
   },
   textarea: {
-    background: "#F9F6F1",
-    border: "1px solid #E5E0D8",
-    borderRadius: "8px",
+    background: NM,
+    border: "none",
+    borderRadius: "10px",
     padding: "11px 14px",
     fontSize: "14px",
     color: "#1A1A18",
@@ -728,12 +741,12 @@ const S = {
     boxSizing: "border-box",
     resize: "vertical",
     lineHeight: 1.5,
-    transition: "border-color 0.15s",
+    boxShadow: NM_I_SM,
   },
   textareaFocus: {
-    background: "#F9F6F1",
-    border: "1px solid #C49A3C",
-    borderRadius: "8px",
+    background: NM,
+    border: "none",
+    borderRadius: "10px",
     padding: "11px 14px",
     fontSize: "14px",
     color: "#1A1A18",
@@ -743,7 +756,7 @@ const S = {
     boxSizing: "border-box",
     resize: "vertical",
     lineHeight: 1.5,
-    transition: "border-color 0.15s",
+    boxShadow: "inset 3px 3px 7px #B8B4AE, inset -3px -3px 7px #FFFFFF",
   },
   formActions: {
     display: "flex",
@@ -766,22 +779,26 @@ const S = {
     alignItems: "center",
     gap: "12px",
     padding: "12px 14px",
-    borderRadius: "8px",
-    border: "1px solid",
+    borderRadius: "10px",
+    border: "none",
     cursor: "pointer",
-    transition: "all 0.15s",
+    transition: "box-shadow 0.18s",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     textAlign: "left",
+    background: NM,
+    boxShadow: NM_S,
   },
   pickerCheck: {
     width: "16px",
     height: "16px",
     borderRadius: "50%",
-    border: "2px solid #E5E0D8",
+    border: "none",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
+    background: NM,
+    boxShadow: NM_I_SM,
   },
   pickerCheckInner: {
     width: "8px",
@@ -850,29 +867,31 @@ const S = {
   btnGhost: {
     display: "inline-flex",
     alignItems: "center",
-    background: "transparent",
-    border: "1px solid #E5E0D8",
+    background: NM,
+    border: "none",
     borderRadius: "8px",
     padding: "9px 16px",
     fontSize: "13px",
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    transition: "all 0.15s",
+    transition: "box-shadow 0.18s",
+    boxShadow: NM_S,
   },
   btnDanger: {
     display: "inline-flex",
     alignItems: "center",
-    background: "rgba(192,57,43,0.08)",
-    border: "1px solid rgba(192,57,43,0.3)",
+    background: NM,
+    border: "none",
     borderRadius: "8px",
     padding: "9px 16px",
     fontSize: "13px",
     color: "#C0392B",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    transition: "all 0.15s",
+    transition: "box-shadow 0.18s",
     fontWeight: 600,
+    boxShadow: NM_S,
   },
 
   // Empty + loading
@@ -899,8 +918,8 @@ const S = {
   },
   skeleton: {
     height: "240px",
-    borderRadius: "12px",
-    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
+    borderRadius: "14px",
+    background: "linear-gradient(90deg, #D8D4CF 25%, #E8E4DF 50%, #D8D4CF 75%)",
     backgroundSize: "600px 100%",
     animation: "shimmer 1.4s infinite",
   },

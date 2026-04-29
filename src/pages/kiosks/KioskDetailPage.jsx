@@ -708,6 +708,13 @@ function RefreshIcon() {
   )
 }
 
+// ── Neuromorphic tokens ────────────────────────────────────
+const NM   = "#E4E0DB"
+const NM_U = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"
+const NM_S = "4px 4px 10px #C4BFB8, -4px -4px 10px #FFFFFF"
+const NM_I = "inset 4px 4px 10px #C4BFB8, inset -4px -4px 10px #FFFFFF"
+const NM_I_SM = "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF"
+
 // ── Styles ─────────────────────────────────────────────────
 const ANIM_CSS = `
   @keyframes fadeUp   { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
@@ -726,34 +733,33 @@ const S = {
     marginBottom: "20px",
   },
   backBtn: {
-    background: "transparent",
-    border: "1px solid #E5E0D8",
-    borderRadius: "6px",
+    background: NM,
+    border: "none",
+    borderRadius: "8px",
     padding: "7px 14px",
     fontSize: "13px",
     color: "#5A5651",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    transition: "color 0.15s",
+    transition: "box-shadow 0.18s",
+    boxShadow: NM_S,
   },
 
   // Hero card
   heroCard: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
+    background: NM,
+    border: "none",
     borderTop: "3px solid",
-    borderRadius: "12px",
+    borderRadius: "14px",
     padding: "28px 32px",
     marginBottom: "20px",
     position: "relative",
-    // overflow must stay visible so absolutely-positioned dropdowns aren't clipped
-    boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+    boxShadow: NM_U,
   },
-  // Clip only the glow, not the whole card
   heroGlowClip: {
     position: "absolute",
     inset: 0,
-    borderRadius: "12px",
+    borderRadius: "14px",
     overflow: "hidden",
     pointerEvents: "none",
   },
@@ -784,13 +790,14 @@ const S = {
   heroIconWrap: {
     width: "52px",
     height: "52px",
-    background: "#F9F6F1",
-    border: "1px solid #E5E0D8",
+    background: NM,
+    border: "none",
     borderRadius: "12px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
+    boxShadow: NM_I_SM,
   },
   heroName: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
@@ -812,15 +819,16 @@ const S = {
     margin: 0,
   },
   editRegionBtn: {
-    background: "transparent",
-    border: "1px solid #E5E0D8",
-    borderRadius: "4px",
+    background: NM,
+    border: "none",
+    borderRadius: "6px",
     padding: "2px 8px",
     fontSize: "11px",
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', sans-serif",
-    transition: "all 0.15s",
+    transition: "box-shadow 0.18s",
+    boxShadow: NM_S,
   },
   regionEditRow: {
     display: "flex",
@@ -829,15 +837,16 @@ const S = {
     flexWrap: "wrap",
   },
   regionSelect: {
-    background: "#F9F6F1",
-    border: "1px solid #E0DAD0",
-    borderRadius: "6px",
+    background: NM,
+    border: "none",
+    borderRadius: "8px",
     padding: "5px 10px",
     fontSize: "13px",
     color: "#1A1A18",
     fontFamily: "'Inter', sans-serif",
     outline: "none",
     minWidth: "180px",
+    boxShadow: NM_I_SM,
   },
   saveRegionBtn: {
     background: "#2D6A4F",
@@ -851,18 +860,19 @@ const S = {
     fontFamily: "'Inter', sans-serif",
   },
   cancelRegionBtn: {
-    background: "transparent",
-    border: "1px solid #E5E0D8",
+    background: NM,
+    border: "none",
     borderRadius: "6px",
     padding: "5px 10px",
     fontSize: "12px",
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', sans-serif",
+    boxShadow: NM_S,
   },
   stopIdInput: {
-    background: "#F9F6F1",
-    border: "1px solid #E0DAD0",
+    background: NM,
+    border: "none",
     borderRadius: "6px",
     padding: "5px 10px",
     fontSize: "13px",
@@ -870,6 +880,7 @@ const S = {
     fontFamily: "monospace",
     outline: "none",
     width: "140px",
+    boxShadow: NM_I_SM,
   },
   heroMeta: {
     display: "flex",
@@ -899,26 +910,27 @@ const S = {
     gap: "8px",
   },
   setStatusBtn: {
-    background: "transparent",
-    border: "1px solid #E5E0D8",
-    borderRadius: "6px",
+    background: NM,
+    border: "none",
+    borderRadius: "8px",
     padding: "5px 12px",
     fontSize: "11px",
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', sans-serif",
-    transition: "all 0.15s",
+    transition: "box-shadow 0.18s",
     whiteSpace: "nowrap",
+    boxShadow: NM_S,
   },
   statusDropdown: {
     position: "absolute",
     top: "100%",
     right: 0,
     marginTop: "6px",
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "10px",
-    boxShadow: "0 8px 28px rgba(0,0,0,0.12)",
+    background: NM,
+    border: "none",
+    borderRadius: "12px",
+    boxShadow: NM_U,
     zIndex: 100,
     minWidth: "200px",
     padding: "6px 0",
@@ -969,8 +981,8 @@ const S = {
   forceBtn: {
     display: "inline-flex",
     alignItems: "center",
-    background: "rgba(45,106,79,0.08)",
-    border: "1px solid rgba(45,106,79,0.25)",
+    background: NM,
+    border: "none",
     borderRadius: "8px",
     padding: "8px 16px",
     fontSize: "13px",
@@ -978,13 +990,14 @@ const S = {
     cursor: "pointer",
     fontFamily: "'Inter', sans-serif",
     fontWeight: 500,
-    transition: "all 0.15s",
+    transition: "box-shadow 0.18s",
+    boxShadow: NM_S,
   },
   forceBtnHover: {
     display: "inline-flex",
     alignItems: "center",
-    background: "rgba(45,106,79,0.15)",
-    border: "1px solid rgba(45,106,79,0.4)",
+    background: NM,
+    border: "none",
     borderRadius: "8px",
     padding: "8px 16px",
     fontSize: "13px",
@@ -992,8 +1005,8 @@ const S = {
     cursor: "pointer",
     fontFamily: "'Inter', sans-serif",
     fontWeight: 500,
-    transition: "all 0.15s",
-    boxShadow: "0 4px 12px rgba(45,106,79,0.12)",
+    transition: "box-shadow 0.18s",
+    boxShadow: NM_I_SM,
   },
   pendingChip: {
     display: "inline-flex",
@@ -1040,11 +1053,11 @@ const S = {
 
   // Cards
   card: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "12px",
+    background: NM,
+    border: "none",
+    borderRadius: "14px",
     padding: "20px 24px",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+    boxShadow: NM_U,
   },
   sectionHeader: {
     display: "flex",
@@ -1061,28 +1074,30 @@ const S = {
     margin: 0,
   },
   editBtn: {
-    background: "transparent",
-    border: "1px solid #E5E0D8",
+    background: NM,
+    border: "none",
     borderRadius: "6px",
     padding: "4px 10px",
     fontSize: "11px",
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', sans-serif",
+    boxShadow: NM_S,
   },
 
   // Diag grid
   diagGrid: {
     display: "grid",
     gridTemplateColumns: "1fr 1fr",
-    gap: "1px",
-    background: "#E5E0D8",
-    borderRadius: "8px",
+    gap: "2px",
+    background: "transparent",
+    borderRadius: "10px",
     overflow: "hidden",
     marginBottom: "16px",
+    boxShadow: NM_I,
   },
   diagCard: {
-    background: "#F9F6F1",
+    background: "rgba(196,191,184,0.15)",
     padding: "12px 14px",
     display: "flex",
     flexDirection: "column",
@@ -1141,10 +1156,10 @@ const S = {
     display: "flex",
     flexDirection: "column",
     gap: "6px",
-    background: "#F9F6F1",
+    background: NM,
     borderRadius: "8px",
     padding: "12px",
-    border: "1px solid #F0EBE3",
+    boxShadow: NM_I_SM,
   },
   hashArrow: {
     color: "#C8C2B8",
@@ -1210,8 +1225,8 @@ const S = {
     lineHeight: 1.5,
   },
   overrideSelect: {
-    background: "#F9F6F1",
-    border: "1px solid #E0DAD0",
+    background: NM,
+    border: "none",
     borderRadius: "8px",
     padding: "9px 12px",
     fontSize: "13px",
@@ -1219,6 +1234,7 @@ const S = {
     fontFamily: "'Inter', sans-serif",
     outline: "none",
     width: "100%",
+    boxShadow: NM_I_SM,
   },
   saveOverrideBtn: {
     background: "linear-gradient(135deg, #2D6A4F, #1b818a)",
@@ -1251,7 +1267,7 @@ const S = {
   logTableWrap: {
     overflowX: "auto",
     borderRadius: "8px",
-    border: "1px solid #E5E0D8",
+    boxShadow: NM_I_SM,
   },
   logTable: {
     width: "100%",
@@ -1319,15 +1335,16 @@ const S = {
     marginTop: "12px",
   },
   logPageBtn: {
-    background: "transparent",
-    border: "1px solid #E5E0D8",
+    background: NM,
+    border: "none",
     borderRadius: "6px",
     padding: "5px 12px",
     fontSize: "12px",
     color: "#5A5651",
     cursor: "pointer",
     fontFamily: "'Inter', sans-serif",
-    transition: "all 0.15s",
+    transition: "box-shadow 0.18s",
+    boxShadow: NM_S,
   },
   logPageInfo: {
     fontSize: "12px",
@@ -1345,7 +1362,7 @@ const S = {
   skeleton: {
     height: "200px",
     borderRadius: "12px",
-    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
+    background: "linear-gradient(90deg, #D8D4CF 25%, #E8E4DF 50%, #D8D4CF 75%)",
     backgroundSize: "600px 100%",
     animation: "shimmer 1.4s infinite",
   },

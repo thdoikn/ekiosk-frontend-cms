@@ -140,11 +140,7 @@ export default function KioskListPage() {
           <button
             key={key}
             onClick={() => setStatus(statusFilter === key ? "all" : key)}
-            style={{
-              ...S.stripItem,
-              borderColor: statusFilter === key ? cfg.dot : "#E5E0D8",
-              background: statusFilter === key ? cfg.bg : "#FFFFFF",
-            }}
+            style={statusFilter === key ? S.stripItemActive : S.stripItem}
           >
             <span style={{ ...S.stripDot, background: cfg.dot }} />
             <span style={{ ...S.stripCount, color: statusFilter === key ? cfg.text : "#1A1A18" }}>{counts[key] ?? 0}</span>
@@ -221,7 +217,7 @@ export default function KioskListPage() {
                     position: statusMenuId === kiosk.id ? "relative" : undefined,
                     zIndex:   statusMenuId === kiosk.id ? 10 : undefined,
                   }}
-                  onMouseEnter={e => e.currentTarget.style.background = "#F9F6F1"}
+                  onMouseEnter={e => e.currentTarget.style.background = "rgba(196,191,184,0.2)"}
                   onMouseLeave={e => e.currentTarget.style.background = "transparent"}
                 >
                   <td style={S.td}>
@@ -354,6 +350,13 @@ function DetailIcon()  { return <svg width="12" height="12" viewBox="0 0 24 24" 
 function RefreshIcon() { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight:4}}><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> }
 function WrenchIcon() { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight:4}}><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg> }
 
+// ── Neuromorphic tokens ────────────────────────────────────
+const NM   = "#E4E0DB"
+const NM_U = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"
+const NM_S = "4px 4px 10px #C4BFB8, -4px -4px 10px #FFFFFF"
+const NM_I = "inset 4px 4px 10px #C4BFB8, inset -4px -4px 10px #FFFFFF"
+const NM_I_SM = "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF"
+
 // ── Styles ─────────────────────────────────────────────────
 const ANIM_CSS = `
   @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
@@ -400,12 +403,26 @@ const S = {
     alignItems: "center",
     gap: "8px",
     padding: "10px 16px",
-    borderRadius: "8px",
-    border: "1px solid",
+    borderRadius: "10px",
+    border: "none",
     cursor: "pointer",
-    transition: "all 0.15s",
+    transition: "box-shadow 0.18s",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+    background: NM,
+    boxShadow: NM_S,
+  },
+  stripItemActive: {
+    display: "flex",
+    alignItems: "center",
+    gap: "8px",
+    padding: "10px 16px",
+    borderRadius: "10px",
+    border: "none",
+    cursor: "pointer",
+    transition: "box-shadow 0.18s",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+    background: NM,
+    boxShadow: NM_I,
   },
   stripDot: {
     width: "8px",
@@ -438,15 +455,16 @@ const S = {
   },
   searchInput: {
     width: "100%",
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "8px",
+    background: NM,
+    border: "none",
+    borderRadius: "10px",
     padding: "10px 40px",
     fontSize: "13px",
     color: "#1A1A18",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     boxSizing: "border-box",
+    boxShadow: NM_I_SM,
   },
   clearBtn: {
     position: "absolute",
@@ -461,9 +479,9 @@ const S = {
     padding: 0,
   },
   select: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "8px",
+    background: NM,
+    border: "none",
+    borderRadius: "10px",
     padding: "10px 14px",
     fontSize: "13px",
     color: "#4A4845",
@@ -471,17 +489,15 @@ const S = {
     outline: "none",
     cursor: "pointer",
     minWidth: "160px",
+    boxShadow: NM_S,
   },
 
   // Table
   tableWrap: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "12px",
-    // overflow must be visible so the status dropdown isn't clipped.
-    // border-radius on the table itself handles corner rounding.
+    background: NM,
+    borderRadius: "14px",
     overflow: "visible",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+    boxShadow: NM_U,
   },
   table: {
     width: "100%",
@@ -496,12 +512,12 @@ const S = {
     letterSpacing: "1px",
     textTransform: "uppercase",
     textAlign: "left",
-    borderBottom: "1px solid #E5E0D8",
-    background: "#F9F6F1",
+    borderBottom: "1px solid #D0CAC0",
+    background: "rgba(196,191,184,0.18)",
     whiteSpace: "nowrap",
   },
   tr: {
-    borderBottom: "1px solid #F0EBE3",
+    borderBottom: "1px solid rgba(196,191,184,0.3)",
     transition: "background 0.1s",
   },
   td: {
@@ -545,7 +561,7 @@ const S = {
   regionChip: {
     fontSize: "12px",
     color: "#4A4845",
-    background: "#F0EBE3",
+    background: "rgba(196,191,184,0.35)",
     borderRadius: "4px",
     padding: "3px 8px",
   },
@@ -590,53 +606,56 @@ const S = {
   btnGhost: {
     display: "inline-flex",
     alignItems: "center",
-    background: "transparent",
-    border: "1px solid #E5E0D8",
-    borderRadius: "6px",
+    background: NM,
+    border: "none",
+    borderRadius: "8px",
     padding: "5px 10px",
     fontSize: "12px",
     color: "#5A5651",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     whiteSpace: "nowrap",
-    transition: "opacity 0.15s",
+    transition: "box-shadow 0.18s",
+    boxShadow: NM_S,
   },
   btnPrimary: {
     display: "inline-flex",
     alignItems: "center",
-    background: "rgba(45,106,79,0.08)",
-    border: "1px solid rgba(45,106,79,0.3)",
-    borderRadius: "6px",
+    background: NM,
+    border: "none",
+    borderRadius: "8px",
     padding: "5px 10px",
     fontSize: "12px",
     color: "#2D6A4F",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     whiteSpace: "nowrap",
-    transition: "opacity 0.15s",
+    transition: "box-shadow 0.18s",
+    boxShadow: NM_S,
   },
   btnDanger: {
     display: "inline-flex",
     alignItems: "center",
-    background: "rgba(216,58,47,0.06)",
-    border: "1px solid rgba(216,58,47,0.2)",
-    borderRadius: "6px",
+    background: NM,
+    border: "none",
+    borderRadius: "8px",
     padding: "5px 10px",
     fontSize: "12px",
     color: "#C0392B",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     whiteSpace: "nowrap",
-    transition: "opacity 0.15s",
+    transition: "box-shadow 0.18s",
+    boxShadow: NM_S,
   },
 
   // Empty & loading
   loadingWrap: { padding: "12px" },
   skeletonRow: {
     height: "52px",
-    borderRadius: "6px",
+    borderRadius: "8px",
     marginBottom: "8px",
-    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
+    background: "linear-gradient(90deg, #D8D4CF 25%, #E8E4DF 50%, #D8D4CF 75%)",
     backgroundSize: "600px 100%",
     animation: "shimmer 1.4s infinite",
   },
@@ -647,32 +666,33 @@ const S = {
     padding: "64px 20px",
     gap: "12px",
   },
-  emptyIcon: { fontSize: "40px", color: "#D0CAC0" },
+  emptyIcon: { fontSize: "40px", color: "#C4BFB8" },
   emptyText: { fontSize: "14px", color: "#8A8680", margin: 0 },
   emptyReset: {
-    background: "transparent",
-    border: "1px solid #E5E0D8",
-    borderRadius: "6px",
+    background: NM,
+    border: "none",
+    borderRadius: "8px",
     padding: "7px 16px",
     fontSize: "12px",
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     marginTop: "4px",
+    boxShadow: NM_S,
   },
 
   statusMenu: {
     position: "absolute",
     top: "100%",
     right: 0,
-    marginTop: "4px",
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "8px",
-    boxShadow: "0 8px 24px rgba(0,0,0,0.12)",
+    marginTop: "6px",
+    background: NM,
+    border: "none",
+    borderRadius: "12px",
+    boxShadow: NM_U,
     zIndex: 100,
     minWidth: "160px",
-    padding: "4px 0",
+    padding: "6px 0",
     overflow: "hidden",
   },
   statusMenuItem: {

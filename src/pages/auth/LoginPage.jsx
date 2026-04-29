@@ -1,23 +1,47 @@
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { buildAuthorizationUrl, isSsoEnabled } from "../../utils/oidc"
+import { useAuthStore } from "../../store/authStore"
+import client from "../../api/client"
 
 export default function LoginPage() {
   const [autoRedirecting, setAutoRedirecting] = useState(false)
+  const [username, setUsername]   = useState("")
+  const [password, setPassword]   = useState("")
+  const [error, setError]         = useState("")
+  const [loading, setLoading]     = useState(false)
+  const login    = useAuthStore((s) => s.login)
+  const navigate = useNavigate()
 
+  const ssoEnabled = isSsoEnabled()
   const isLoggedOut = new URLSearchParams(window.location.search).has("logged_out")
 
   useEffect(() => {
-    if (!isSsoEnabled() || isLoggedOut) return
-    // Auto-redirect to Keycloak if the user has an active session there
+    if (!ssoEnabled || isLoggedOut) return
     setAutoRedirecting(true)
     const t = setTimeout(() => {
       window.location.href = buildAuthorizationUrl()
-    }, 800) // small delay so the page renders before redirect
+    }, 800)
     return () => clearTimeout(t)
-  }, [isLoggedOut])
+  }, [isLoggedOut, ssoEnabled])
 
   function handleSso() {
     window.location.href = buildAuthorizationUrl()
+  }
+
+  async function handlePasswordLogin(e) {
+    e.preventDefault()
+    setError("")
+    setLoading(true)
+    try {
+      const res = await client.post("/auth/token/", { username, password })
+      login(res.data.access, res.data.refresh)
+      navigate("/", { replace: true })
+    } catch {
+      setError("Username atau password salah.")
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -55,16 +79,16 @@ export default function LoginPage() {
           <span style={s.leftFooter}>© 2025 Otorita IKN · Semua Hak Dilindungi</span>
         </div>
 
-        {/* Right — SSO */}
+        {/* Right — login form */}
         <div style={s.right}>
           <div style={s.card}>
-            {autoRedirecting ? (
+            {ssoEnabled && autoRedirecting ? (
               <div style={s.redirecting}>
                 <div style={s.redirectSpinner} />
                 <p style={s.redirectTitle}>Mengalihkan ke Portal SSO</p>
                 <p style={s.redirectSub}>Mohon tunggu sebentar…</p>
               </div>
-            ) : (
+            ) : ssoEnabled ? (
               <>
                 <div style={s.cardHeader}>
                   <div style={s.ssoIcon}>
@@ -76,7 +100,6 @@ export default function LoginPage() {
                     Otorita Ibu Kota Nusantara
                   </p>
                 </div>
-
                 <button
                   onClick={handleSso}
                   style={s.ssoBtn}
@@ -87,13 +110,63 @@ export default function LoginPage() {
                   <span>Masuk dengan SSO</span>
                   <ArrowIcon />
                 </button>
-
                 <div style={s.hint}>
                   <span style={s.hintDot} />
-                  <span style={s.hintText}>
-                    Anda akan diarahkan ke portal autentikasi IKN
-                  </span>
+                  <span style={s.hintText}>Anda akan diarahkan ke portal autentikasi IKN</span>
                 </div>
+              </>
+            ) : (
+              <>
+                <div style={s.cardHeader}>
+                  <div style={s.ssoIcon}>
+                    <img src="/logo.png" alt="Nusantara" style={{ width: "40px", height: "40px", objectFit: "contain" }} />
+                  </div>
+                  <h2 style={s.cardTitle}>Masuk ke eKiosk</h2>
+                  <p style={s.cardSub}>Login dengan akun administrator</p>
+                </div>
+                <form onSubmit={handlePasswordLogin} style={s.form}>
+                  <div style={s.fieldGroup}>
+                    <label style={s.label}>Username</label>
+                    <input
+                      type="text"
+                      value={username}
+                      onChange={e => setUsername(e.target.value)}
+                      required
+                      autoFocus
+                      autoComplete="username"
+                      style={s.input}
+                      onFocus={e => Object.assign(e.currentTarget.style, s.inputFocus)}
+                      onBlur={e => Object.assign(e.currentTarget.style, s.input)}
+                      placeholder="Masukkan username"
+                    />
+                  </div>
+                  <div style={s.fieldGroup}>
+                    <label style={s.label}>Password</label>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={e => setPassword(e.target.value)}
+                      required
+                      autoComplete="current-password"
+                      style={s.input}
+                      onFocus={e => Object.assign(e.currentTarget.style, s.inputFocus)}
+                      onBlur={e => Object.assign(e.currentTarget.style, s.input)}
+                      placeholder="Masukkan password"
+                    />
+                  </div>
+                  {error && <p style={s.errorMsg}>{error}</p>}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    style={loading ? { ...s.ssoBtn, opacity: 0.6 } : s.ssoBtn}
+                    onMouseEnter={e => { if (!loading) Object.assign(e.currentTarget.style, s.ssoBtnHover) }}
+                    onMouseLeave={e => { if (!loading) Object.assign(e.currentTarget.style, s.ssoBtn) }}
+                  >
+                    <KeyIcon />
+                    <span>{loading ? "Memproses…" : "Masuk"}</span>
+                    <ArrowIcon />
+                  </button>
+                </form>
               </>
             )}
           </div>
@@ -307,4 +380,42 @@ const s = {
 
   /* Footer */
   rightFooter: { fontSize: "12px", color: "#3a3a36", textAlign: "center" },
+
+  /* Password form */
+  form: { display: "flex", flexDirection: "column", gap: "18px" },
+  fieldGroup: { display: "flex", flexDirection: "column", gap: "8px" },
+  label: { fontSize: "12px", color: "#808180", fontWeight: 500, letterSpacing: "0.3px" },
+  input: {
+    background: "#1e1e1b",
+    border: "1px solid #3a3a36",
+    borderRadius: "10px",
+    padding: "12px 14px",
+    fontSize: "14px",
+    color: "#fff9eb",
+    outline: "none",
+    fontFamily: "'DM Sans', sans-serif",
+    transition: "border-color 0.18s",
+    width: "100%",
+    boxSizing: "border-box",
+  },
+  inputFocus: {
+    background: "#1e1e1b",
+    border: "1px solid #1b818a",
+    borderRadius: "10px",
+    padding: "12px 14px",
+    fontSize: "14px",
+    color: "#fff9eb",
+    outline: "none",
+    fontFamily: "'DM Sans', sans-serif",
+    transition: "border-color 0.18s",
+    width: "100%",
+    boxSizing: "border-box",
+  },
+  errorMsg: {
+    fontSize: "13px",
+    color: "#e05a4e",
+    margin: 0,
+    textAlign: "center",
+    fontWeight: 500,
+  },
 }

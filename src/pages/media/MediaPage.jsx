@@ -44,8 +44,8 @@ function UploadZone({ onFiles }) {
     <div
       style={{
         ...S.uploadZone,
-        borderColor: dragging ? "#C49A3C" : "#E5E0D8",
-        background: dragging ? "rgba(196,154,60,0.04)" : "#F9F6F1",
+        borderColor: dragging ? "#C49A3C" : "#C4BFB8",
+        background: NM,
       }}
       onDragOver={e => { e.preventDefault(); setDragging(true) }}
       onDragLeave={() => setDragging(false)}
@@ -494,7 +494,7 @@ export default function MediaPage() {
             <div
               key={m.id}
               style={{ ...S.listRow, animationDelay: `${i * 0.03}s` }}
-              onMouseEnter={e => e.currentTarget.style.background = "#F9F6F1"}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(196,191,184,0.2)"}
               onMouseLeave={e => e.currentTarget.style.background = "transparent"}
             >
               <div style={S.listNameCell}>
@@ -575,6 +575,13 @@ function SpinIcon() {
   return <span style={{ display: "inline-block", animation: "spin 0.7s linear infinite", fontSize: "12px" }}>⟳</span>
 }
 
+// ── Neuromorphic tokens ────────────────────────────────────
+const NM   = "#E4E0DB"
+const NM_U = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"
+const NM_S = "4px 4px 10px #C4BFB8, -4px -4px 10px #FFFFFF"
+const NM_I = "inset 4px 4px 10px #C4BFB8, inset -4px -4px 10px #FFFFFF"
+const NM_I_SM = "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF"
+
 // ── Styles ─────────────────────────────────────────────────
 const ANIM_CSS = `
   @keyframes fadeUp  { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
@@ -606,13 +613,13 @@ const S = {
   statsStrip: {
     display: "flex",
     alignItems: "center",
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "10px",
+    background: NM,
+    border: "none",
+    borderRadius: "12px",
     padding: "14px 24px",
     marginBottom: "20px",
     gap: "0",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+    boxShadow: NM_U,
   },
   statItem: {
     display: "flex",
@@ -638,7 +645,7 @@ const S = {
   statDivider: {
     width: "1px",
     height: "36px",
-    background: "#E5E0D8",
+    background: "#C4BFB8",
     flexShrink: 0,
   },
 
@@ -669,14 +676,14 @@ const S = {
     marginBottom: "16px",
   },
   uploadItem: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "8px",
+    background: NM,
+    border: "none",
+    borderRadius: "10px",
     padding: "10px 14px",
     display: "flex",
     alignItems: "center",
     gap: "12px",
-    boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+    boxShadow: NM_S,
   },
   uploadItemLeft: {
     display: "flex",
@@ -746,15 +753,16 @@ const S = {
     pointerEvents: "none",
   },
   searchInput: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "8px",
+    background: NM,
+    border: "none",
+    borderRadius: "10px",
     padding: "9px 36px",
     fontSize: "13px",
     color: "#1A1A18",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     width: "240px",
+    boxShadow: NM_I_SM,
   },
   clearBtn: {
     position: "absolute",
@@ -773,23 +781,25 @@ const S = {
     display: "inline-flex",
     alignItems: "center",
     gap: "6px",
-    background: "transparent",
-    border: "1px solid #E5E0D8",
+    background: NM,
+    border: "none",
     borderRadius: "20px",
     padding: "6px 14px",
     fontSize: "12px",
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    transition: "all 0.15s",
+    transition: "box-shadow 0.18s",
+    boxShadow: NM_S,
   },
   typeTabActive: {
-    background: "rgba(42,79,133,0.08)",
-    border: "1px solid rgba(42,79,133,0.3)",
+    background: NM,
+    border: "none",
     color: "#7BA3D4",
+    boxShadow: NM_I_SM,
   },
   tabCount: {
-    background: "#F0EBE3",
+    background: "rgba(196,191,184,0.4)",
     borderRadius: "10px",
     padding: "1px 6px",
     fontSize: "10px",
@@ -805,15 +815,16 @@ const S = {
   viewToggle: {
     display: "flex",
     gap: "4px",
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "8px",
-    padding: "3px",
+    background: NM,
+    border: "none",
+    borderRadius: "10px",
+    padding: "4px",
+    boxShadow: NM_I_SM,
   },
   viewBtn: {
     background: "transparent",
     border: "none",
-    borderRadius: "5px",
+    borderRadius: "7px",
     width: "28px",
     height: "28px",
     display: "flex",
@@ -824,24 +835,25 @@ const S = {
     transition: "all 0.15s",
   },
   viewBtnActive: {
-    background: "#F0EBE3",
+    background: NM,
     color: "#C49A3C",
+    boxShadow: NM_S,
   },
 
   // Grid
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-    gap: "12px",
+    gap: "16px",
   },
   mediaCard: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "10px",
+    background: NM,
+    border: "none",
+    borderRadius: "12px",
     overflow: "hidden",
     animation: "fadeUp 0.35s ease both",
-    transition: "border-color 0.15s, box-shadow 0.15s",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+    transition: "box-shadow 0.2s",
+    boxShadow: NM_U,
   },
   cardThumb: {
     width: "100%",
@@ -937,18 +949,18 @@ const S = {
 
   // List view
   listWrap: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "12px",
+    background: NM,
+    border: "none",
+    borderRadius: "14px",
     overflow: "hidden",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+    boxShadow: NM_U,
   },
   listHeader: {
     display: "grid",
     gridTemplateColumns: "2fr 100px 100px 120px 80px",
     padding: "10px 16px",
-    background: "#F9F6F1",
-    borderBottom: "1px solid #E5E0D8",
+    background: "rgba(196,191,184,0.18)",
+    borderBottom: "1px solid rgba(196,191,184,0.5)",
     gap: "12px",
   },
   listHeaderCell: {
@@ -962,7 +974,7 @@ const S = {
     display: "grid",
     gridTemplateColumns: "2fr 100px 100px 120px 80px",
     padding: "10px 16px",
-    borderBottom: "1px solid #F0EBE3",
+    borderBottom: "1px solid rgba(196,191,184,0.35)",
     alignItems: "center",
     gap: "12px",
     transition: "background 0.1s",
@@ -1033,22 +1045,22 @@ const S = {
     padding: "20px",
   },
   previewBox: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "14px",
+    background: NM,
+    border: "none",
+    borderRadius: "16px",
     width: "100%",
     maxWidth: "700px",
     maxHeight: "90vh",
     overflowY: "auto",
     animation: "slideUp 0.25s ease both",
-    boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+    boxShadow: NM_U,
   },
   previewHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "flex-start",
     padding: "20px 24px 16px",
-    borderBottom: "1px solid #E5E0D8",
+    borderBottom: "1px solid rgba(196,191,184,0.5)",
   },
   previewTitle: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
@@ -1119,15 +1131,15 @@ const S = {
 
   // Confirm delete
   confirmBox: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "14px",
+    background: NM,
+    border: "none",
+    borderRadius: "16px",
     width: "100%",
     maxWidth: "360px",
     padding: "28px",
     textAlign: "center",
     animation: "slideUp 0.25s ease both",
-    boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+    boxShadow: NM_U,
   },
   confirmIcon: {
     width: "48px",
@@ -1159,18 +1171,19 @@ const S = {
     justifyContent: "center",
   },
   btnGhost: {
-    background: "transparent",
-    border: "1px solid #E5E0D8",
+    background: NM,
+    border: "none",
     borderRadius: "8px",
     padding: "9px 18px",
     fontSize: "13px",
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+    boxShadow: NM_S,
   },
   btnDanger: {
-    background: "rgba(192,57,43,0.08)",
-    border: "1px solid rgba(192,57,43,0.3)",
+    background: NM,
+    border: "none",
     borderRadius: "8px",
     padding: "9px 18px",
     fontSize: "13px",
@@ -1178,6 +1191,7 @@ const S = {
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontWeight: 600,
+    boxShadow: NM_S,
   },
 
   // Empty & loading
@@ -1198,8 +1212,8 @@ const S = {
   emptyText: { fontSize: "13px", color: "#8A8680", margin: 0 },
   skeleton: {
     height: "180px",
-    borderRadius: "10px",
-    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
+    borderRadius: "12px",
+    background: "linear-gradient(90deg, #D8D4CF 25%, #E8E4DF 50%, #D8D4CF 75%)",
     backgroundSize: "600px 100%",
     animation: "shimmer 1.4s infinite",
   },

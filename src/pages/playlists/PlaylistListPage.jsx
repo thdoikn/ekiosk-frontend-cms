@@ -143,12 +143,10 @@ export default function PlaylistListPage() {
               key={p.id}
               style={{ ...S.card, animationDelay: `${i * 0.05}s` }}
               onMouseEnter={e => {
-                e.currentTarget.style.borderColor = "#C49A3C"
-                e.currentTarget.style.boxShadow = "0 4px 20px rgba(196,154,60,0.1)"
+                e.currentTarget.style.boxShadow = "8px 8px 18px #C4BFB8, -8px -8px 18px #FFFFFF"
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.borderColor = "#E5E0D8"
-                e.currentTarget.style.boxShadow = "none"
+                e.currentTarget.style.boxShadow = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"
               }}
             >
               <div style={S.cardTop}>
@@ -227,6 +225,13 @@ export default function PlaylistListPage() {
   )
 }
 
+// ── Neuromorphic tokens ────────────────────────────────────
+const NM   = "#E4E0DB"
+const NM_U = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"
+const NM_S = "4px 4px 10px #C4BFB8, -4px -4px 10px #FFFFFF"
+const NM_I = "inset 4px 4px 10px #C4BFB8, inset -4px -4px 10px #FFFFFF"
+const NM_I_SM = "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF"
+
 // ── Styles ─────────────────────────────────────────────────
 const S = {
   page: {
@@ -253,15 +258,16 @@ const S = {
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-    gap: "14px",
+    gap: "20px",
   },
   card: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "12px",
+    background: NM,
+    border: "none",
+    borderRadius: "14px",
     padding: "20px",
     animation: "fadeUp 0.4s ease both",
-    transition: "border-color 0.2s, box-shadow 0.2s",
+    transition: "box-shadow 0.22s",
+    boxShadow: NM_U,
   },
   cardTop: {
     display: "flex",
@@ -272,17 +278,18 @@ const S = {
   cardIconWrap: {
     width: "36px",
     height: "36px",
-    background: "#F9F6F1",
-    border: "1px solid #E5E0D8",
-    borderRadius: "8px",
+    background: NM,
+    border: "none",
+    borderRadius: "10px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    boxShadow: NM_I_SM,
   },
   cardActions: { display: "flex", gap: "6px" },
   activeBadge: {
     fontSize: "11px",
-    background: "rgba(45,106,79,0.1)",
+    background: "rgba(45,106,79,0.12)",
     border: "1px solid rgba(45,106,79,0.25)",
     color: "#2D6A4F",
     borderRadius: "20px",
@@ -293,13 +300,14 @@ const S = {
   },
   inactiveBadge: {
     fontSize: "11px",
-    background: "#F9F6F1",
-    border: "1px solid #E5E0D8",
+    background: NM,
+    border: "none",
     color: "#8A8680",
     borderRadius: "20px",
     padding: "3px 10px",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+    boxShadow: NM_I_SM,
   },
   cardName: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
@@ -314,10 +322,11 @@ const S = {
     display: "flex",
     alignItems: "center",
     gap: "12px",
-    background: "#F9F6F1",
-    borderRadius: "8px",
+    background: NM,
+    borderRadius: "10px",
     padding: "10px 12px",
     marginBottom: "12px",
+    boxShadow: NM_I_SM,
   },
   cardMetaItem: {
     display: "flex",
@@ -342,7 +351,7 @@ const S = {
   cardMetaDivider: {
     width: "1px",
     height: "28px",
-    background: "#E5E0D8",
+    background: "#C4BFB8",
     flexShrink: 0,
   },
   cardFooter: { display: "flex", gap: "8px", alignItems: "center" },
@@ -351,37 +360,39 @@ const S = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "transparent",
-    border: "1px solid #E5E0D8",
-    borderRadius: "7px",
+    background: NM,
+    border: "none",
+    borderRadius: "9px",
     padding: "8px",
     fontSize: "12px",
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    transition: "all 0.15s",
+    transition: "box-shadow 0.18s",
     fontWeight: 500,
+    boxShadow: NM_S,
   },
   builderBtnHover: {
     flex: 1,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: "rgba(45,106,79,0.06)",
-    border: "1px solid rgba(45,106,79,0.3)",
-    borderRadius: "7px",
+    background: NM,
+    border: "none",
+    borderRadius: "9px",
     padding: "8px",
     fontSize: "12px",
     color: "#2D6A4F",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    transition: "all 0.15s",
+    transition: "box-shadow 0.18s",
     fontWeight: 500,
+    boxShadow: NM_I_SM,
   },
   iconBtnDanger: {
-    background: "transparent",
-    border: "1px solid #E5E0D8",
-    borderRadius: "7px",
+    background: NM,
+    border: "none",
+    borderRadius: "9px",
     width: "34px",
     height: "34px",
     display: "flex",
@@ -389,6 +400,7 @@ const S = {
     justifyContent: "center",
     color: "#C0392B",
     cursor: "pointer",
+    boxShadow: NM_S,
   },
   overlay: {
     position: "fixed",
@@ -403,14 +415,14 @@ const S = {
     padding: "20px",
   },
   modal: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "14px",
+    background: NM,
+    border: "none",
+    borderRadius: "16px",
     width: "100%",
     maxWidth: "420px",
     padding: "24px",
     animation: "slideUp 0.25s ease both",
-    boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+    boxShadow: NM_U,
   },
   modalHeader: {
     display: "flex",
@@ -448,9 +460,9 @@ const S = {
     textTransform: "uppercase",
   },
   input: {
-    background: "#F9F6F1",
-    border: "1px solid #E5E0D8",
-    borderRadius: "8px",
+    background: NM,
+    border: "none",
+    borderRadius: "10px",
     padding: "11px 14px",
     fontSize: "14px",
     color: "#1A1A18",
@@ -458,7 +470,7 @@ const S = {
     outline: "none",
     width: "100%",
     boxSizing: "border-box",
-    transition: "border-color 0.15s",
+    boxShadow: NM_I_SM,
   },
   hint: {
     fontSize: "12px",
@@ -488,14 +500,15 @@ const S = {
   btnGhost: {
     display: "inline-flex",
     alignItems: "center",
-    background: "transparent",
-    border: "1px solid #E5E0D8",
+    background: NM,
+    border: "none",
     borderRadius: "8px",
     padding: "9px 16px",
     fontSize: "13px",
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+    boxShadow: NM_S,
   },
   empty: {
     display: "flex",
@@ -512,8 +525,8 @@ const S = {
   },
   skeleton: {
     height: "220px",
-    borderRadius: "12px",
-    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
+    borderRadius: "14px",
+    background: "linear-gradient(90deg, #D8D4CF 25%, #E8E4DF 50%, #D8D4CF 75%)",
     backgroundSize: "600px 100%",
     animation: "shimmer 1.4s infinite",
   },

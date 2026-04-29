@@ -74,13 +74,14 @@ function Input({ value, onChange, type = "text", placeholder, disabled, autoComp
       placeholder={placeholder} disabled={disabled}
       autoComplete={autoComplete}
       style={{
-        background: "#F9F6F1",
-        border: `1px solid ${focused ? "#C49A3C" : "#E5E0D8"}`,
-        borderRadius: "8px", padding: "10px 13px",
+        background: NM,
+        border: "none",
+        borderRadius: "10px", padding: "10px 13px",
         fontSize: "13px", color: "#1A1A18",
         fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", outline: "none",
         width: "100%", boxSizing: "border-box",
-        transition: "border-color 0.15s",
+        boxShadow: focused ? "inset 3px 3px 7px #B8B4AE, inset -3px -3px 7px #FFFFFF" : NM_I_SM,
+        transition: "box-shadow 0.18s",
         opacity: disabled ? 0.5 : 1,
         cursor: disabled ? "not-allowed" : "text",
       }}
@@ -102,18 +103,25 @@ function Field({ label, required, hint, children }) {
   )
 }
 
+// ── Neuromorphic tokens ────────────────────────────────────
+const NM   = "#E4E0DB"
+const NM_U = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"
+const NM_S = "4px 4px 10px #C4BFB8, -4px -4px 10px #FFFFFF"
+const NM_I = "inset 4px 4px 10px #C4BFB8, inset -4px -4px 10px #FFFFFF"
+const NM_I_SM = "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF"
+
 // ── Section card ───────────────────────────────────────────
 function Section({ title, subtitle, delay = "0s", children }) {
   return (
     <div style={{
-      background: "#FFFFFF", border: "1px solid #E5E0D8",
-      borderRadius: "12px", overflow: "hidden",
+      background: NM, border: "none",
+      borderRadius: "14px", overflow: "hidden",
       animation: "fadeUp 0.4s ease both", animationDelay: delay,
-      boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+      boxShadow: NM_U,
     }}>
       <div style={{
-        padding: "18px 24px 14px", borderBottom: "1px solid #E5E0D8",
-        background: "#F9F6F1",
+        padding: "18px 24px 14px", borderBottom: "1px solid rgba(196,191,184,0.5)",
+        background: "rgba(196,191,184,0.15)",
       }}>
         <h2 style={{
           fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", fontSize: "12px",
@@ -225,11 +233,11 @@ function CreateUserModal({ onClose, onSubmit, loading, error }) {
       animation: "fadeIn 0.2s ease both", padding: "20px",
     }}>
       <div style={{
-        background: "#FFFFFF", border: "1px solid #E5E0D8",
-        borderRadius: "14px", width: "100%", maxWidth: "500px",
+        background: NM, border: "none",
+        borderRadius: "16px", width: "100%", maxWidth: "500px",
         padding: "24px", animation: "slideUp 0.25s ease both",
         maxHeight: "90vh", overflowY: "auto",
-        boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+        boxShadow: NM_U,
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
           <h3 style={{ fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", fontSize: "16px", color: "#1A1A18", margin: 0, letterSpacing: "0.5px" }}>
@@ -308,13 +316,13 @@ function UserRow({ user, onDeactivate, onReactivate, isActing, index }) {
     <div
       style={{
         display: "flex", alignItems: "center", gap: "12px",
-        padding: "11px 4px", borderBottom: "1px solid #E5E0D8",
+        padding: "11px 4px", borderBottom: "1px solid rgba(196,191,184,0.45)",
         transition: "background 0.1s", borderRadius: "4px",
         margin: "0 -4px",
         animation: "fadeUp 0.35s ease both",
         animationDelay: `${index * 0.04}s`,
       }}
-      onMouseEnter={e => e.currentTarget.style.background = "#F9F6F1"}
+      onMouseEnter={e => e.currentTarget.style.background = "rgba(196,191,184,0.2)"}
       onMouseLeave={e => e.currentTarget.style.background = "transparent"}
     >
       {/* Avatar */}
@@ -459,7 +467,7 @@ export default function SettingsPage() {
               ["Timezone",   "Asia/Makassar (WITA)"],
               ["Lingkungan", "Production"],
             ].map(([label, value]) => (
-              <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid #E5E0D8" }}>
+              <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid rgba(196,191,184,0.45)" }}>
                 <span style={{ fontSize: "12px", color: "#8A8680", fontWeight: 500 }}>{label}</span>
                 <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "12px", color: "#7A7670" }}>{value}</span>
               </div>
@@ -475,9 +483,10 @@ export default function SettingsPage() {
             {/* Stats */}
             <div style={{
               display: "flex", alignItems: "center",
-              background: "#F9F6F1", border: "1px solid #E5E0D8",
-              borderRadius: "8px", padding: "12px 20px",
+              background: NM, border: "none",
+              borderRadius: "12px", padding: "12px 20px",
               marginBottom: "16px",
+              boxShadow: NM_I_SM,
             }}>
               {[
                 { val: users.length, label: "Total",   color: "#C49A3C" },
@@ -487,7 +496,7 @@ export default function SettingsPage() {
                 { val: staffCount,   label: "Staff",   color: "#7BA3D4" },
               ].map((item, i) =>
                 item === null ? (
-                  <div key={i} style={{ width: "1px", height: "32px", background: "#E5E0D8", flexShrink: 0 }} />
+                  <div key={i} style={{ width: "1px", height: "32px", background: "#C4BFB8", flexShrink: 0 }} />
                 ) : (
                   <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px", alignItems: "center" }}>
                     <span style={{ fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", fontSize: "22px", fontWeight: 600, color: item.color, lineHeight: 1 }}>{item.val}</span>
@@ -508,7 +517,7 @@ export default function SettingsPage() {
                 {[...Array(3)].map((_, i) => (
                   <div key={i} style={{
                     height: "52px", borderRadius: "8px", marginBottom: "6px",
-                    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
+                    background: "linear-gradient(90deg, #D8D4CF 25%, #E8E4DF 50%, #D8D4CF 75%)",
                     backgroundSize: "600px 100%", animation: "shimmer 1.4s infinite",
                   }} />
                 ))}

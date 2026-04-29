@@ -12,7 +12,7 @@ import RegionListPage from './pages/regions/RegionListPage'
 import PlaylistListPage from './pages/playlists/PlaylistListPage'
 import PlaylistBuilderPage from './pages/playlists/PlaylistBuilderPage'
 import MediaPage from './pages/media/MediaPage'
-import InteractivePage from './pages/interactive/InteractivePage'
+// import InteractivePage from './pages/interactive/InteractivePage'
 import SettingsPage from './pages/settings/SettingsPage'
 
 const queryClient = new QueryClient()
@@ -50,7 +50,7 @@ export default function App() {
             <Route path="playlists" element={<StaffRoute><PlaylistListPage /></StaffRoute>} />
             <Route path="playlists/:id" element={<StaffRoute><PlaylistBuilderPage /></StaffRoute>} />
             <Route path="media" element={<StaffRoute><MediaPage /></StaffRoute>} />
-            <Route path="interactive" element={<StaffRoute><InteractivePage /></StaffRoute>} />
+            {/* <Route path="interactive" element={<StaffRoute><InteractivePage /></StaffRoute>} /> */}
             <Route path="settings" element={<StaffRoute><SettingsPage /></StaffRoute>} />
           </Route>
         </Routes>

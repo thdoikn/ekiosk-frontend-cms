@@ -528,6 +528,13 @@ export default function PlaylistBuilderPage() {
   )
 }
 
+// ── Neuromorphic tokens ────────────────────────────────────
+const NM   = "#E4E0DB"
+const NM_U = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"
+const NM_S = "4px 4px 10px #C4BFB8, -4px -4px 10px #FFFFFF"
+const NM_I = "inset 4px 4px 10px #C4BFB8, inset -4px -4px 10px #FFFFFF"
+const NM_I_SM = "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF"
+
 // ── Styles ─────────────────────────────────────────────────
 const S = {
   page: {
@@ -547,9 +554,9 @@ const S = {
   topLeft: { display: "flex", alignItems: "flex-start", gap: "16px" },
   topRight: { display: "flex", alignItems: "center", gap: "12px" },
   backBtn: {
-    background: "transparent",
-    border: "1px solid #E5E0D8",
-    borderRadius: "6px",
+    background: NM,
+    border: "none",
+    borderRadius: "8px",
     padding: "7px 14px",
     fontSize: "13px",
     color: "#7A7670",
@@ -557,6 +564,7 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     flexShrink: 0,
     marginTop: "4px",
+    boxShadow: NM_S,
   },
   titleArea: { display: "flex", flexDirection: "column", gap: "6px" },
   pageTitle: {
@@ -570,11 +578,12 @@ const S = {
   titleMeta: { display: "flex", gap: "8px", flexWrap: "wrap" },
   metaChip: {
     fontSize: "11px",
-    background: "#F0EBE3",
-    border: "1px solid #E5E0D8",
+    background: NM,
+    border: "none",
     borderRadius: "20px",
     padding: "3px 10px",
     color: "#7A7670",
+    boxShadow: NM_I_SM,
   },
   regionChip: {
     fontSize: "11px",
@@ -602,11 +611,12 @@ const S = {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-    background: "#F9F6F1",
-    border: "1px solid #E5E0D8",
-    borderRadius: "8px",
+    background: NM,
+    border: "none",
+    borderRadius: "10px",
     padding: "9px 14px",
     marginBottom: "16px",
+    boxShadow: NM_I_SM,
   },
   hashLabel: {
     fontSize: "10px",
@@ -625,32 +635,32 @@ const S = {
   panels: {
     display: "grid",
     gridTemplateColumns: "1fr 360px",
-    gap: "16px",
+    gap: "20px",
     alignItems: "start",
   },
   leftPanel: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "12px",
+    background: NM,
+    border: "none",
+    borderRadius: "14px",
     overflow: "hidden",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+    boxShadow: NM_U,
   },
   rightPanel: {
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
-    borderRadius: "12px",
+    background: NM,
+    border: "none",
+    borderRadius: "14px",
     overflow: "hidden",
     position: "sticky",
     top: "16px",
-    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+    boxShadow: NM_U,
   },
   panelHeader: {
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
     padding: "16px 20px",
-    borderBottom: "1px solid #E5E0D8",
-    background: "#F9F6F1",
+    borderBottom: "1px solid rgba(196,191,184,0.5)",
+    background: "rgba(196,191,184,0.15)",
   },
   panelTitle: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
@@ -668,18 +678,19 @@ const S = {
   sequenceList: {
     display: "flex",
     flexDirection: "column",
-    padding: "8px",
-    gap: "6px",
+    padding: "10px",
+    gap: "8px",
   },
   sortableItem: {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-    background: "#F9F6F1",
-    border: "1px solid #E5E0D8",
-    borderRadius: "8px",
+    background: NM,
+    border: "none",
+    borderRadius: "10px",
     padding: "8px 10px",
     userSelect: "none",
+    boxShadow: NM_S,
   },
   dragHandle: {
     color: "#C5BFB8",
@@ -692,8 +703,8 @@ const S = {
     width: "22px",
     height: "22px",
     borderRadius: "50%",
-    background: "#FFFFFF",
-    border: "1px solid #E5E0D8",
+    background: NM,
+    border: "none",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -701,6 +712,7 @@ const S = {
     color: "#8A8680",
     fontFamily: "'DM Mono', monospace",
     flexShrink: 0,
+    boxShadow: NM_I_SM,
   },
   itemThumb: {
     width: "52px",
@@ -754,8 +766,8 @@ const S = {
   },
   durationInput: {
     width: "52px",
-    background: "#FFFFFF",
-    border: "1px solid #D0CAC0",
+    background: NM,
+    border: "none",
     borderRadius: "6px",
     padding: "5px 8px",
     fontSize: "12px",
@@ -763,6 +775,7 @@ const S = {
     fontFamily: "'DM Mono', monospace",
     outline: "none",
     textAlign: "center",
+    boxShadow: NM_I_SM,
   },
   durationUnit: { fontSize: "11px", color: "#8A8680", flexShrink: 0 },
   removeBtn: {
@@ -796,8 +809,8 @@ const S = {
   // Timeline
   timeline: {
     padding: "14px 20px 16px",
-    borderTop: "1px solid #E5E0D8",
-    background: "#F9F6F1",
+    borderTop: "1px solid rgba(196,191,184,0.5)",
+    background: "rgba(196,191,184,0.12)",
   },
   timelineLabel: {
     fontSize: "10px",
@@ -835,7 +848,7 @@ const S = {
     display: "flex",
     flexDirection: "column",
     gap: "8px",
-    borderBottom: "1px solid #E5E0D8",
+    borderBottom: "1px solid rgba(196,191,184,0.5)",
   },
   libSearchWrap: { position: "relative" },
   libSearchIcon: {
@@ -848,33 +861,36 @@ const S = {
   },
   libSearch: {
     width: "100%",
-    background: "#F9F6F1",
-    border: "1px solid #E5E0D8",
-    borderRadius: "7px",
+    background: NM,
+    border: "none",
+    borderRadius: "8px",
     padding: "8px 10px 8px 30px",
     fontSize: "12px",
     color: "#1A1A18",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     boxSizing: "border-box",
+    boxShadow: NM_I_SM,
   },
   libTypeFilter: { display: "flex", gap: "4px" },
   typeTab: {
     flex: 1,
-    background: "transparent",
-    border: "1px solid #E5E0D8",
-    borderRadius: "6px",
+    background: NM,
+    border: "none",
+    borderRadius: "8px",
     padding: "5px",
     fontSize: "11px",
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    transition: "all 0.15s",
+    transition: "box-shadow 0.18s",
+    boxShadow: NM_S,
   },
   typeTabActive: {
-    background: "rgba(42,79,133,0.08)",
-    border: "1px solid rgba(42,79,133,0.3)",
+    background: NM,
+    border: "none",
     color: "#7BA3D4",
+    boxShadow: NM_I_SM,
   },
   mediaLibList: {
     display: "flex",
@@ -973,12 +989,12 @@ const S = {
   loadingGrid: {
     display: "grid",
     gridTemplateColumns: "1fr 360px",
-    gap: "16px",
+    gap: "20px",
   },
   skeleton: {
     height: "400px",
-    borderRadius: "12px",
-    background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
+    borderRadius: "14px",
+    background: "linear-gradient(90deg, #D8D4CF 25%, #E8E4DF 50%, #D8D4CF 75%)",
     backgroundSize: "600px 100%",
     animation: "shimmer 1.4s infinite",
   },
