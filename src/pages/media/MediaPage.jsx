@@ -331,7 +331,7 @@ export default function MediaPage() {
         setTimeout(() => {
           setUploads(prev => prev.filter(u => u.id !== uploadId))
         }, 3000)
-      } catch (err) {
+      } catch {
         setUploads(prev =>
           prev.map(u => u.id === uploadId
             ? { ...u, error: "Gagal mengunggah" } : u)
@@ -595,7 +595,7 @@ const S = {
   page: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     color: "#1A1A18",
-    maxWidth: "1400px",
+    width: "100%",
     animation: "fadeUp 0.4s ease both",
   },
   header: { marginBottom: "20px" },

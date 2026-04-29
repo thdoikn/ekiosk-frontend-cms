@@ -4,10 +4,8 @@ import client from "../../api/client"
 
 // ── API ────────────────────────────────────────────────────
 const fetchUsers     = () => client.get("/users/").then(r => r.data)
-const createUser     = (data) => client.post("/users/", data)
 const deactivateUser = (id) => client.post(`/users/${id}/deactivate/`)
 const reactivateUser = (id) => client.post(`/users/${id}/activate/`)
-const changePassword = (data) => client.post("/users/change-password/", data)
 
 // ── Helpers ────────────────────────────────────────────────
 function formatDateTime(str) {
@@ -132,87 +130,6 @@ function Section({ title, subtitle, delay = "0s", children }) {
         {subtitle && <p style={{ fontSize: "12px", color: "#8A8680", margin: 0, fontWeight: 300 }}>{subtitle}</p>}
       </div>
       <div style={{ padding: "20px 24px" }}>{children}</div>
-    </div>
-  )
-}
-
-// ── Password Section ───────────────────────────────────────
-function PasswordForm() {
-  const [form, setForm] = useState({ current: "", next: "", confirm: "" })
-  const [toast, setToast] = useState({ msg: "", type: "" })
-  const set = (k) => (e) => setForm(p => ({ ...p, [k]: e.target.value }))
-
-  const showToast = (msg, type) => {
-    setToast({ msg, type })
-    setTimeout(() => setToast({ msg: "", type: "" }), 4000)
-  }
-
-  const mut = useMutation({
-    mutationFn: changePassword,
-    onSuccess: () => {
-      setForm({ current: "", next: "", confirm: "" })
-      showToast("Password berhasil diubah.", "success")
-    },
-    onError: (err) => {
-      showToast(err.response?.data?.detail || "Gagal mengubah password.", "error")
-    },
-  })
-
-  const mismatch = form.confirm && form.next !== form.confirm
-  const valid    = form.current && form.next.length >= 8 && form.next === form.confirm
-  const len      = form.next.length
-  const score    = len === 0 ? 0 : len < 8 ? 1 : len < 12 ? 2 : len < 16 ? 3 : 4
-  const strengthColor = ["", "#C0392B", "#9B7228", "#7BA3D4", "#418840"][score]
-  const strengthLabel = ["", "Terlalu pendek", "Cukup", "Kuat", "Sangat kuat"][score]
-
-  return (
-    <div>
-      {toast.msg && <Toast msg={toast.msg} type={toast.type} onClose={() => setToast({ msg: "", type: "" })} />}
-
-      <Field label="Password Saat Ini" required>
-        <Input type="password" value={form.current} onChange={set("current")} placeholder="Masukkan password lama" autoComplete="current-password" />
-      </Field>
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0 16px" }}>
-        <Field label="Password Baru" required hint={form.next && form.next.length < 8 ? { text: "Minimal 8 karakter" } : null}>
-          <Input type="password" value={form.next} onChange={set("next")} placeholder="Minimal 8 karakter" autoComplete="new-password" />
-        </Field>
-        <Field label="Konfirmasi Password Baru" required hint={mismatch ? { text: "Password tidak cocok", error: true } : null}>
-          <Input type="password" value={form.confirm} onChange={set("confirm")} placeholder="Ulangi password baru" autoComplete="new-password" />
-        </Field>
-      </div>
-
-      {/* Strength bar */}
-      {form.next && (
-        <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}>
-          <div style={{ display: "flex", gap: "4px" }}>
-            {[0, 1, 2, 3].map(i => (
-              <div key={i} style={{
-                width: "32px", height: "4px", borderRadius: "2px",
-                background: i < score ? strengthColor : "#E5E0D8",
-                transition: "background 0.2s",
-              }} />
-            ))}
-          </div>
-          <span style={{ fontSize: "11px", color: strengthColor }}>{strengthLabel}</span>
-        </div>
-      )}
-
-      <button
-        style={{
-          display: "inline-flex", alignItems: "center",
-          background: "linear-gradient(135deg, #2D6A4F, #1b818a)",
-          border: "none", borderRadius: "8px", padding: "10px 18px",
-          fontSize: "13px", fontWeight: 600, color: "#FFFFFF",
-          cursor: !valid || mut.isPending ? "not-allowed" : "pointer",
-          fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-          opacity: !valid || mut.isPending ? 0.5 : 1,
-        }}
-        disabled={!valid || mut.isPending}
-        onClick={() => mut.mutate({ current_password: form.current, new_password: form.next })}
-      >
-        {mut.isPending ? "Menyimpan…" : "Ubah Password"}
-      </button>
     </div>
   )
 }
@@ -436,7 +353,7 @@ export default function SettingsPage() {
   const staffCount   = users.filter(u => u.is_staff).length
 
   return (
-    <div style={{ fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", color: "#1A1A18", maxWidth: "1400px", animation: "fadeUp 0.4s ease both" }}>
+    <div style={{ fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", color: "#1A1A18", width: "100%", animation: "fadeUp 0.4s ease both" }}>
       <style>{ANIM_CSS}</style>
 
       {/* Header */}
@@ -455,11 +372,7 @@ export default function SettingsPage() {
         {/* LEFT */}
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
 
-          <Section title="Ubah Password" subtitle="Ganti password akun yang sedang aktif" delay="0s">
-            <PasswordForm />
-          </Section>
-
-          <Section title="Informasi Sistem" delay="0.05s">
+          <Section title="Informasi Sistem" subtitle="Ringkasan konfigurasi aplikasi dan lingkungan server" delay="0s">
             {[
               ["Sistem",     "eKiosk CMS"],
               ["Versi",      "1.0.0"],
