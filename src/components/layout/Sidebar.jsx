@@ -1,14 +1,13 @@
 import { NavLink } from "react-router-dom"
-import { useAuthStore } from "../../store/authStore"
 
 const ALL_NAV_ITEMS = [
-  { to: "/dashboard",   label: "Dashboard",   icon: DashIcon,    staffOnly: false },
-  { to: "/kiosks",      label: "Kiosks",      icon: MonitorIcon, staffOnly: true  },
-  { to: "/regions",     label: "Regions",     icon: MapIcon,     staffOnly: true  },
-  { to: "/playlists",   label: "Playlists",   icon: ListIcon,    staffOnly: true  },
-  { to: "/media",       label: "Media",       icon: ImageIcon,   staffOnly: true  },
-  // { to: "/interactive", label: "Interactive", icon: ClickIcon,   staffOnly: true  },
-  { to: "/settings",    label: "Settings",    icon: GearIcon,    staffOnly: true  },
+  { to: "/dashboard",   label: "Dashboard", icon: <DashIcon />    },
+  { to: "/kiosks",      label: "Kiosks",    icon: <MonitorIcon /> },
+  { to: "/regions",     label: "Regions",   icon: <MapIcon />     },
+  { to: "/playlists",   label: "Playlists", icon: <ListIcon />    },
+  { to: "/media",       label: "Media",     icon: <ImageIcon />   },
+  // { to: "/interactive", label: "Interactive", icon: <ClickIcon />   },
+  { to: "/settings",    label: "Settings",  icon: <GearIcon />    },
 ]
 
 const NM_BG   = "#EDEAE6"
@@ -17,10 +16,6 @@ const NM_IN   = "inset 3px 3px 8px #D0CCCA, inset -3px -3px 8px #FFFFFF"
 const NM_SM   = "3px 3px 7px #D0CCCA, -3px -3px 7px #FFFFFF"
 
 export default function Sidebar({ collapsed, onToggle }) {
-  const user     = useAuthStore((s) => s.user)
-  const isPublic = !user?.is_staff
-  const NAV_ITEMS = isPublic ? ALL_NAV_ITEMS.filter(i => !i.staffOnly) : ALL_NAV_ITEMS
-
   return (
     <aside style={{
       ...s.aside,
@@ -48,7 +43,7 @@ export default function Sidebar({ collapsed, onToggle }) {
       )}
 
       <nav style={{ ...s.nav, padding: collapsed ? "0 10px" : "0 12px" }}>
-        {NAV_ITEMS.map(({ to, label, icon: Icon }) => (
+        {ALL_NAV_ITEMS.map(({ to, label, icon }) => (
           <NavLink
             key={to}
             to={to}
@@ -68,7 +63,7 @@ export default function Sidebar({ collapsed, onToggle }) {
                   color: isActive ? "#C49A3C" : "#8A8680",
                   filter: isActive ? "drop-shadow(0 0 4px rgba(196,154,60,0.4))" : "none",
                 }}>
-                  <Icon />
+                  {icon}
                 </span>
                 {!collapsed && (
                   <span style={{

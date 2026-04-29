@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import client from "../../api/client"
+import { useAuthStore } from "../../store/authStore"
 
 // ── API ────────────────────────────────────────────────────
 const fetchUsers     = () => client.get("/users/").then(r => r.data)
@@ -227,7 +228,7 @@ function CreateUserModal({ onClose, onSubmit, loading, error }) {
 }
 
 // ── User Row ───────────────────────────────────────────────
-function UserRow({ user, onDeactivate, onReactivate, isActing, index }) {
+function UserRow({ user, onDeactivate, onReactivate, isActing, index, canManageUsers }) {
   const active = user.is_active
   const hue = (user.username.charCodeAt(0) * 37) % 360
   return (
@@ -264,7 +265,7 @@ function UserRow({ user, onDeactivate, onReactivate, isActing, index }) {
             {displayName(user)}
           </span>
           {user.is_superuser && (
-            <span style={{ fontSize: "9px", background: "rgba(192,57,43,0.08)", border: "1px solid rgba(192,57,43,0.3)", color: "#C0392B", borderRadius: "4px", padding: "1px 6px", fontWeight: 700, letterSpacing: "0.5px" }}>SUPER</span>
+            <span style={{ fontSize: "9px", background: "rgba(192,57,43,0.08)", border: "1px solid rgba(192,57,43,0.3)", color: "#C0392B", borderRadius: "4px", padding: "1px 6px", fontWeight: 700, letterSpacing: "0.5px" }}>SUPERADMIN</span>
           )}
           {user.is_staff && !user.is_superuser && (
             <span style={{ fontSize: "9px", background: "rgba(42,79,133,0.12)", border: "1px solid rgba(42,79,133,0.35)", color: "#7BA3D4", borderRadius: "4px", padding: "1px 6px", fontWeight: 700, letterSpacing: "0.5px" }}>STAFF</span>
@@ -295,7 +296,7 @@ function UserRow({ user, onDeactivate, onReactivate, isActing, index }) {
       </span>
 
       {/* Action */}
-      {!user.is_superuser && (
+      {canManageUsers && !user.is_superuser && (
         <button
           disabled={isActing}
           onClick={() => active ? onDeactivate(user.id) : onReactivate(user.id)}
@@ -321,6 +322,7 @@ function UserRow({ user, onDeactivate, onReactivate, isActing, index }) {
 // ── Main Page ──────────────────────────────────────────────
 export default function SettingsPage() {
   const qc = useQueryClient()
+  const currentUser = useAuthStore((s) => s.user)
   const [actingId, setActingId] = useState(null)
   const [userToast, setUserToast] = useState({ msg: "", type: "" })
 
@@ -351,6 +353,7 @@ export default function SettingsPage() {
   const users        = [...(data?.results ?? data ?? [])].sort((a, b) => roleRank(a) - roleRank(b))
   const activeCount  = users.filter(u => u.is_active).length
   const staffCount   = users.filter(u => u.is_staff).length
+  const canManageUsers = Boolean(currentUser?.is_superuser)
 
   return (
     <div style={{ fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", color: "#1A1A18", width: "100%", animation: "fadeUp 0.4s ease both" }}>
@@ -451,6 +454,7 @@ export default function SettingsPage() {
                     user={u}
                     index={i}
                     isActing={actingId === u.id}
+                    canManageUsers={canManageUsers}
                     onDeactivate={deactivateMut.mutate}
                     onReactivate={reactivateMut.mutate}
                   />
