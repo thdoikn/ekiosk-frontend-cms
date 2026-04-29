@@ -2,6 +2,15 @@ import { useState, useMemo } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
 import client from "../../api/client"
+import {
+  PageHeader,
+  SearchInput,
+  Toolbar,
+  EmptyState,
+  LoadingSkeleton,
+  KioskStatusBadge,
+  statusKiosk,
+} from "../../ui"
 
 // ── API ────────────────────────────────────────────────────
 const fetchKiosks    = () => client.get("/kiosks/").then(r => r.data)
@@ -9,16 +18,6 @@ const fetchRegions   = () => client.get("/regions/").then(r => r.data)
 const doForceUpdate  = (id) => client.post(`/kiosks/${id}/force-update/`)
 const doSetStatus    = ({ id, operational_status }) =>
   client.post(`/kiosks/${id}/set-status/`, { operational_status })
-
-// ── Helpers ────────────────────────────────────────────────
-const STATUS_CFG = {
-  operational:  { label: "Operational",  bg: "#E8F4EC", text: "#2D6A4F", dot: "#418840" },
-  stale:        { label: "Stale",        bg: "#FEF5E7", text: "#9B7228", dot: "#C49A3C" },
-  maintenance:  { label: "Maintenance",  bg: "#E3F2FD", text: "#1565C0", dot: "#1976D2" },
-  out_of_order: { label: "Out of Order", bg: "#FDECEA", text: "#C0392B", dot: "#D83A2F" },
-  disconnected: { label: "Disconnected", bg: "#F3F2F0", text: "#6A6860", dot: "#9A9890" },
-  pending:      { label: "Pending",      bg: "#FAFAFA", text: "#9E9E9E", dot: "#BDBDBD" },
-}
 
 // foreground = app is open on screen
 // background = app running but screen is off / another app on front
@@ -36,16 +35,6 @@ function timeSince(dateStr) {
   if (diff < 3600)  return `${Math.floor(diff / 60)}m ago`
   if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
   return `${Math.floor(diff / 86400)}d ago`
-}
-
-function StatusBadge({ status }) {
-  const cfg = STATUS_CFG[status] || STATUS_CFG.pending
-  return (
-    <span style={{ ...S.badge, background: cfg.bg, color: cfg.text }}>
-      <span style={{ ...S.badgeDot, background: cfg.dot }} />
-      {cfg.label}
-    </span>
-  )
 }
 
 function ActionBtn({ onClick, variant = "ghost", disabled, children }) {
@@ -123,20 +112,17 @@ export default function KioskListPage() {
     <div style={S.page}>
       <style>{ANIM_CSS}</style>
 
-      {/* Header */}
-      <div style={S.header}>
-        <div>
-          <h1 style={S.pageTitle}>Kiosk Management</h1>
-          <p style={S.pageSub}>
-            {kiosks.length} kiosk terdaftar
-            {filtered.length !== kiosks.length && ` · ${filtered.length} ditampilkan`}
-          </p>
-        </div>
-      </div>
+      <PageHeader
+        title="Kiosk Management"
+        subtitle={`${kiosks.length} kiosk terdaftar${
+          filtered.length !== kiosks.length ? ` · ${filtered.length} ditampilkan` : ""
+        }`}
+        style={{ marginBottom: "20px" }}
+      />
 
       {/* Status summary strip */}
       <div style={S.statusStrip}>
-        {Object.entries(STATUS_CFG).map(([key, cfg]) => (
+        {Object.entries(statusKiosk).map(([key, cfg]) => (
           <button
             key={key}
             onClick={() => setStatus(statusFilter === key ? "all" : key)}
@@ -149,23 +135,14 @@ export default function KioskListPage() {
         ))}
       </div>
 
-      {/* Filters row */}
-      <div style={S.filtersRow}>
-        {/* Search */}
-        <div style={S.searchWrap}>
-          <SearchIcon />
-          <input
-            style={S.searchInput}
-            placeholder="Cari nama atau IP kiosk..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-          {search && (
-            <button style={S.clearBtn} onClick={() => setSearch("")}>✕</button>
-          )}
-        </div>
-
-        {/* Region filter */}
+      <Toolbar style={{ marginBottom: "12px" }}>
+        <SearchInput
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Cari nama atau IP kiosk..."
+          onClear={() => setSearch("")}
+          style={{ flex: "1 1 320px" }}
+        />
         <select
           style={S.select}
           value={regionFilter}
@@ -176,23 +153,22 @@ export default function KioskListPage() {
             <option key={r.id} value={r.id}>{r.name}</option>
           ))}
         </select>
-      </div>
+      </Toolbar>
 
       {/* Table */}
       <div style={S.tableWrap}>
         {isLoading ? (
           <div style={S.loadingWrap}>
-            {[...Array(5)].map((_, i) => (
-              <div key={i} style={{ ...S.skeletonRow, animationDelay: `${i * 0.08}s` }} />
-            ))}
+            <LoadingSkeleton rows={5} rowHeight={52} gap={8} />
           </div>
         ) : filtered.length === 0 ? (
           <div style={S.empty}>
-            <span style={S.emptyIcon}>◫</span>
-            <p style={S.emptyText}>Tidak ada kiosk yang cocok dengan filter</p>
-            <button style={S.emptyReset} onClick={() => { setSearch(""); setRegion("all"); setStatus("all") }}>
-              Reset Filter
-            </button>
+            <EmptyState
+              icon="◫"
+              title="Tidak ada kiosk yang cocok dengan filter"
+              actionLabel="Reset Filter"
+              onAction={() => { setSearch(""); setRegion("all"); setStatus("all") }}
+            />
           </div>
         ) : (
           <table style={S.table}>
@@ -207,7 +183,7 @@ export default function KioskListPage() {
               </tr>
             </thead>
             <tbody>
-              {filtered.map((kiosk, i) => (
+              {filtered.map((kiosk) => (
                 <tr
                   key={kiosk.id}
                   style={{
@@ -224,7 +200,7 @@ export default function KioskListPage() {
                     <div style={S.kioskNameCell}>
                       <div style={{
                         ...S.kioskDot,
-                        background: STATUS_CFG[kiosk.status]?.dot ?? "#9A9890"
+                        background: statusKiosk[kiosk.status]?.dot ?? "#9A9890"
                       }} />
                       <div>
                         <button
@@ -245,7 +221,7 @@ export default function KioskListPage() {
                     </span>
                   </td>
                   <td style={S.td}>
-                    <StatusBadge status={kiosk.status} />
+                    <KioskStatusBadge status={kiosk.status} style={{ verticalAlign: "middle" }} />
                     {kiosk.last_app_state && APP_STATE_CFG[kiosk.last_app_state] && (
                       <div style={{
                         display: "inline-flex",
@@ -339,13 +315,6 @@ export default function KioskListPage() {
 }
 
 // ── Icons ──────────────────────────────────────────────────
-function SearchIcon() {
-  return (
-    <svg style={{ position: "absolute", left: "14px", top: "50%", transform: "translateY(-50%)", color: "#A8A49C" }} width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-    </svg>
-  )
-}
 function DetailIcon()  { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight:4}}><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> }
 function RefreshIcon() { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight:4}}><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg> }
 function WrenchIcon() { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight:4}}><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg> }

@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
 import client from "../../api/client"
+import { PageHeader, EmptyState, color, depth, font } from "../../ui"
 
 // ── API ────────────────────────────────────────────────────
 const fetchPlaylists = () => client.get("/playlists/").then(r => r.data)
@@ -22,14 +23,6 @@ function TrashIcon() {
 function BuilderIcon() {
   return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}><polygon points="5 3 19 12 5 21 5 3"/></svg>
 }
-
-// ── Animation CSS ──────────────────────────────────────────
-const ANIM_CSS = `
-  @keyframes fadeUp  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
-  @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes shimmer { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
-`
 
 // ── Create Modal ───────────────────────────────────────────
 function CreateModal({ onClose, onSubmit, loading }) {
@@ -107,14 +100,13 @@ export default function PlaylistListPage() {
 
   return (
     <div style={S.page}>
-      <style>{ANIM_CSS}</style>
-
-      <div style={S.header}>
-        <div>
-          <h1 style={S.pageTitle}>Playlist Management</h1>
-          <p style={S.pageSub}>{playlists.length} playlist tersedia</p>
-        </div>
+      <PageHeader
+        title="Playlist Management"
+        subtitle={`${playlists.length} playlist tersedia`}
+        style={S.header}
+      >
         <button
+          type="button"
           style={S.btnPrimary}
           onClick={() => setShowCreate(true)}
           onMouseEnter={e => (e.currentTarget.style.boxShadow = "0 6px 20px rgba(45,106,79,0.25)")}
@@ -122,7 +114,7 @@ export default function PlaylistListPage() {
         >
           <PlusIcon /> Buat Playlist
         </button>
-      </div>
+      </PageHeader>
 
       {isLoading ? (
         <div style={S.grid}>
@@ -130,11 +122,12 @@ export default function PlaylistListPage() {
         </div>
       ) : playlists.length === 0 ? (
         <div style={S.empty}>
-          <FilmIcon size={40} color="#C5BFB8" />
-          <p style={S.emptyTitle}>Belum ada playlist</p>
-          <button style={S.btnPrimary} onClick={() => setShowCreate(true)}>
-            <PlusIcon /> Buat Playlist Pertama
-          </button>
+          <EmptyState
+            icon={<FilmIcon size={40} color={color.textHint} />}
+            title="Belum ada playlist"
+            actionLabel="Buat Playlist Pertama"
+            onAction={() => setShowCreate(true)}
+          />
         </div>
       ) : (
         <div style={S.grid}>
@@ -225,20 +218,13 @@ export default function PlaylistListPage() {
   )
 }
 
-// ── Neuromorphic tokens ────────────────────────────────────
-const NM   = "#EDEAE6"
-const NM_U = "6px 6px 14px #D0CCCA, -6px -6px 14px #FFFFFF"
-const NM_S = "4px 4px 10px #D0CCCA, -4px -4px 10px #FFFFFF"
-const NM_I = "inset 4px 4px 10px #D0CCCA, inset -4px -4px 10px #FFFFFF"
-const NM_I_SM = "inset 3px 3px 7px #D0CCCA, inset -3px -3px 7px #FFFFFF"
-
-// ── Styles ─────────────────────────────────────────────────
+// ── Styles (tokens from `../../ui`) ───────────────────────
 const S = {
   page: {
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    color: "#1A1A18",
+    fontFamily: font.family,
+    color: color.text,
     width: "100%",
-    animation: "fadeUp 0.4s ease both",
+    animation: "civFadeUp 0.4s ease both",
   },
   header: {
     display: "flex",
@@ -261,13 +247,13 @@ const S = {
     gap: "20px",
   },
   card: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "14px",
     padding: "20px",
-    animation: "fadeUp 0.4s ease both",
+    animation: "civFadeUp 0.4s ease both",
     transition: "box-shadow 0.22s",
-    boxShadow: NM_U,
+    boxShadow: depth.raised,
   },
   cardTop: {
     display: "flex",
@@ -278,13 +264,13 @@ const S = {
   cardIconWrap: {
     width: "36px",
     height: "36px",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "10px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   cardActions: { display: "flex", gap: "6px" },
   activeBadge: {
@@ -300,14 +286,14 @@ const S = {
   },
   inactiveBadge: {
     fontSize: "11px",
-    background: NM,
+    background: color.surface,
     border: "none",
     color: "#8A8680",
     borderRadius: "20px",
     padding: "3px 10px",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   cardName: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
@@ -322,11 +308,11 @@ const S = {
     display: "flex",
     alignItems: "center",
     gap: "12px",
-    background: NM,
+    background: color.surface,
     borderRadius: "10px",
     padding: "10px 12px",
     marginBottom: "12px",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   cardMetaItem: {
     display: "flex",
@@ -360,7 +346,7 @@ const S = {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "9px",
     padding: "8px",
@@ -370,14 +356,14 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "box-shadow 0.18s",
     fontWeight: 500,
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   builderBtnHover: {
     flex: 1,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "9px",
     padding: "8px",
@@ -387,10 +373,10 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "box-shadow 0.18s",
     fontWeight: 500,
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   iconBtnDanger: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "9px",
     width: "34px",
@@ -400,7 +386,7 @@ const S = {
     justifyContent: "center",
     color: "#C0392B",
     cursor: "pointer",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   overlay: {
     position: "fixed",
@@ -411,18 +397,18 @@ const S = {
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1000,
-    animation: "fadeIn 0.2s ease both",
+    animation: "civFadeIn 0.2s ease both",
     padding: "20px",
   },
   modal: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "16px",
     width: "100%",
     maxWidth: "420px",
     padding: "24px",
-    animation: "slideUp 0.25s ease both",
-    boxShadow: NM_U,
+    animation: "civSlideUp 0.25s ease both",
+    boxShadow: depth.raised,
   },
   modalHeader: {
     display: "flex",
@@ -460,7 +446,7 @@ const S = {
     textTransform: "uppercase",
   },
   input: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "10px",
     padding: "11px 14px",
@@ -470,7 +456,7 @@ const S = {
     outline: "none",
     width: "100%",
     boxSizing: "border-box",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   hint: {
     fontSize: "12px",
@@ -500,7 +486,7 @@ const S = {
   btnGhost: {
     display: "inline-flex",
     alignItems: "center",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "8px",
     padding: "9px 16px",
@@ -508,7 +494,7 @@ const S = {
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   empty: {
     display: "flex",
@@ -528,6 +514,6 @@ const S = {
     borderRadius: "14px",
     background: "linear-gradient(90deg, #D8D4CF 25%, #E8E4DF 50%, #D8D4CF 75%)",
     backgroundSize: "600px 100%",
-    animation: "shimmer 1.4s infinite",
+    animation: "civShimmer 1.4s infinite",
   },
 }

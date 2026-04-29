@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { Outlet } from "react-router-dom"
+import { animationsCss } from "../../ui/animations"
+import { color, font } from "../../ui/tokens"
 import Sidebar from "./Sidebar"
 import Topbar from "./Topbar"
 
@@ -17,11 +19,19 @@ export default function AppLayout() {
       </div>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        ${animationsCss}
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+          }
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #EDEAE6; }
+        body { background: ${color.bg}; }
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #D0CCCA; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: ${color.scrollbar}; border-radius: 3px; }
       `}</style>
     </div>
   )
@@ -31,8 +41,8 @@ const layoutStyles = {
   root: {
     display: "flex",
     height: "100vh",
-    background: "#EDEAE6",
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+    background: color.bg,
+    fontFamily: font.family,
     overflow: "hidden",
   },
   main: {
@@ -46,6 +56,6 @@ const layoutStyles = {
     flex: 1,
     overflowY: "auto",
     padding: "28px 32px",
-    background: "#EDEAE6",
+    background: color.bg,
   },
 }

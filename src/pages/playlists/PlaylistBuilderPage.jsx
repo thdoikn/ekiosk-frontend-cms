@@ -11,6 +11,7 @@ import {
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import client from "../../api/client"
+import { color, depth, font } from "../../ui"
 
 // ── API ────────────────────────────────────────────────────
 const fetchPlaylist = (id) => client.get(`/playlists/${id}/`).then(r => r.data)
@@ -39,12 +40,7 @@ function CloseIcon() {
   return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
 }
 
-// ── Animation CSS ──────────────────────────────────────────
-const ANIM_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=DM+Mono:wght@400&family=DM+Sans:wght@300;400;500;600&display=swap');
-  @keyframes fadeUp  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes shimmer { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
-`
+// Keyframes: civFadeUp, civShimmer (global via AppLayout)
 
 // ── Sortable playlist item ─────────────────────────────────
 function SortableItem({ item, index, onRemove, onDurationChange }) {
@@ -302,7 +298,6 @@ export default function PlaylistBuilderPage() {
   if (plLoading) {
     return (
       <div style={S.page}>
-        <style>{ANIM_CSS}</style>
         <div style={S.loadingGrid}>
           {[...Array(4)].map((_, i) => <div key={i} style={S.skeleton} />)}
         </div>
@@ -312,8 +307,6 @@ export default function PlaylistBuilderPage() {
 
   return (
     <div style={S.page}>
-      <style>{ANIM_CSS}</style>
-
       {/* Top bar */}
       <div style={S.topBar}>
         <div style={S.topLeft}>
@@ -528,20 +521,13 @@ export default function PlaylistBuilderPage() {
   )
 }
 
-// ── Neuromorphic tokens ────────────────────────────────────
-const NM   = "#EDEAE6"
-const NM_U = "6px 6px 14px #D0CCCA, -6px -6px 14px #FFFFFF"
-const NM_S = "4px 4px 10px #D0CCCA, -4px -4px 10px #FFFFFF"
-const NM_I = "inset 4px 4px 10px #D0CCCA, inset -4px -4px 10px #FFFFFF"
-const NM_I_SM = "inset 3px 3px 7px #D0CCCA, inset -3px -3px 7px #FFFFFF"
-
-// ── Styles ─────────────────────────────────────────────────
+// ── Styles (tokens from `../../ui`) ───────────────────────
 const S = {
   page: {
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    color: "#1A1A18",
+    fontFamily: font.family,
+    color: color.text,
     maxWidth: "1400px",
-    animation: "fadeUp 0.35s ease both",
+    animation: "civFadeUp 0.35s ease both",
   },
   topBar: {
     display: "flex",
@@ -554,7 +540,7 @@ const S = {
   topLeft: { display: "flex", alignItems: "flex-start", gap: "16px" },
   topRight: { display: "flex", alignItems: "center", gap: "12px" },
   backBtn: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "8px",
     padding: "7px 14px",
@@ -564,7 +550,7 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     flexShrink: 0,
     marginTop: "4px",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   titleArea: { display: "flex", flexDirection: "column", gap: "6px" },
   pageTitle: {
@@ -578,12 +564,12 @@ const S = {
   titleMeta: { display: "flex", gap: "8px", flexWrap: "wrap" },
   metaChip: {
     fontSize: "11px",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "20px",
     padding: "3px 10px",
     color: "#7A7670",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   regionChip: {
     fontSize: "11px",
@@ -611,12 +597,12 @@ const S = {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "10px",
     padding: "9px 14px",
     marginBottom: "16px",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   hashLabel: {
     fontSize: "10px",
@@ -639,20 +625,20 @@ const S = {
     alignItems: "start",
   },
   leftPanel: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "14px",
     overflow: "hidden",
-    boxShadow: NM_U,
+    boxShadow: depth.raised,
   },
   rightPanel: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "14px",
     overflow: "hidden",
     position: "sticky",
     top: "16px",
-    boxShadow: NM_U,
+    boxShadow: depth.raised,
   },
   panelHeader: {
     display: "flex",
@@ -685,12 +671,12 @@ const S = {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "10px",
     padding: "8px 10px",
     userSelect: "none",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   dragHandle: {
     color: "#C5BFB8",
@@ -703,7 +689,7 @@ const S = {
     width: "22px",
     height: "22px",
     borderRadius: "50%",
-    background: NM,
+    background: color.surface,
     border: "none",
     display: "flex",
     alignItems: "center",
@@ -712,7 +698,7 @@ const S = {
     color: "#8A8680",
     fontFamily: "'DM Mono', monospace",
     flexShrink: 0,
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   itemThumb: {
     width: "52px",
@@ -766,7 +752,7 @@ const S = {
   },
   durationInput: {
     width: "52px",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "6px",
     padding: "5px 8px",
@@ -775,7 +761,7 @@ const S = {
     fontFamily: "'DM Mono', monospace",
     outline: "none",
     textAlign: "center",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   durationUnit: { fontSize: "11px", color: "#8A8680", flexShrink: 0 },
   removeBtn: {
@@ -861,7 +847,7 @@ const S = {
   },
   libSearch: {
     width: "100%",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "8px",
     padding: "8px 10px 8px 30px",
@@ -870,12 +856,12 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     boxSizing: "border-box",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   libTypeFilter: { display: "flex", gap: "4px" },
   typeTab: {
     flex: 1,
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "8px",
     padding: "5px",
@@ -884,13 +870,13 @@ const S = {
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "box-shadow 0.18s",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   typeTabActive: {
-    background: NM,
+    background: color.surface,
     border: "none",
     color: "#7BA3D4",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   mediaLibList: {
     display: "flex",
@@ -982,7 +968,7 @@ const S = {
     height: "54px",
     background: "linear-gradient(90deg, #F0EBE3 25%, #F9F5EE 50%, #F0EBE3 75%)",
     backgroundSize: "600px 100%",
-    animation: "shimmer 1.4s infinite",
+    animation: "civShimmer 1.4s infinite",
   },
 
   // Loading
@@ -996,6 +982,6 @@ const S = {
     borderRadius: "14px",
     background: "linear-gradient(90deg, #D8D4CF 25%, #E8E4DF 50%, #D8D4CF 75%)",
     backgroundSize: "600px 100%",
-    animation: "shimmer 1.4s infinite",
+    animation: "civShimmer 1.4s infinite",
   },
 }

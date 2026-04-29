@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import client from "../../api/client"
+import { PageHeader, EmptyState, color, depth, font } from "../../ui"
 
 // ── API ────────────────────────────────────────────────────
 const fetchRegions   = () => client.get("/regions/").then(r => r.data)
@@ -126,7 +127,7 @@ function AssignModal({ region, playlists, onAssign, onClose, loading }) {
             onClick={() => setSelected(p.id)}
             style={{
               ...S.playlistPickerItem,
-              boxShadow: selected === p.id ? NM_I_SM : NM_S,
+              boxShadow: selected === p.id ? depth.insetSm : depth.raisedSm,
               color: selected === p.id ? "#2D6A4F" : "#7A7670",
             }}
           >
@@ -290,15 +291,13 @@ export default function RegionListPage() {
 
   return (
     <div style={S.page}>
-      <style>{ANIM_CSS}</style>
-
-      {/* Header */}
-      <div style={S.header}>
-        <div>
-          <h1 style={S.pageTitle}>Region Management</h1>
-          <p style={S.pageSub}>{regions.length} region terdaftar</p>
-        </div>
+      <PageHeader
+        title="Region Management"
+        subtitle={`${regions.length} region terdaftar`}
+        style={S.header}
+      >
         <button
+          type="button"
           style={S.btnPrimary}
           onClick={() => setModal("create")}
           onMouseEnter={e => Object.assign(e.currentTarget.style, S.btnPrimaryHover)}
@@ -306,7 +305,7 @@ export default function RegionListPage() {
         >
           <PlusIcon /> Tambah Region
         </button>
-      </div>
+      </PageHeader>
 
       {/* Cards grid */}
       {isLoading ? (
@@ -317,12 +316,14 @@ export default function RegionListPage() {
         </div>
       ) : regions.length === 0 ? (
         <div style={S.empty}>
-          <MapPinIcon color="#C5BFB8" size={40} />
-          <p style={S.emptyTitle}>Belum ada region</p>
-          <p style={S.emptyText}>Buat region pertama untuk mulai mengatur kiosk berdasarkan lokasi</p>
-          <button style={S.btnPrimary} onClick={() => setModal("create")}>
-            <PlusIcon /> Buat Region Pertama
-          </button>
+          <EmptyState
+            icon={<MapPinIcon color={color.textHint} size={40} />}
+            title="Belum ada region"
+            actionLabel="Buat Region Pertama"
+            onAction={() => setModal("create")}
+          >
+            <p style={S.emptyText}>Buat region pertama untuk mulai mengatur kiosk berdasarkan lokasi</p>
+          </EmptyState>
         </div>
       ) : (
         <div style={S.grid}>
@@ -402,27 +403,13 @@ function PlaylistIcon() {
   return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 6 }}><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
 }
 
-// ── Neuromorphic tokens ────────────────────────────────────
-const NM   = "#EDEAE6"
-const NM_U = "6px 6px 14px #D0CCCA, -6px -6px 14px #FFFFFF"
-const NM_S = "4px 4px 10px #D0CCCA, -4px -4px 10px #FFFFFF"
-const NM_I = "inset 4px 4px 10px #D0CCCA, inset -4px -4px 10px #FFFFFF"
-const NM_I_SM = "inset 3px 3px 7px #D0CCCA, inset -3px -3px 7px #FFFFFF"
-
-// ── Styles ─────────────────────────────────────────────────
-const ANIM_CSS = `
-  @keyframes fadeUp   { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes shimmer  { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
-  @keyframes fadeIn   { from{opacity:0} to{opacity:1} }
-  @keyframes slideUp  { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-`
-
+// ── Styles (tokens from `../../ui`) ────────────────────────
 const S = {
   page: {
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    color: "#1A1A18",
+    fontFamily: font.family,
+    color: color.text,
     width: "100%",
-    animation: "fadeUp 0.4s ease both",
+    animation: "civFadeUp 0.4s ease both",
   },
   header: {
     display: "flex",
@@ -454,14 +441,14 @@ const S = {
 
   // Region card
   regionCard: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "14px",
     overflow: "hidden",
     transition: "box-shadow 0.22s",
-    animation: "fadeUp 0.4s ease both",
+    animation: "civFadeUp 0.4s ease both",
     position: "relative",
-    boxShadow: NM_U,
+    boxShadow: depth.raised,
   },
   regionStripe: {
     height: "3px",
@@ -509,11 +496,11 @@ const S = {
     display: "flex",
     alignItems: "center",
     gap: "16px",
-    background: NM,
+    background: color.surface,
     borderRadius: "10px",
     padding: "10px 14px",
     marginBottom: "14px",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   regionStat: {
     display: "flex",
@@ -546,7 +533,7 @@ const S = {
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "10px",
     padding: "9px",
@@ -556,14 +543,14 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontWeight: 500,
     transition: "box-shadow 0.18s",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   assignBtnHover: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     width: "100%",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "10px",
     padding: "9px",
@@ -573,12 +560,12 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontWeight: 500,
     transition: "box-shadow 0.18s",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
 
   // Icon buttons
   iconBtn: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "8px",
     width: "30px",
@@ -589,10 +576,10 @@ const S = {
     color: "#7A7670",
     cursor: "pointer",
     transition: "box-shadow 0.18s",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   iconBtnDanger: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "8px",
     width: "30px",
@@ -603,7 +590,7 @@ const S = {
     color: "#C0392B",
     cursor: "pointer",
     transition: "box-shadow 0.18s",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
 
   // Modal overlay
@@ -616,28 +603,28 @@ const S = {
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1000,
-    animation: "fadeIn 0.2s ease both",
+    animation: "civFadeIn 0.2s ease both",
     padding: "20px",
   },
   modal: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "16px",
     width: "100%",
     maxWidth: "480px",
-    animation: "slideUp 0.25s ease both",
+    animation: "civSlideUp 0.25s ease both",
     overflow: "hidden",
-    boxShadow: NM_U,
+    boxShadow: depth.raised,
   },
   confirmBox: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "16px",
     width: "100%",
     maxWidth: "380px",
     padding: "28px",
-    animation: "slideUp 0.25s ease both",
-    boxShadow: NM_U,
+    animation: "civSlideUp 0.25s ease both",
+    boxShadow: depth.raised,
   },
   confirmTitle: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
@@ -703,7 +690,7 @@ const S = {
     textTransform: "uppercase",
   },
   input: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "10px",
     padding: "11px 14px",
@@ -713,10 +700,10 @@ const S = {
     outline: "none",
     width: "100%",
     boxSizing: "border-box",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   inputFocus: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "10px",
     padding: "11px 14px",
@@ -729,7 +716,7 @@ const S = {
     boxShadow: "inset 3px 3px 7px #B8B4AE, inset -3px -3px 7px #FFFFFF",
   },
   textarea: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "10px",
     padding: "11px 14px",
@@ -741,10 +728,10 @@ const S = {
     boxSizing: "border-box",
     resize: "vertical",
     lineHeight: 1.5,
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   textareaFocus: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "10px",
     padding: "11px 14px",
@@ -785,8 +772,8 @@ const S = {
     transition: "box-shadow 0.18s",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     textAlign: "left",
-    background: NM,
-    boxShadow: NM_S,
+    background: color.surface,
+    boxShadow: depth.raisedSm,
   },
   pickerCheck: {
     width: "16px",
@@ -797,8 +784,8 @@ const S = {
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
-    background: NM,
-    boxShadow: NM_I_SM,
+    background: color.surface,
+    boxShadow: depth.insetSm,
   },
   pickerCheckInner: {
     width: "8px",
@@ -867,7 +854,7 @@ const S = {
   btnGhost: {
     display: "inline-flex",
     alignItems: "center",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "8px",
     padding: "9px 16px",
@@ -876,12 +863,12 @@ const S = {
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "box-shadow 0.18s",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   btnDanger: {
     display: "inline-flex",
     alignItems: "center",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "8px",
     padding: "9px 16px",
@@ -891,7 +878,7 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "box-shadow 0.18s",
     fontWeight: 600,
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
 
   // Empty + loading
@@ -921,6 +908,6 @@ const S = {
     borderRadius: "14px",
     background: "linear-gradient(90deg, #D8D4CF 25%, #E8E4DF 50%, #D8D4CF 75%)",
     backgroundSize: "600px 100%",
-    animation: "shimmer 1.4s infinite",
+    animation: "civShimmer 1.4s infinite",
   },
 }

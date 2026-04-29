@@ -1,6 +1,7 @@
 import { useState, useRef } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import client from "../../api/client"
+import { PageHeader, SearchInput, EmptyState, StatCard, color, depth, font } from "../../ui"
 
 // ── API ────────────────────────────────────────────────────
 const fetchMedia  = () => client.get("/media/").then(r => r.data)
@@ -44,8 +45,8 @@ function UploadZone({ onFiles }) {
     <div
       style={{
         ...S.uploadZone,
-        borderColor: dragging ? "#C49A3C" : "#D0CCCA",
-        background: NM,
+        borderColor: dragging ? color.accent : color.scrollbar,
+        background: color.surface,
       }}
       onDragOver={e => { e.preventDefault(); setDragging(true) }}
       onDragLeave={() => setDragging(false)}
@@ -342,37 +343,25 @@ export default function MediaPage() {
 
   return (
     <div style={S.page}>
-      <style>{ANIM_CSS}</style>
+      <PageHeader
+        title="Media Library"
+        subtitle="Kelola semua aset media untuk konten kiosk"
+        style={{ marginBottom: 20 }}
+      />
 
-      {/* Header */}
-      <div style={S.header}>
-        <div>
-          <h1 style={S.pageTitle}>Media Library</h1>
-          <p style={S.pageSub}>Kelola semua aset media untuk konten kiosk</p>
-        </div>
-      </div>
-
-      {/* Stats strip */}
-      <div style={S.statsStrip}>
-        <div style={S.statItem}>
-          <span style={S.statValue}>{allMedia.length}</span>
-          <span style={S.statLabel}>Total File</span>
-        </div>
-        <div style={S.statDivider} />
-        <div style={S.statItem}>
-          <span style={{ ...S.statValue, color: "#7BA3D4" }}>{imageCount}</span>
-          <span style={S.statLabel}>Gambar</span>
-        </div>
-        <div style={S.statDivider} />
-        <div style={S.statItem}>
-          <span style={{ ...S.statValue, color: "#418840" }}>{videoCount}</span>
-          <span style={S.statLabel}>Video</span>
-        </div>
-        <div style={S.statDivider} />
-        <div style={S.statItem}>
-          <span style={{ ...S.statValue, color: "#C49A3C" }}>{formatBytes(totalSize)}</span>
-          <span style={S.statLabel}>Total Ukuran</span>
-        </div>
+      {/* Stats */}
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+          gap: 12,
+          marginBottom: 20,
+        }}
+      >
+        <StatCard label="Total File" value={allMedia.length} color={color.accent} />
+        <StatCard label="Gambar" value={imageCount} color="#7BA3D4" />
+        <StatCard label="Video" value={videoCount} color={color.success} />
+        <StatCard label="Total Ukuran" value={formatBytes(totalSize)} color={color.accent} />
       </div>
 
       {/* Upload zone */}
@@ -396,21 +385,14 @@ export default function MediaPage() {
       {/* Filters + view toggle */}
       <div style={S.toolbar}>
         <div style={S.toolbarLeft}>
-          <div style={S.searchWrap}>
-            <svg style={S.searchIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"/>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-            <input
-              style={S.searchInput}
-              placeholder="Cari nama file…"
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-            />
-            {search && (
-              <button style={S.clearBtn} onClick={() => setSearch("")}>✕</button>
-            )}
-          </div>
+          <SearchInput
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            onClear={() => setSearch("")}
+            placeholder="Cari nama file…"
+            aria-label="Cari media"
+            style={{ flex: "0 1 260px" }}
+          />
 
           <div style={S.typeFilter}>
             {[
@@ -461,15 +443,16 @@ export default function MediaPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div style={S.empty}>
-          <ImageIcon size={40} color="#C5BFB8" />
-          <p style={S.emptyTitle}>
-            {allMedia.length === 0 ? "Belum ada media" : "Tidak ada media yang cocok"}
-          </p>
-          <p style={S.emptyText}>
-            {allMedia.length === 0
-              ? "Unggah gambar atau video menggunakan area di atas"
-              : "Coba ubah filter pencarian"}
-          </p>
+          <EmptyState
+            icon="◧"
+            title={allMedia.length === 0 ? "Belum ada media" : "Tidak ada media yang cocok"}
+          >
+            <p style={{ ...S.emptyText, margin: 0, textAlign: "center" }}>
+              {allMedia.length === 0
+                ? "Unggah gambar atau video menggunakan area di atas"
+                : "Coba ubah filter pencarian"}
+            </p>
+          </EmptyState>
         </div>
       ) : viewMode === "grid" ? (
         <div style={S.grid}>
@@ -572,81 +555,16 @@ function ImageIcon({ size = 16, color = "#A8A49C" }) {
   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
 }
 function SpinIcon() {
-  return <span style={{ display: "inline-block", animation: "spin 0.7s linear infinite", fontSize: "12px" }}>⟳</span>
+  return <span style={{ display: "inline-block", animation: "civSpin 0.7s linear infinite", fontSize: "12px" }}>⟳</span>
 }
 
-// ── Neuromorphic tokens ────────────────────────────────────
-const NM   = "#EDEAE6"
-const NM_U = "6px 6px 14px #D0CCCA, -6px -6px 14px #FFFFFF"
-const NM_S = "4px 4px 10px #D0CCCA, -4px -4px 10px #FFFFFF"
-const NM_I = "inset 4px 4px 10px #D0CCCA, inset -4px -4px 10px #FFFFFF"
-const NM_I_SM = "inset 3px 3px 7px #D0CCCA, inset -3px -3px 7px #FFFFFF"
-
-// ── Styles ─────────────────────────────────────────────────
-const ANIM_CSS = `
-  @keyframes fadeUp  { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
-  @keyframes slideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes shimmer { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
-  @keyframes spin    { to{transform:rotate(360deg)} }
-`
-
+// ── Styles (depth/color from `../../ui` tokens) ─────────────
 const S = {
   page: {
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    color: "#1A1A18",
+    fontFamily: font.family,
+    color: color.text,
     width: "100%",
-    animation: "fadeUp 0.4s ease both",
-  },
-  header: { marginBottom: "20px" },
-  pageTitle: {
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    fontSize: "26px",
-    fontWeight: 600,
-    color: "#1A1A18",
-    margin: "0 0 4px",
-    letterSpacing: "1px",
-  },
-  pageSub: { fontSize: "13px", color: "#8A8680", margin: 0, fontWeight: 300 },
-
-  // Stats
-  statsStrip: {
-    display: "flex",
-    alignItems: "center",
-    background: NM,
-    border: "none",
-    borderRadius: "12px",
-    padding: "14px 24px",
-    marginBottom: "20px",
-    gap: "0",
-    boxShadow: NM_U,
-  },
-  statItem: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "3px",
-    flex: 1,
-    alignItems: "center",
-  },
-  statValue: {
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    fontSize: "22px",
-    fontWeight: 600,
-    color: "#C49A3C",
-    lineHeight: 1,
-  },
-  statLabel: {
-    fontSize: "10px",
-    color: "#8A8680",
-    textTransform: "uppercase",
-    letterSpacing: "0.8px",
-    fontWeight: 600,
-  },
-  statDivider: {
-    width: "1px",
-    height: "36px",
-    background: "#D0CCCA",
-    flexShrink: 0,
+    animation: "civFadeUp 0.4s ease both",
   },
 
   // Upload zone
@@ -676,14 +594,14 @@ const S = {
     marginBottom: "16px",
   },
   uploadItem: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "10px",
     padding: "10px 14px",
     display: "flex",
     alignItems: "center",
     gap: "12px",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   uploadItemLeft: {
     display: "flex",
@@ -753,7 +671,7 @@ const S = {
     pointerEvents: "none",
   },
   searchInput: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "10px",
     padding: "9px 36px",
@@ -762,7 +680,7 @@ const S = {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     outline: "none",
     width: "240px",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   clearBtn: {
     position: "absolute",
@@ -781,7 +699,7 @@ const S = {
     display: "inline-flex",
     alignItems: "center",
     gap: "6px",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "20px",
     padding: "6px 14px",
@@ -790,13 +708,13 @@ const S = {
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "box-shadow 0.18s",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   typeTabActive: {
-    background: NM,
+    background: color.surface,
     border: "none",
     color: "#7BA3D4",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   tabCount: {
     background: "rgba(196,191,184,0.4)",
@@ -815,11 +733,11 @@ const S = {
   viewToggle: {
     display: "flex",
     gap: "4px",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "10px",
     padding: "4px",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   viewBtn: {
     background: "transparent",
@@ -835,9 +753,9 @@ const S = {
     transition: "all 0.15s",
   },
   viewBtnActive: {
-    background: NM,
+    background: color.surface,
     color: "#C49A3C",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
 
   // Grid
@@ -847,13 +765,13 @@ const S = {
     gap: "16px",
   },
   mediaCard: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "12px",
     overflow: "hidden",
-    animation: "fadeUp 0.35s ease both",
+    animation: "civFadeUp 0.35s ease both",
     transition: "box-shadow 0.2s",
-    boxShadow: NM_U,
+    boxShadow: depth.raised,
   },
   cardThumb: {
     width: "100%",
@@ -902,7 +820,7 @@ const S = {
     alignItems: "center",
     justifyContent: "center",
     gap: "10px",
-    animation: "fadeIn 0.15s ease both",
+    animation: "civFadeIn 0.15s ease both",
   },
   overlayBtn: {
     width: "36px",
@@ -949,11 +867,11 @@ const S = {
 
   // List view
   listWrap: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "14px",
     overflow: "hidden",
-    boxShadow: NM_U,
+    boxShadow: depth.raised,
   },
   listHeader: {
     display: "grid",
@@ -978,7 +896,7 @@ const S = {
     alignItems: "center",
     gap: "12px",
     transition: "background 0.1s",
-    animation: "fadeUp 0.3s ease both",
+    animation: "civFadeUp 0.3s ease both",
   },
   listNameCell: {
     display: "flex",
@@ -1041,19 +959,19 @@ const S = {
     alignItems: "center",
     justifyContent: "center",
     zIndex: 1000,
-    animation: "fadeIn 0.2s ease both",
+    animation: "civFadeIn 0.2s ease both",
     padding: "20px",
   },
   previewBox: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "16px",
     width: "100%",
     maxWidth: "700px",
     maxHeight: "90vh",
     overflowY: "auto",
-    animation: "slideUp 0.25s ease both",
-    boxShadow: NM_U,
+    animation: "civSlideUp 0.25s ease both",
+    boxShadow: depth.raised,
   },
   previewHeader: {
     display: "flex",
@@ -1131,15 +1049,15 @@ const S = {
 
   // Confirm delete
   confirmBox: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "16px",
     width: "100%",
     maxWidth: "360px",
     padding: "28px",
     textAlign: "center",
-    animation: "slideUp 0.25s ease both",
-    boxShadow: NM_U,
+    animation: "civSlideUp 0.25s ease both",
+    boxShadow: depth.raised,
   },
   confirmIcon: {
     width: "48px",
@@ -1171,7 +1089,7 @@ const S = {
     justifyContent: "center",
   },
   btnGhost: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "8px",
     padding: "9px 18px",
@@ -1179,10 +1097,10 @@ const S = {
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   btnDanger: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "8px",
     padding: "9px 18px",
@@ -1191,7 +1109,7 @@ const S = {
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     fontWeight: 600,
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
 
   // Empty & loading
@@ -1215,6 +1133,6 @@ const S = {
     borderRadius: "12px",
     background: "linear-gradient(90deg, #D8D4CF 25%, #E8E4DF 50%, #D8D4CF 75%)",
     backgroundSize: "600px 100%",
-    animation: "shimmer 1.4s infinite",
+    animation: "civShimmer 1.4s infinite",
   },
 }

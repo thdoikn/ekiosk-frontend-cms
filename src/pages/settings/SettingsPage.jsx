@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import client from "../../api/client"
 import { useAuthStore } from "../../store/authStore"
+import { PageHeader, SectionCard, LoadingSkeleton, EmptyState, color, depth, font } from "../../ui"
 
 // ── API ────────────────────────────────────────────────────
 const fetchUsers     = () => client.get("/users/").then(r => r.data)
@@ -33,12 +34,7 @@ function roleRank(u) {
   return 2
 }
 
-const ANIM_CSS = `
-  @keyframes fadeUp  { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes fadeIn  { from{opacity:0} to{opacity:1} }
-  @keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes shimmer { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
-`
+// Keyframes: civFadeIn / civSlideUp / civFadeUp / civShimmer (injected globally via AppLayout)
 
 // ── Toast ──────────────────────────────────────────────────
 function Toast({ msg, type, onClose }) {
@@ -52,14 +48,14 @@ function Toast({ msg, type, onClose }) {
       color: isErr ? "#C0392B" : "#418840",
       borderRadius: "8px", padding: "10px 14px",
       marginBottom: "16px", fontSize: "13px",
-      animation: "fadeIn 0.2s ease both",
+      animation: "civFadeIn 0.2s ease both",
     }}>
       <span>{isErr ? "✕" : "✓"}</span>
       <span style={{ flex: 1 }}>{msg}</span>
       <button onClick={onClose} style={{
         background: "none", border: "none", color: "inherit",
         cursor: "pointer", padding: "0 4px", opacity: 0.6,
-        fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+        fontFamily: font.family,
       }}>✕</button>
     </div>
   )
@@ -74,13 +70,13 @@ function Input({ value, onChange, type = "text", placeholder, disabled, autoComp
       placeholder={placeholder} disabled={disabled}
       autoComplete={autoComplete}
       style={{
-        background: NM,
+        background: color.surface,
         border: "none",
         borderRadius: "10px", padding: "10px 13px",
-        fontSize: "13px", color: "#1A1A18",
-        fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", outline: "none",
+        fontSize: "13px", color: color.text,
+        fontFamily: font.family, outline: "none",
         width: "100%", boxSizing: "border-box",
-        boxShadow: focused ? "inset 3px 3px 7px #B8B4AE, inset -3px -3px 7px #FFFFFF" : NM_I_SM,
+        boxShadow: focused ? depth.insetFocus : depth.insetSm,
         transition: "box-shadow 0.18s",
         opacity: disabled ? 0.5 : 1,
         cursor: disabled ? "not-allowed" : "text",
@@ -103,37 +99,7 @@ function Field({ label, required, hint, children }) {
   )
 }
 
-// ── Neuromorphic tokens ────────────────────────────────────
-const NM   = "#EDEAE6"
-const NM_U = "6px 6px 14px #D0CCCA, -6px -6px 14px #FFFFFF"
-const NM_S = "4px 4px 10px #D0CCCA, -4px -4px 10px #FFFFFF"
-const NM_I = "inset 4px 4px 10px #D0CCCA, inset -4px -4px 10px #FFFFFF"
-const NM_I_SM = "inset 3px 3px 7px #D0CCCA, inset -3px -3px 7px #FFFFFF"
-
-// ── Section card ───────────────────────────────────────────
-function Section({ title, subtitle, delay = "0s", children }) {
-  return (
-    <div style={{
-      background: NM, border: "none",
-      borderRadius: "14px", overflow: "hidden",
-      animation: "fadeUp 0.4s ease both", animationDelay: delay,
-      boxShadow: NM_U,
-    }}>
-      <div style={{
-        padding: "18px 24px 14px", borderBottom: "1px solid rgba(196,191,184,0.5)",
-        background: "rgba(196,191,184,0.15)",
-      }}>
-        <h2 style={{
-          fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", fontSize: "12px",
-          fontWeight: 600, color: "#7A7670", letterSpacing: "1.5px",
-          textTransform: "uppercase", margin: subtitle ? "0 0 3px" : 0,
-        }}>{title}</h2>
-        {subtitle && <p style={{ fontSize: "12px", color: "#8A8680", margin: 0, fontWeight: 300 }}>{subtitle}</p>}
-      </div>
-      <div style={{ padding: "20px 24px" }}>{children}</div>
-    </div>
-  )
-}
+// Section layout: `SectionCard` from `../../ui`
 
 // ── Create User Modal ──────────────────────────────────────
 function CreateUserModal({ onClose, onSubmit, loading, error }) {
@@ -149,20 +115,20 @@ function CreateUserModal({ onClose, onSubmit, loading, error }) {
       position: "fixed", inset: 0, background: "rgba(0,0,0,0.45)",
       backdropFilter: "blur(5px)", display: "flex", alignItems: "center",
       justifyContent: "center", zIndex: 1000,
-      animation: "fadeIn 0.2s ease both", padding: "20px",
+      animation: "civFadeIn 0.2s ease both", padding: "20px",
     }}>
       <div style={{
-        background: NM, border: "none",
+        background: color.surface, border: "none",
         borderRadius: "16px", width: "100%", maxWidth: "500px",
-        padding: "24px", animation: "slideUp 0.25s ease both",
+        padding: "24px", animation: "civSlideUp 0.25s ease both",
         maxHeight: "90vh", overflowY: "auto",
-        boxShadow: NM_U,
+        boxShadow: depth.raised,
       }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-          <h3 style={{ fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", fontSize: "16px", color: "#1A1A18", margin: 0, letterSpacing: "0.5px" }}>
+          <h3 style={{ fontFamily: font.family, fontSize: "16px", color: color.text, margin: 0, letterSpacing: "0.5px" }}>
             Tambah Pengguna Baru
           </h3>
-          <button onClick={onClose} style={{ background: "transparent", border: "none", color: "#8A8680", fontSize: "16px", cursor: "pointer", padding: "2px 6px", fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif" }}>✕</button>
+          <button onClick={onClose} style={{ background: "transparent", border: "none", color: color.textMuted, fontSize: "16px", cursor: "pointer", padding: "2px 6px", fontFamily: font.family }}>✕</button>
         </div>
 
         {error && (
@@ -203,17 +169,18 @@ function CreateUserModal({ onClose, onSubmit, loading, error }) {
         </div>
 
         <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-          <button onClick={onClose} style={{ display: "inline-flex", alignItems: "center", background: "transparent", border: "1px solid #E5E0D8", borderRadius: "8px", padding: "9px 16px", fontSize: "13px", color: "#7A7670", cursor: "pointer", fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif" }}>
+          <button onClick={onClose} style={{ display: "inline-flex", alignItems: "center", background: "transparent", border: `1px solid ${color.borderStrong}`, borderRadius: "8px", padding: "9px 16px", fontSize: "13px", color: color.textSubtle, cursor: "pointer", fontFamily: font.family }} type="button">
             Batal
           </button>
           <button
+            type="button"
             style={{
               display: "inline-flex", alignItems: "center",
               background: "linear-gradient(135deg, #2D6A4F, #1b818a)",
               border: "none", borderRadius: "8px", padding: "10px 18px",
               fontSize: "13px", fontWeight: 600, color: "#FFFFFF",
               cursor: !valid || loading ? "not-allowed" : "pointer",
-              fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+              fontFamily: font.family,
               opacity: !valid || loading ? 0.5 : 1,
             }}
             disabled={!valid || loading}
@@ -238,7 +205,7 @@ function UserRow({ user, onDeactivate, onReactivate, isActing, index, canManageU
         padding: "11px 4px", borderBottom: "1px solid rgba(196,191,184,0.45)",
         transition: "background 0.1s", borderRadius: "4px",
         margin: "0 -4px",
-        animation: "fadeUp 0.35s ease both",
+        animation: "civFadeUp 0.35s ease both",
         animationDelay: `${index * 0.04}s`,
       }}
       onMouseEnter={e => e.currentTarget.style.background = "rgba(196,191,184,0.2)"}
@@ -307,7 +274,7 @@ function UserRow({ user, onDeactivate, onReactivate, isActing, index, canManageU
             fontSize: "11px", fontWeight: 600,
             color: active ? "#C0392B" : "#418840",
             cursor: isActing ? "not-allowed" : "pointer",
-            fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+            fontFamily: font.family,
             opacity: isActing ? 0.5 : 1,
             whiteSpace: "nowrap",
           }}
@@ -356,18 +323,13 @@ export default function SettingsPage() {
   const canManageUsers = Boolean(currentUser?.is_superuser)
 
   return (
-    <div style={{ fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", color: "#1A1A18", width: "100%", animation: "fadeUp 0.4s ease both" }}>
-      <style>{ANIM_CSS}</style>
+    <div style={{ fontFamily: font.family, color: color.text, width: "100%", animation: "civFadeUp 0.4s ease both" }}>
 
-      {/* Header */}
-      <div style={{ marginBottom: "28px" }}>
-        <h1 style={{ fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", fontSize: "26px", fontWeight: 600, color: "#1A1A18", margin: "0 0 4px", letterSpacing: "1px" }}>
-          Pengaturan
-        </h1>
-        <p style={{ fontSize: "13px", color: "#8A8680", margin: 0, fontWeight: 300 }}>
-          Kelola akun dan konfigurasi sistem eKiosk
-        </p>
-      </div>
+      <PageHeader
+        title="Pengaturan"
+        subtitle="Kelola akun dan konfigurasi sistem eKiosk"
+        style={{ marginBottom: 28 }}
+      />
 
       {/* Two-column layout */}
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1.5fr", gap: "16px", alignItems: "start" }}>
@@ -375,7 +337,7 @@ export default function SettingsPage() {
         {/* LEFT */}
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
 
-          <Section title="Informasi Sistem" subtitle="Ringkasan konfigurasi aplikasi dan lingkungan server" delay="0s">
+          <SectionCard title="Informasi Sistem" subtitle="Ringkasan konfigurasi aplikasi dan lingkungan server" delay="0s">
             {[
               ["Sistem",     "eKiosk CMS"],
               ["Versi",      "1.0.0"],
@@ -389,21 +351,21 @@ export default function SettingsPage() {
                 <span style={{ fontFamily: "'DM Mono', monospace", fontSize: "12px", color: "#7A7670" }}>{value}</span>
               </div>
             ))}
-          </Section>
+          </SectionCard>
 
         </div>
 
         {/* RIGHT */}
         <div>
-          <Section title="Manajemen Pengguna" subtitle="Kelola akun staff yang dapat mengakses dashboard CMS" delay="0.08s">
+          <SectionCard title="Manajemen Pengguna" subtitle="Kelola akun staff yang dapat mengakses dashboard CMS" delay="0.08s">
 
             {/* Stats */}
             <div style={{
               display: "flex", alignItems: "center",
-              background: NM, border: "none",
+              background: color.surface, border: "none",
               borderRadius: "12px", padding: "12px 20px",
               marginBottom: "16px",
-              boxShadow: NM_I_SM,
+              boxShadow: depth.insetSm,
             }}>
               {[
                 { val: users.length, label: "Total",   color: "#C49A3C" },
@@ -430,22 +392,13 @@ export default function SettingsPage() {
 
             {/* User list */}
             {isLoading ? (
-              <div>
-                {[...Array(3)].map((_, i) => (
-                  <div key={i} style={{
-                    height: "52px", borderRadius: "8px", marginBottom: "6px",
-                    background: "linear-gradient(90deg, #D8D4CF 25%, #E8E4DF 50%, #D8D4CF 75%)",
-                    backgroundSize: "600px 100%", animation: "shimmer 1.4s infinite",
-                  }} />
-                ))}
-              </div>
+              <LoadingSkeleton rows={3} rowHeight={52} gap={6} />
             ) : users.length === 0 ? (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "40px 20px", gap: "10px" }}>
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#C5BFB8" strokeWidth="2">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                </svg>
-                <p style={{ fontSize: "13px", color: "#8A8680", margin: 0 }}>Belum ada pengguna terdaftar</p>
-              </div>
+              <EmptyState icon="👤" title="Belum ada pengguna terdaftar">
+                <p style={{ fontSize: 12, color: color.textMuted, margin: 0, textAlign: "center", maxWidth: 360 }}>
+                  Tambahkan pengguna baru melalui aksi di atas bila Anda memiliki akses.
+                </p>
+              </EmptyState>
             ) : (
               <div>
                 {users.map((u, i) => (
@@ -461,7 +414,7 @@ export default function SettingsPage() {
                 ))}
               </div>
             )}
-          </Section>
+          </SectionCard>
         </div>
       </div>
 

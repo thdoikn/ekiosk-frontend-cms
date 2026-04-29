@@ -5,21 +5,20 @@ import { useAuthStore } from "../../store/authStore"
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from "react-leaflet"
 import "leaflet/dist/leaflet.css"
 import client from "../../api/client"
+import {
+  PageHeader,
+  StatCard,
+  KioskStatusBadge,
+  color,
+  statusKiosk,
+} from "../../ui"
 
 // ── API calls ──────────────────────────────────────────────
 const fetchSummary = () => client.get("/kiosks/summary/").then(r => r.data)
 const fetchKiosks  = () => client.get("/kiosks/").then(r => r.data)
 const forceUpdate  = (id) => client.post(`/kiosks/${id}/force-update/`)
 
-// ── Helpers ────────────────────────────────────────────────
-const STATUS_CONFIG = {
-  operational:  { label: "Operational",  bg: "#E8F4EC", text: "#2D6A4F", dot: "#418840"  },
-  stale:        { label: "Stale",        bg: "#FEF5E7", text: "#9B7228", dot: "#C49A3C"  },
-  maintenance:  { label: "Maintenance",  bg: "#E3F2FD", text: "#1565C0", dot: "#1976D2"  },
-  out_of_order: { label: "Out of Order", bg: "#FDECEA", text: "#C0392B", dot: "#D83A2F"  },
-  disconnected: { label: "Disconnected", bg: "#F3F2F0", text: "#6A6860", dot: "#9A9890"  },
-  pending:      { label: "Pending",      bg: "#FAFAFA", text: "#9E9E9E", dot: "#BDBDBD"  },
-}
+// Kiosk display status keyframes shared via tokens
 
 function timeSince(dateStr) {
   if (!dateStr) return "Never"
@@ -72,28 +71,6 @@ function InvalidateMapSize({ trigger }) {
 }
 
 // ── Sub-components ─────────────────────────────────────────
-function StatCard({ label, value, color, icon }) {
-  return (
-    <div style={{ ...styles.statCard, borderTopColor: color }}>
-      <div style={styles.statTop}>
-        <span style={styles.statIcon}>{icon}</span>
-        <span style={{ ...styles.statValue, color }}>{value}</span>
-      </div>
-      <span style={styles.statLabel}>{label}</span>
-    </div>
-  )
-}
-
-function StatusBadge({ status }) {
-  const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.pending
-  return (
-    <span style={{ ...styles.badge, background: cfg.bg, color: cfg.text }}>
-      <span style={{ ...styles.badgeDot, background: cfg.dot }} />
-      {cfg.label}
-    </span>
-  )
-}
-
 function KioskMap({ kiosks }) {
   const [activeStatus, setActiveStatus] = useState("all")
   const [expanded, setExpanded] = useState(false)
@@ -120,7 +97,7 @@ function KioskMap({ kiosks }) {
       />
       {mapped.length > 0 && <FitBounds kiosks={mapped} />}
       {filtered.map(kiosk => {
-        const cfg = STATUS_CONFIG[kiosk.status] || STATUS_CONFIG.pending
+            const cfg = statusKiosk[kiosk.status] || statusKiosk.pending
         return (
           <CircleMarker
             key={kiosk.id}
@@ -178,7 +155,7 @@ function KioskMap({ kiosks }) {
         </div>
         <div style={styles.mapControls}>
           <div style={styles.mapLegend}>
-            {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
+            {Object.entries(statusKiosk).map(([key, cfg]) => (
               <button
                 key={key}
                 onClick={() => setActiveStatus(activeStatus === key ? "all" : key)}
@@ -230,7 +207,7 @@ function KioskMap({ kiosks }) {
 }
 
 function KioskCard({ kiosk, onForceUpdate, isForcing, navigate, isPublic }) {
-  const cfg = STATUS_CONFIG[kiosk.status] || STATUS_CONFIG.pending
+  const cfg = statusKiosk[kiosk.status] || statusKiosk.pending
   return (
     <div
       style={styles.kioskCard}
@@ -245,7 +222,7 @@ function KioskCard({ kiosk, onForceUpdate, isForcing, navigate, isPublic }) {
             <p style={styles.kioskName}>{kiosk.name}</p>
             <p style={styles.kioskRegion}>{kiosk.region?.name ?? "No Region"}</p>
           </div>
-          <StatusBadge status={kiosk.status} />
+          <KioskStatusBadge status={kiosk.status} />
         </div>
 
         <div style={styles.kioskMeta}>
@@ -335,14 +312,12 @@ export default function DashboardPage() {
 
   return (
     <div style={styles.page}>
-      {/* Page header */}
-      <div style={styles.pageHeader}>
-        <div>
-          <h1 style={styles.pageTitle}>Dashboard</h1>
-          <p style={styles.pageSubtitle}>Monitoring dan kontrol semua eKiosk IKN</p>
-        </div>
+      <PageHeader
+        title="Dashboard"
+        subtitle="Monitoring dan kontrol semua eKiosk IKN"
+        style={{ marginBottom: "24px" }}
+      >
         <div style={styles.headerRight}>
-          {/* View toggle — prominent segmented control */}
           <div style={styles.viewSegment}>
             {[
               { key: "grid", icon: <GridIcon />,   label: "Daftar Kiosk" },
@@ -363,7 +338,7 @@ export default function DashboardPage() {
             <span style={styles.refreshText}>Refresh 30 detik</span>
           </div>
         </div>
-      </div>
+      </PageHeader>
 
       {/* Stat cards */}
       <div style={styles.statsGrid}>
@@ -376,10 +351,10 @@ export default function DashboardPage() {
           </div>
         ) : (
           <>
-            <StatCard label="Total Kiosks"      value={summary?.total         ?? 0} color="#C49A3C" icon="▦" />
-            <StatCard label="Operational"        value={summary?.operational   ?? 0} color="#418840" icon="●" />
-            <StatCard label="Disconnected"       value={summary?.disconnected  ?? 0} color="#9A9890" icon="●" />
-            <StatCard label="Issues"             value={(summary?.maintenance ?? 0) + (summary?.out_of_order ?? 0) + (summary?.stale ?? 0)} color="#D83A2F" icon="◐" />
+            <StatCard label="Total Kiosks"      value={summary?.total         ?? 0} color={color.accent} icon={<span>▦</span>} />
+            <StatCard label="Operational"        value={summary?.operational   ?? 0} color={statusKiosk.operational.dot} icon={<span>●</span>} />
+            <StatCard label="Disconnected"       value={summary?.disconnected  ?? 0} color={statusKiosk.disconnected.dot} icon={<span>●</span>} />
+            <StatCard label="Issues"             value={(summary?.maintenance ?? 0) + (summary?.out_of_order ?? 0) + (summary?.stale ?? 0)} color={statusKiosk.out_of_order.dot} icon={<span>◐</span>} />
           </>
         )}
       </div>
@@ -539,25 +514,6 @@ const styles = {
     color: "#2A2520",
     width: "100%",
   },
-  pageHeader: {
-    display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    marginBottom: "28px",
-  },
-  pageTitle: {
-    fontSize: "26px",
-    fontWeight: 700,
-    color: "#2A2520",
-    margin: "0 0 3px",
-    letterSpacing: "0.3px",
-  },
-  pageSubtitle: {
-    fontSize: "13px",
-    color: "#9A9590",
-    margin: 0,
-    fontWeight: 400,
-  },
   headerRight: {
     display: "flex",
     alignItems: "center",
@@ -626,36 +582,6 @@ const styles = {
     gridTemplateColumns: "repeat(4, 1fr)",
     gap: "16px",
     marginBottom: "24px",
-  },
-  statCard: {
-    background: NM,
-    borderRadius: "16px",
-    padding: "22px 24px",
-    boxShadow: NM_U,
-    position: "relative",
-    overflow: "hidden",
-  },
-  statTop: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: "12px",
-  },
-  statIcon: {
-    fontSize: "20px",
-    color: "#C0BAB0",
-  },
-  statValue: {
-    fontSize: "38px",
-    fontWeight: 700,
-    lineHeight: 1,
-  },
-  statLabel: {
-    fontSize: "11px",
-    color: "#9A9590",
-    letterSpacing: "1px",
-    textTransform: "uppercase",
-    fontWeight: 600,
   },
   loadingRow: {
     display: "contents",
@@ -958,25 +884,6 @@ const styles = {
     fontSize: "12px",
     color: "#9A9590",
     margin: 0,
-  },
-
-  // Badge
-  badge: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "6px",
-    borderRadius: "20px",
-    padding: "4px 10px",
-    fontSize: "11px",
-    fontWeight: 600,
-    letterSpacing: "0.2px",
-    whiteSpace: "nowrap",
-  },
-  badgeDot: {
-    width: "6px",
-    height: "6px",
-    borderRadius: "50%",
-    flexShrink: 0,
   },
 
   // Kiosk meta grid

@@ -2,6 +2,7 @@ import { useState } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import client from "../../api/client"
+import { KioskStatusBadge, color, depth, font } from "../../ui"
 
 // ── API ────────────────────────────────────────────────────
 const fetchKiosk     = (id) => client.get(`/kiosks/${id}/`).then(r => r.data)
@@ -59,28 +60,6 @@ function timeSince(dateStr) {
 }
 
 // ── Sub-components ─────────────────────────────────────────
-function StatusBadge({ status, large }) {
-  const cfg = STATUS_CFG[status] || STATUS_CFG.pending
-  return (
-    <span style={{
-      ...S.badge,
-      background: cfg.bg,
-      color: cfg.text,
-      fontSize: large ? "13px" : "11px",
-      padding: large ? "6px 14px" : "4px 10px",
-    }}>
-      <span style={{
-        ...S.badgeDot,
-        background: cfg.dot,
-        width: large ? "8px" : "6px",
-        height: large ? "8px" : "6px",
-        animation: status === "operational" ? "pulse 2s ease infinite" : "none",
-      }} />
-      {cfg.label}
-    </span>
-  )
-}
-
 function DiagCard({ label, value, mono, accent }) {
   return (
     <div style={S.diagCard}>
@@ -100,13 +79,13 @@ function DiagCard({ label, value, mono, accent }) {
 function StorageBar({ used, total }) {
   if (!used || !total) return <span style={{ color: "#A8A49C" }}>—</span>
   const pct = Math.min(100, Math.round((1 - used / total) * 100))
-  const color = pct > 80 ? "#D83A2F" : pct > 60 ? "#C49A3C" : "#418840"
+  const barColor = pct > 80 ? "#D83A2F" : pct > 60 ? "#C49A3C" : "#418840"
   return (
     <div style={S.storageWrap}>
       <div style={S.storageBar}>
-        <div style={{ ...S.storageBarFill, width: `${pct}%`, background: color }} />
+        <div style={{ ...S.storageBarFill, width: `${pct}%`, background: barColor }} />
       </div>
-      <span style={{ ...S.storageLabel, color }}>{pct}% used</span>
+      <span style={{ ...S.storageLabel, color: barColor }}>{pct}% used</span>
     </div>
   )
 }
@@ -213,7 +192,6 @@ export default function KioskDetailPage() {
   if (isLoading) {
     return (
       <div style={S.page}>
-        <style>{ANIM_CSS}</style>
         <div style={S.loadingGrid}>
           {[...Array(6)].map((_, i) => (
             <div key={i} style={{ ...S.skeleton, animationDelay: `${i * 0.07}s` }} />
@@ -226,7 +204,6 @@ export default function KioskDetailPage() {
   if (!kiosk) {
     return (
       <div style={S.page}>
-        <style>{ANIM_CSS}</style>
         <div style={S.notFound}>
           <span style={S.notFoundIcon}>◫</span>
           <p style={S.notFoundText}>Kiosk tidak ditemukan</p>
@@ -238,7 +215,6 @@ export default function KioskDetailPage() {
 
   return (
     <div style={S.page}>
-      <style>{ANIM_CSS}</style>
 
       {/* Back + header */}
       <div style={S.topRow}>
@@ -368,7 +344,10 @@ export default function KioskDetailPage() {
 
           <div style={S.heroRight}>
             <div style={S.statusRow}>
-              <StatusBadge status={kiosk.status} large />
+              <KioskStatusBadge
+                status={kiosk.status}
+                style={{ fontSize: "13px", padding: "6px 14px", fontWeight: 600 }}
+              />
               <div style={{ position: "relative" }}>
                 <button
                   style={S.setStatusBtn}
@@ -708,32 +687,19 @@ function RefreshIcon() {
   )
 }
 
-// ── Neuromorphic tokens ────────────────────────────────────
-const NM   = "#EDEAE6"
-const NM_U = "6px 6px 14px #D0CCCA, -6px -6px 14px #FFFFFF"
-const NM_S = "4px 4px 10px #D0CCCA, -4px -4px 10px #FFFFFF"
-const NM_I = "inset 4px 4px 10px #D0CCCA, inset -4px -4px 10px #FFFFFF"
-const NM_I_SM = "inset 3px 3px 7px #D0CCCA, inset -3px -3px 7px #FFFFFF"
-
-// ── Styles ─────────────────────────────────────────────────
-const ANIM_CSS = `
-  @keyframes fadeUp   { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes shimmer  { 0%{background-position:-600px 0} 100%{background-position:600px 0} }
-  @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:0.4} }
-`
-
+// ── Styles (tokens from `../../ui`) ───────────────────────
 const S = {
   page: {
-    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
-    color: "#1A1A18",
+    fontFamily: font.family,
+    color: color.text,
     width: "100%",
-    animation: "fadeUp 0.4s ease both",
+    animation: "civFadeUp 0.4s ease both",
   },
   topRow: {
     marginBottom: "20px",
   },
   backBtn: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "8px",
     padding: "7px 14px",
@@ -742,19 +708,19 @@ const S = {
     cursor: "pointer",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     transition: "box-shadow 0.18s",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
 
   // Hero card
   heroCard: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderTop: "3px solid",
     borderRadius: "14px",
     padding: "28px 32px",
     marginBottom: "20px",
     position: "relative",
-    boxShadow: NM_U,
+    boxShadow: depth.raised,
   },
   heroGlowClip: {
     position: "absolute",
@@ -790,14 +756,14 @@ const S = {
   heroIconWrap: {
     width: "52px",
     height: "52px",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "12px",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     flexShrink: 0,
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   heroName: {
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
@@ -819,7 +785,7 @@ const S = {
     margin: 0,
   },
   editRegionBtn: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "6px",
     padding: "2px 8px",
@@ -828,7 +794,7 @@ const S = {
     cursor: "pointer",
     fontFamily: "'Inter', sans-serif",
     transition: "box-shadow 0.18s",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   regionEditRow: {
     display: "flex",
@@ -837,7 +803,7 @@ const S = {
     flexWrap: "wrap",
   },
   regionSelect: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "8px",
     padding: "5px 10px",
@@ -846,7 +812,7 @@ const S = {
     fontFamily: "'Inter', sans-serif",
     outline: "none",
     minWidth: "180px",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   saveRegionBtn: {
     background: "#2D6A4F",
@@ -860,7 +826,7 @@ const S = {
     fontFamily: "'Inter', sans-serif",
   },
   cancelRegionBtn: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "6px",
     padding: "5px 10px",
@@ -868,10 +834,10 @@ const S = {
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', sans-serif",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   stopIdInput: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "6px",
     padding: "5px 10px",
@@ -880,7 +846,7 @@ const S = {
     fontFamily: "monospace",
     outline: "none",
     width: "140px",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   heroMeta: {
     display: "flex",
@@ -910,7 +876,7 @@ const S = {
     gap: "8px",
   },
   setStatusBtn: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "8px",
     padding: "5px 12px",
@@ -920,17 +886,17 @@ const S = {
     fontFamily: "'Inter', sans-serif",
     transition: "box-shadow 0.18s",
     whiteSpace: "nowrap",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   statusDropdown: {
     position: "absolute",
     top: "100%",
     right: 0,
     marginTop: "6px",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "12px",
-    boxShadow: NM_U,
+    boxShadow: depth.raised,
     zIndex: 100,
     minWidth: "200px",
     padding: "6px 0",
@@ -981,7 +947,7 @@ const S = {
   forceBtn: {
     display: "inline-flex",
     alignItems: "center",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "8px",
     padding: "8px 16px",
@@ -991,12 +957,12 @@ const S = {
     fontFamily: "'Inter', sans-serif",
     fontWeight: 500,
     transition: "box-shadow 0.18s",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   forceBtnHover: {
     display: "inline-flex",
     alignItems: "center",
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "8px",
     padding: "8px 16px",
@@ -1006,7 +972,7 @@ const S = {
     fontFamily: "'Inter', sans-serif",
     fontWeight: 500,
     transition: "box-shadow 0.18s",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   pendingChip: {
     display: "inline-flex",
@@ -1024,7 +990,7 @@ const S = {
     height: "6px",
     borderRadius: "50%",
     background: "#C49A3C",
-    animation: "pulse 1.5s ease infinite",
+    animation: "civPulse 1.5s ease infinite",
     display: "inline-block",
   },
 
@@ -1053,11 +1019,11 @@ const S = {
 
   // Cards
   card: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "14px",
     padding: "20px 24px",
-    boxShadow: NM_U,
+    boxShadow: depth.raised,
   },
   sectionHeader: {
     display: "flex",
@@ -1074,7 +1040,7 @@ const S = {
     margin: 0,
   },
   editBtn: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "6px",
     padding: "4px 10px",
@@ -1082,7 +1048,7 @@ const S = {
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', sans-serif",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
 
   // Diag grid
@@ -1094,7 +1060,7 @@ const S = {
     borderRadius: "10px",
     overflow: "hidden",
     marginBottom: "16px",
-    boxShadow: NM_I,
+    boxShadow: depth.inset,
   },
   diagCard: {
     background: "rgba(196,191,184,0.15)",
@@ -1156,10 +1122,10 @@ const S = {
     display: "flex",
     flexDirection: "column",
     gap: "6px",
-    background: NM,
+    background: color.surface,
     borderRadius: "8px",
     padding: "12px",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   hashArrow: {
     color: "#C8C2B8",
@@ -1225,7 +1191,7 @@ const S = {
     lineHeight: 1.5,
   },
   overrideSelect: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "8px",
     padding: "9px 12px",
@@ -1234,7 +1200,7 @@ const S = {
     fontFamily: "'Inter', sans-serif",
     outline: "none",
     width: "100%",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   saveOverrideBtn: {
     background: "linear-gradient(135deg, #2D6A4F, #1b818a)",
@@ -1267,7 +1233,7 @@ const S = {
   logTableWrap: {
     overflowX: "auto",
     borderRadius: "8px",
-    boxShadow: NM_I_SM,
+    boxShadow: depth.insetSm,
   },
   logTable: {
     width: "100%",
@@ -1335,7 +1301,7 @@ const S = {
     marginTop: "12px",
   },
   logPageBtn: {
-    background: NM,
+    background: color.surface,
     border: "none",
     borderRadius: "6px",
     padding: "5px 12px",
@@ -1344,7 +1310,7 @@ const S = {
     cursor: "pointer",
     fontFamily: "'Inter', sans-serif",
     transition: "box-shadow 0.18s",
-    boxShadow: NM_S,
+    boxShadow: depth.raisedSm,
   },
   logPageInfo: {
     fontSize: "12px",
@@ -1364,7 +1330,7 @@ const S = {
     borderRadius: "12px",
     background: "linear-gradient(90deg, #D8D4CF 25%, #E8E4DF 50%, #D8D4CF 75%)",
     backgroundSize: "600px 100%",
-    animation: "shimmer 1.4s infinite",
+    animation: "civShimmer 1.4s infinite",
   },
   notFound: {
     display: "flex",
