@@ -143,10 +143,10 @@ export default function PlaylistListPage() {
               key={p.id}
               style={{ ...S.card, animationDelay: `${i * 0.05}s` }}
               onMouseEnter={e => {
-                e.currentTarget.style.boxShadow = "8px 8px 18px #C4BFB8, -8px -8px 18px #FFFFFF"
+                e.currentTarget.style.boxShadow = "8px 8px 18px #D0CCCA, -8px -8px 18px #FFFFFF"
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.boxShadow = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"
+                e.currentTarget.style.boxShadow = "6px 6px 14px #D0CCCA, -6px -6px 14px #FFFFFF"
               }}
             >
               <div style={S.cardTop}>
@@ -226,11 +226,11 @@ export default function PlaylistListPage() {
 }
 
 // ── Neuromorphic tokens ────────────────────────────────────
-const NM   = "#E4E0DB"
-const NM_U = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"
-const NM_S = "4px 4px 10px #C4BFB8, -4px -4px 10px #FFFFFF"
-const NM_I = "inset 4px 4px 10px #C4BFB8, inset -4px -4px 10px #FFFFFF"
-const NM_I_SM = "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF"
+const NM   = "#EDEAE6"
+const NM_U = "6px 6px 14px #D0CCCA, -6px -6px 14px #FFFFFF"
+const NM_S = "4px 4px 10px #D0CCCA, -4px -4px 10px #FFFFFF"
+const NM_I = "inset 4px 4px 10px #D0CCCA, inset -4px -4px 10px #FFFFFF"
+const NM_I_SM = "inset 3px 3px 7px #D0CCCA, inset -3px -3px 7px #FFFFFF"
 
 // ── Styles ─────────────────────────────────────────────────
 const S = {
@@ -351,7 +351,7 @@ const S = {
   cardMetaDivider: {
     width: "1px",
     height: "28px",
-    background: "#C4BFB8",
+    background: "#D0CCCA",
     flexShrink: 0,
   },
   cardFooter: { display: "flex", gap: "8px", alignItems: "center" },

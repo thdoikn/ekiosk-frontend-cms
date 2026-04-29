@@ -52,6 +52,21 @@ export default function Topbar() {
           </div>
         </div>
 
+        {user?.is_superuser && (
+          <a
+            href={window.location.origin + "/admin/"}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={s.adminBtn}
+            onMouseEnter={e => Object.assign(e.currentTarget.style, s.adminBtnHover)}
+            onMouseLeave={e => Object.assign(e.currentTarget.style, s.adminBtn)}
+            title="Django Admin"
+          >
+            <AdminIcon />
+            <span>Admin</span>
+          </a>
+        )}
+
         <button
           onClick={handleLogout}
           style={s.logoutBtn}
@@ -70,7 +85,7 @@ export default function Topbar() {
 const s = {
   header: {
     height: "64px",
-    background: "#E4E0DB",
+    background: "#EDEAE6",
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
@@ -108,8 +123,8 @@ const s = {
     display: "flex",
     alignItems: "center",
     gap: "10px",
-    background: "#E4E0DB",
-    boxShadow: "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF",
+    background: "#EDEAE6",
+    boxShadow: "inset 3px 3px 7px #D0CCCA, inset -3px -3px 7px #FFFFFF",
     borderRadius: "30px",
     padding: "6px 14px 6px 6px",
   },
@@ -145,11 +160,45 @@ const s = {
     lineHeight: 1,
     fontWeight: 400,
   },
+  adminBtn: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    background: "#EDEAE6",
+    border: "none",
+    borderRadius: "10px",
+    padding: "8px 14px",
+    fontSize: "12px",
+    fontWeight: 500,
+    color: "#2D6A4F",
+    cursor: "pointer",
+    fontFamily: "'Inter', sans-serif",
+    textDecoration: "none",
+    boxShadow: "3px 3px 7px #D0CCCA, -3px -3px 7px #FFFFFF",
+    transition: "all 0.18s",
+  },
+  adminBtnHover: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    background: "#EDEAE6",
+    border: "none",
+    borderRadius: "10px",
+    padding: "8px 14px",
+    fontSize: "12px",
+    fontWeight: 500,
+    color: "#1A4A33",
+    cursor: "pointer",
+    fontFamily: "'Inter', sans-serif",
+    textDecoration: "none",
+    boxShadow: "inset 3px 3px 7px #D0CCCA, inset -3px -3px 7px #FFFFFF",
+    transition: "all 0.18s",
+  },
   logoutBtn: {
     display: "flex",
     alignItems: "center",
     gap: "6px",
-    background: "#E4E0DB",
+    background: "#EDEAE6",
     border: "none",
     borderRadius: "10px",
     padding: "8px 14px",
@@ -158,14 +207,14 @@ const s = {
     color: "#7A7670",
     cursor: "pointer",
     fontFamily: "'Inter', sans-serif",
-    boxShadow: "3px 3px 7px #C4BFB8, -3px -3px 7px #FFFFFF",
+    boxShadow: "3px 3px 7px #D0CCCA, -3px -3px 7px #FFFFFF",
     transition: "all 0.18s",
   },
   logoutBtnHover: {
     display: "flex",
     alignItems: "center",
     gap: "6px",
-    background: "#E4E0DB",
+    background: "#EDEAE6",
     border: "none",
     borderRadius: "10px",
     padding: "8px 14px",
@@ -174,9 +223,17 @@ const s = {
     color: "#C0392B",
     cursor: "pointer",
     fontFamily: "'Inter', sans-serif",
-    boxShadow: "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF",
+    boxShadow: "inset 3px 3px 7px #D0CCCA, inset -3px -3px 7px #FFFFFF",
     transition: "all 0.18s",
   },
+}
+
+function AdminIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+    </svg>
+  )
 }
 
 function LogoutIcon() {

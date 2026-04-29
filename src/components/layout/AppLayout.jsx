@@ -18,10 +18,10 @@ export default function AppLayout() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: #E4E0DB; }
+        body { background: #EDEAE6; }
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #C4BFB8; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: #D0CCCA; border-radius: 3px; }
       `}</style>
     </div>
   )
@@ -31,7 +31,7 @@ const layoutStyles = {
   root: {
     display: "flex",
     height: "100vh",
-    background: "#E4E0DB",
+    background: "#EDEAE6",
     fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
     overflow: "hidden",
   },
@@ -46,6 +46,6 @@ const layoutStyles = {
     flex: 1,
     overflowY: "auto",
     padding: "28px 32px",
-    background: "#E4E0DB",
+    background: "#EDEAE6",
   },
 }

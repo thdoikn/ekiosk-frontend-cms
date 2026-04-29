@@ -481,11 +481,11 @@ function MapPinIcon() {
 }
 
 // ── Neumorphic tokens ───────────────────────────────────────
-const NM   = "#E4E0DB"
-const NM_U = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"
-const NM_S = "4px 4px 10px #C4BFB8, -4px -4px 10px #FFFFFF"
-const NM_I = "inset 4px 4px 10px #C4BFB8, inset -4px -4px 10px #FFFFFF"
-const NM_I_SM = "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF"
+const NM   = "#EDEAE6"
+const NM_U = "6px 6px 14px #D0CCCA, -6px -6px 14px #FFFFFF"
+const NM_S = "4px 4px 10px #D0CCCA, -4px -4px 10px #FFFFFF"
+const NM_I = "inset 4px 4px 10px #D0CCCA, inset -4px -4px 10px #FFFFFF"
+const NM_I_SM = "inset 3px 3px 7px #D0CCCA, inset -3px -3px 7px #FFFFFF"
 
 // ── Styles ─────────────────────────────────────────────────
 const styles = {
@@ -947,7 +947,7 @@ const styles = {
   },
   emptyIcon: {
     fontSize: "48px",
-    color: "#C4BFB8",
+    color: "#D0CCCA",
   },
   emptyText: {
     fontSize: "14px",

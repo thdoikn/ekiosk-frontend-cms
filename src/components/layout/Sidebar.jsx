@@ -11,10 +11,10 @@ const ALL_NAV_ITEMS = [
   { to: "/settings",    label: "Settings",    icon: GearIcon,    staffOnly: true  },
 ]
 
-const NM_BG   = "#E4E0DB"
-const NM_UP   = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"
-const NM_IN   = "inset 3px 3px 8px #C4BFB8, inset -3px -3px 8px #FFFFFF"
-const NM_SM   = "3px 3px 7px #C4BFB8, -3px -3px 7px #FFFFFF"
+const NM_BG   = "#EDEAE6"
+const NM_UP   = "6px 6px 14px #D0CCCA, -6px -6px 14px #FFFFFF"
+const NM_IN   = "inset 3px 3px 8px #D0CCCA, inset -3px -3px 8px #FFFFFF"
+const NM_SM   = "3px 3px 7px #D0CCCA, -3px -3px 7px #FFFFFF"
 
 export default function Sidebar({ collapsed, onToggle }) {
   const user     = useAuthStore((s) => s.user)
@@ -120,7 +120,7 @@ export default function Sidebar({ collapsed, onToggle }) {
 
 const s = {
   aside: {
-    background: "#E4E0DB",
+    background: "#EDEAE6",
     display: "flex",
     flexDirection: "column",
     flexShrink: 0,
@@ -138,8 +138,8 @@ const s = {
     width: "40px",
     height: "40px",
     borderRadius: "12px",
-    background: "#E4E0DB",
-    boxShadow: "3px 3px 7px #C4BFB8, -3px -3px 7px #FFFFFF",
+    background: "#EDEAE6",
+    boxShadow: "3px 3px 7px #D0CCCA, -3px -3px 7px #FFFFFF",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -222,8 +222,8 @@ const s = {
     display: "flex",
     alignItems: "center",
     gap: "7px",
-    background: "#E4E0DB",
-    boxShadow: "inset 2px 2px 5px #C4BFB8, inset -2px -2px 5px #FFFFFF",
+    background: "#EDEAE6",
+    boxShadow: "inset 2px 2px 5px #D0CCCA, inset -2px -2px 5px #FFFFFF",
     borderRadius: "20px",
     padding: "6px 12px",
   },
@@ -242,7 +242,7 @@ const s = {
     whiteSpace: "nowrap",
   },
   toggleBtn: {
-    background: "#E4E0DB",
+    background: "#EDEAE6",
     border: "none",
     borderRadius: "10px",
     width: "34px",
@@ -254,7 +254,7 @@ const s = {
     color: "#8A8680",
     padding: 0,
     flexShrink: 0,
-    boxShadow: "3px 3px 7px #C4BFB8, -3px -3px 7px #FFFFFF",
+    boxShadow: "3px 3px 7px #D0CCCA, -3px -3px 7px #FFFFFF",
     transition: "all 0.18s",
     alignSelf: "flex-end",
   },

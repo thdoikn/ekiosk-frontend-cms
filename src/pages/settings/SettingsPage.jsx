@@ -104,11 +104,11 @@ function Field({ label, required, hint, children }) {
 }
 
 // ── Neuromorphic tokens ────────────────────────────────────
-const NM   = "#E4E0DB"
-const NM_U = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"
-const NM_S = "4px 4px 10px #C4BFB8, -4px -4px 10px #FFFFFF"
-const NM_I = "inset 4px 4px 10px #C4BFB8, inset -4px -4px 10px #FFFFFF"
-const NM_I_SM = "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF"
+const NM   = "#EDEAE6"
+const NM_U = "6px 6px 14px #D0CCCA, -6px -6px 14px #FFFFFF"
+const NM_S = "4px 4px 10px #D0CCCA, -4px -4px 10px #FFFFFF"
+const NM_I = "inset 4px 4px 10px #D0CCCA, inset -4px -4px 10px #FFFFFF"
+const NM_I_SM = "inset 3px 3px 7px #D0CCCA, inset -3px -3px 7px #FFFFFF"
 
 // ── Section card ───────────────────────────────────────────
 function Section({ title, subtitle, delay = "0s", children }) {
@@ -496,7 +496,7 @@ export default function SettingsPage() {
                 { val: staffCount,   label: "Staff",   color: "#7BA3D4" },
               ].map((item, i) =>
                 item === null ? (
-                  <div key={i} style={{ width: "1px", height: "32px", background: "#C4BFB8", flexShrink: 0 }} />
+                  <div key={i} style={{ width: "1px", height: "32px", background: "#D0CCCA", flexShrink: 0 }} />
                 ) : (
                   <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", gap: "2px", alignItems: "center" }}>
                     <span style={{ fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif", fontSize: "22px", fontWeight: 600, color: item.color, lineHeight: 1 }}>{item.val}</span>

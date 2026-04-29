@@ -351,11 +351,11 @@ function RefreshIcon() { return <svg width="12" height="12" viewBox="0 0 24 24" 
 function WrenchIcon() { return <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{marginRight:4}}><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg> }
 
 // ── Neuromorphic tokens ────────────────────────────────────
-const NM   = "#E4E0DB"
-const NM_U = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"
-const NM_S = "4px 4px 10px #C4BFB8, -4px -4px 10px #FFFFFF"
-const NM_I = "inset 4px 4px 10px #C4BFB8, inset -4px -4px 10px #FFFFFF"
-const NM_I_SM = "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF"
+const NM   = "#EDEAE6"
+const NM_U = "6px 6px 14px #D0CCCA, -6px -6px 14px #FFFFFF"
+const NM_S = "4px 4px 10px #D0CCCA, -4px -4px 10px #FFFFFF"
+const NM_I = "inset 4px 4px 10px #D0CCCA, inset -4px -4px 10px #FFFFFF"
+const NM_I_SM = "inset 3px 3px 7px #D0CCCA, inset -3px -3px 7px #FFFFFF"
 
 // ── Styles ─────────────────────────────────────────────────
 const ANIM_CSS = `
@@ -666,7 +666,7 @@ const S = {
     padding: "64px 20px",
     gap: "12px",
   },
-  emptyIcon: { fontSize: "40px", color: "#C4BFB8" },
+  emptyIcon: { fontSize: "40px", color: "#D0CCCA" },
   emptyText: { fontSize: "14px", color: "#8A8680", margin: 0 },
   emptyReset: {
     background: NM,

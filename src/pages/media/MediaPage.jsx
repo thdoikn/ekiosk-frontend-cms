@@ -44,7 +44,7 @@ function UploadZone({ onFiles }) {
     <div
       style={{
         ...S.uploadZone,
-        borderColor: dragging ? "#C49A3C" : "#C4BFB8",
+        borderColor: dragging ? "#C49A3C" : "#D0CCCA",
         background: NM,
       }}
       onDragOver={e => { e.preventDefault(); setDragging(true) }}
@@ -576,11 +576,11 @@ function SpinIcon() {
 }
 
 // ── Neuromorphic tokens ────────────────────────────────────
-const NM   = "#E4E0DB"
-const NM_U = "6px 6px 14px #C4BFB8, -6px -6px 14px #FFFFFF"
-const NM_S = "4px 4px 10px #C4BFB8, -4px -4px 10px #FFFFFF"
-const NM_I = "inset 4px 4px 10px #C4BFB8, inset -4px -4px 10px #FFFFFF"
-const NM_I_SM = "inset 3px 3px 7px #C4BFB8, inset -3px -3px 7px #FFFFFF"
+const NM   = "#EDEAE6"
+const NM_U = "6px 6px 14px #D0CCCA, -6px -6px 14px #FFFFFF"
+const NM_S = "4px 4px 10px #D0CCCA, -4px -4px 10px #FFFFFF"
+const NM_I = "inset 4px 4px 10px #D0CCCA, inset -4px -4px 10px #FFFFFF"
+const NM_I_SM = "inset 3px 3px 7px #D0CCCA, inset -3px -3px 7px #FFFFFF"
 
 // ── Styles ─────────────────────────────────────────────────
 const ANIM_CSS = `
@@ -645,7 +645,7 @@ const S = {
   statDivider: {
     width: "1px",
     height: "36px",
-    background: "#C4BFB8",
+    background: "#D0CCCA",
     flexShrink: 0,
   },
 
