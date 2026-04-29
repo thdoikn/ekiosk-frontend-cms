@@ -62,6 +62,15 @@ function FitBounds({ kiosks }) {
   return null
 }
 
+function InvalidateMapSize({ trigger }) {
+  const map = useMap()
+  useEffect(() => {
+    const id = setTimeout(() => map.invalidateSize(), 120)
+    return () => clearTimeout(id)
+  }, [map, trigger])
+  return null
+}
+
 // ── Sub-components ─────────────────────────────────────────
 function StatCard({ label, value, color, icon }) {
   return (
@@ -87,6 +96,7 @@ function StatusBadge({ status }) {
 
 function KioskMap({ kiosks }) {
   const [activeStatus, setActiveStatus] = useState("all")
+  const [expanded, setExpanded] = useState(false)
 
   const mapped = kiosks.filter(hasValidCoords)
   const filtered = activeStatus === "all" ? mapped : mapped.filter(k => k.status === activeStatus)
@@ -96,108 +106,125 @@ function KioskMap({ kiosks }) {
     ? [parseFloat(mapped[0].latitude), parseFloat(mapped[0].longitude)]
     : IKN_CENTER
 
-  return (
-    <div style={styles.mapSection}>
-      <div style={styles.mapHeader}>
+  const mapContent = (isExpanded = false) => (
+    <MapContainer
+      center={defaultCenter}
+      zoom={mapped.length === 0 ? 12 : 10}
+      style={{ width: "100%", height: "100%", borderRadius: isExpanded ? "0 0 16px 16px" : "0 0 10px 10px" }}
+      zoomControl={true}
+    >
+      <InvalidateMapSize trigger={isExpanded} />
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      {mapped.length > 0 && <FitBounds kiosks={mapped} />}
+      {filtered.map(kiosk => {
+        const cfg = STATUS_CONFIG[kiosk.status] || STATUS_CONFIG.pending
+        return (
+          <CircleMarker
+            key={kiosk.id}
+            center={[parseFloat(kiosk.latitude), parseFloat(kiosk.longitude)]}
+            radius={10}
+            pathOptions={{
+              color: cfg.dot,
+              fillColor: cfg.dot,
+              fillOpacity: 0.85,
+              weight: 2,
+            }}
+          >
+            <Popup>
+              <div style={styles.popupContent}>
+                <div style={styles.popupHeader}>
+                  <span style={{ ...styles.popupDot, background: cfg.dot }} />
+                  <strong style={styles.popupName}>{kiosk.name}</strong>
+                </div>
+                <div style={styles.popupGrid}>
+                  <span style={styles.popupKey}>Status</span>
+                  <span style={{ ...styles.popupVal, color: cfg.dot }}>{cfg.label}</span>
+                  <span style={styles.popupKey}>Region</span>
+                  <span style={styles.popupVal}>{kiosk.region?.name ?? "—"}</span>
+                  <span style={styles.popupKey}>Last Heartbeat</span>
+                  <span style={styles.popupVal}>{timeSince(kiosk.last_heartbeat)}</span>
+                  <span style={styles.popupKey}>IP Address</span>
+                  <span style={styles.popupVal}>{kiosk.last_ip_address ?? "—"}</span>
+                  <span style={styles.popupKey}>Playlist</span>
+                  <span style={styles.popupVal}>{kiosk.active_playlist?.name ?? "None"}</span>
+                  <span style={styles.popupKey}>Storage Free</span>
+                  <span style={styles.popupVal}>{formatBytes(kiosk.last_storage_free)}</span>
+                  <span style={styles.popupKey}>Coordinates</span>
+                  <span style={styles.popupVal}>{parseFloat(kiosk.latitude).toFixed(5)}, {parseFloat(kiosk.longitude).toFixed(5)}</span>
+                </div>
+              </div>
+            </Popup>
+          </CircleMarker>
+        )
+      })}
+      {mapped.length === 0 && (
+        <div style={styles.mapNoCoords}>
+          Belum ada kiosk dengan koordinat GPS
+        </div>
+      )}
+    </MapContainer>
+  )
+
+  const mapHeader = (isExpanded = false) => (
+    <div style={styles.mapHeader}>
         <div>
           <h2 style={styles.mapTitle}>Peta Sebaran Kiosk</h2>
           <p style={styles.mapSubtitle}>
             {mapped.length} dari {kiosks.length} kiosk memiliki koordinat
           </p>
         </div>
-        <div style={styles.mapLegend}>
-          {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
-            <button
-              key={key}
-              onClick={() => setActiveStatus(activeStatus === key ? "all" : key)}
-              style={{
-                ...styles.legendItem,
-                opacity: activeStatus !== "all" && activeStatus !== key ? 0.4 : 1,
-                background: activeStatus === key ? cfg.bg : "transparent",
-                borderColor: activeStatus === key ? cfg.dot : "#E0DAD0",
-              }}
-            >
-              <span style={{ ...styles.legendDot, background: cfg.dot }} />
-              <span style={{ ...styles.legendLabel, color: activeStatus === key ? cfg.text : "#7A7670" }}>{cfg.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div style={styles.mapWrapper}>
-        <MapContainer
-          center={defaultCenter}
-          zoom={mapped.length === 0 ? 12 : 10}
-          style={{ width: "100%", height: "100%", borderRadius: "0 0 10px 10px" }}
-          zoomControl={true}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          {mapped.length > 0 && <FitBounds kiosks={mapped} />}
-          {filtered.map(kiosk => {
-            const cfg = STATUS_CONFIG[kiosk.status] || STATUS_CONFIG.pending
-            return (
-              <CircleMarker
-                key={kiosk.id}
-                center={[parseFloat(kiosk.latitude), parseFloat(kiosk.longitude)]}
-                radius={10}
-                pathOptions={{
-                  color: cfg.dot,
-                  fillColor: cfg.dot,
-                  fillOpacity: 0.85,
-                  weight: 2,
+        <div style={styles.mapControls}>
+          <div style={styles.mapLegend}>
+            {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
+              <button
+                key={key}
+                onClick={() => setActiveStatus(activeStatus === key ? "all" : key)}
+                style={{
+                  ...styles.legendItem,
+                  opacity: activeStatus !== "all" && activeStatus !== key ? 0.4 : 1,
+                  background: activeStatus === key ? cfg.bg : "transparent",
+                  borderColor: activeStatus === key ? cfg.dot : "#E0DAD0",
                 }}
               >
-                <Popup>
-                  <div style={styles.popupContent}>
-                    <div style={styles.popupHeader}>
-                      <span style={{ ...styles.popupDot, background: cfg.dot }} />
-                      <strong style={styles.popupName}>{kiosk.name}</strong>
-                    </div>
-                    <div style={styles.popupGrid}>
-                      <span style={styles.popupKey}>Status</span>
-                      <span style={{ ...styles.popupVal, color: cfg.dot }}>{cfg.label}</span>
-                      <span style={styles.popupKey}>Region</span>
-                      <span style={styles.popupVal}>{kiosk.region?.name ?? "—"}</span>
-                      <span style={styles.popupKey}>Last Heartbeat</span>
-                      <span style={styles.popupVal}>{timeSince(kiosk.last_heartbeat)}</span>
-                      <span style={styles.popupKey}>IP Address</span>
-                      <span style={styles.popupVal}>{kiosk.last_ip_address ?? "—"}</span>
-                      <span style={styles.popupKey}>Playlist</span>
-                      <span style={styles.popupVal}>{kiosk.active_playlist?.name ?? "None"}</span>
-                      <span style={styles.popupKey}>Storage Free</span>
-                      <span style={styles.popupVal}>{formatBytes(kiosk.last_storage_free)}</span>
-                      <span style={styles.popupKey}>Coordinates</span>
-                      <span style={styles.popupVal}>{parseFloat(kiosk.latitude).toFixed(5)}, {parseFloat(kiosk.longitude).toFixed(5)}</span>
-                    </div>
-                  </div>
-                </Popup>
-              </CircleMarker>
-            )
-          })}
-          {mapped.length === 0 && (
-            <div style={{
-              position: "absolute",
-              bottom: "12px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              background: "rgba(255,255,255,0.92)",
-              border: "1px solid #E5E0D8",
-              borderRadius: "20px",
-              padding: "6px 14px",
-              fontSize: "12px",
-              color: "#8A8680",
-              zIndex: 1000,
-              pointerEvents: "none",
-              whiteSpace: "nowrap",
-            }}>
-              Belum ada kiosk dengan koordinat GPS
-            </div>
-          )}
-        </MapContainer>
+                <span style={{ ...styles.legendDot, background: cfg.dot }} />
+                <span style={{ ...styles.legendLabel, color: activeStatus === key ? cfg.text : "#7A7670" }}>{cfg.label}</span>
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => setExpanded(!isExpanded)}
+            style={styles.mapExpandBtn}
+            onMouseEnter={e => Object.assign(e.currentTarget.style, styles.mapExpandBtnHover)}
+            onMouseLeave={e => Object.assign(e.currentTarget.style, styles.mapExpandBtn)}
+          >
+            {isExpanded ? <CloseIcon /> : <ExpandIcon />}
+            <span>{isExpanded ? "Tutup" : "Perbesar"}</span>
+          </button>
+        </div>
       </div>
+  )
+
+  return (
+    <div style={styles.mapSection}>
+      {mapHeader()}
+
+      <div style={styles.mapWrapper}>
+        {mapContent()}
+      </div>
+
+      {expanded && (
+        <div style={styles.mapOverlay}>
+          <div style={styles.mapOverlayCard}>
+            {mapHeader(true)}
+            <div style={styles.mapOverlayWrapper}>
+              {mapContent(true)}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -479,6 +506,24 @@ function MapPinIcon() {
     </svg>
   )
 }
+function ExpandIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="15 3 21 3 21 9" />
+      <polyline points="9 21 3 21 3 15" />
+      <line x1="21" y1="3" x2="14" y2="10" />
+      <line x1="3" y1="21" x2="10" y2="14" />
+    </svg>
+  )
+}
+function CloseIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  )
+}
 
 // ── Neumorphic tokens ───────────────────────────────────────
 const NM   = "#EDEAE6"
@@ -657,6 +702,45 @@ const styles = {
     gap: "6px",
     flexWrap: "wrap",
   },
+  mapControls: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: "10px",
+    flexWrap: "wrap",
+  },
+  mapExpandBtn: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    background: NM,
+    border: "none",
+    borderRadius: "20px",
+    padding: "7px 13px",
+    color: "#2D6A4F",
+    cursor: "pointer",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+    fontSize: "11px",
+    fontWeight: 700,
+    boxShadow: NM_S,
+    transition: "all 0.18s",
+  },
+  mapExpandBtnHover: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "6px",
+    background: NM,
+    border: "none",
+    borderRadius: "20px",
+    padding: "7px 13px",
+    color: "#1A4A33",
+    cursor: "pointer",
+    fontFamily: "'Inter', 'Plus Jakarta Sans', sans-serif",
+    fontSize: "11px",
+    fontWeight: 700,
+    boxShadow: NM_I_SM,
+    transition: "all 0.18s",
+  },
   legendItem: {
     display: "flex",
     alignItems: "center",
@@ -682,8 +766,47 @@ const styles = {
     fontWeight: 500,
   },
   mapWrapper: {
-    height: "420px",
+    height: "clamp(520px, calc(100vh - 330px), 760px)",
     position: "relative",
+  },
+  mapOverlay: {
+    position: "fixed",
+    inset: 0,
+    zIndex: 2000,
+    padding: "28px",
+    background: "rgba(42,37,32,0.38)",
+    backdropFilter: "blur(8px)",
+    display: "flex",
+  },
+  mapOverlayCard: {
+    width: "100%",
+    height: "100%",
+    background: NM,
+    borderRadius: "18px",
+    overflow: "hidden",
+    boxShadow: "10px 10px 28px rgba(42,37,32,0.28), -6px -6px 18px rgba(255,255,255,0.35)",
+    display: "flex",
+    flexDirection: "column",
+  },
+  mapOverlayWrapper: {
+    flex: 1,
+    minHeight: 0,
+    position: "relative",
+  },
+  mapNoCoords: {
+    position: "absolute",
+    bottom: "12px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    background: "rgba(255,255,255,0.92)",
+    border: "1px solid #E5E0D8",
+    borderRadius: "20px",
+    padding: "6px 14px",
+    fontSize: "12px",
+    color: "#8A8680",
+    zIndex: 1000,
+    pointerEvents: "none",
+    whiteSpace: "nowrap",
   },
   mapEmpty: {
     height: "100%",
