@@ -21,6 +21,12 @@ function toTitleCase(str) {
   if (!str) return ""
   return str.replace(/\S+/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
 }
+function formatDirektorat(str) {
+  if (!str) return ""
+  return toTitleCase(str)
+    .replace(/^Direktur\b/, "Direktorat")
+    .replace(/\b(Dan|Di|Ke|Dari)\b/g, w => w.toLowerCase())
+}
 function displayName(user) {
   const full = `${user.first_name || ""} ${user.last_name || ""}`.trim()
   return full ? toTitleCase(full) : user.username
@@ -198,6 +204,8 @@ function CreateUserModal({ onClose, onSubmit, loading, error }) {
 function UserRow({ user, onDeactivate, onReactivate, isActing, index, canManageUsers }) {
   const active = user.is_active
   const hue = (user.username.charCodeAt(0) * 37) % 360
+  const userIdentifier = user.nip || user.username
+  const direktorat = formatDirektorat(user.direktorat)
   return (
     <div
       style={{
@@ -239,16 +247,12 @@ function UserRow({ user, onDeactivate, onReactivate, isActing, index, canManageU
           )}
         </div>
         <span style={{ fontSize: "11px", color: "#8A8680" }}>
-          @{user.username}{user.email ? ` · ${user.email}` : ""}
+          {userIdentifier}{user.email ? ` · ${user.email}` : ""}
         </span>
-        {(user.direktorat || user.nip || user.jabatan) && (
+        {(direktorat || user.jabatan) && (
           <div style={{ marginTop: "4px", fontSize: "10px", color: color.textMuted, lineHeight: 1.35 }}>
-            {user.direktorat ? (
-              <span title="Direktorat">Dir.: {user.direktorat}</span>
-            ) : null}
-            {user.direktorat && (user.nip || user.jabatan) ? " · " : null}
-            {user.nip ? <span title="NIP">NIP: {user.nip}</span> : null}
-            {user.nip && user.jabatan ? " · " : null}
+            {direktorat ? <span title="Direktorat">{direktorat}</span> : null}
+            {direktorat && user.jabatan ? " · " : null}
             {user.jabatan ? <span title="Jabatan">{user.jabatan}</span> : null}
           </div>
         )}
