@@ -241,6 +241,17 @@ function UserRow({ user, onDeactivate, onReactivate, isActing, index, canManageU
         <span style={{ fontSize: "11px", color: "#8A8680" }}>
           @{user.username}{user.email ? ` · ${user.email}` : ""}
         </span>
+        {(user.direktorat || user.nip || user.jabatan) && (
+          <div style={{ marginTop: "4px", fontSize: "10px", color: color.textMuted, lineHeight: 1.35 }}>
+            {user.direktorat ? (
+              <span title="Direktorat">Dir.: {user.direktorat}</span>
+            ) : null}
+            {user.direktorat && (user.nip || user.jabatan) ? " · " : null}
+            {user.nip ? <span title="NIP">NIP: {user.nip}</span> : null}
+            {user.nip && user.jabatan ? " · " : null}
+            {user.jabatan ? <span title="Jabatan">{user.jabatan}</span> : null}
+          </div>
+        )}
       </div>
 
       {/* Dates */}
