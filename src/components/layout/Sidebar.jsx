@@ -89,8 +89,8 @@ export default function Sidebar({ collapsed, onToggle }) {
         padding: collapsed ? "14px 10px" : "14px 12px",
       }}>
         {!collapsed && (
-          <div style={{...s.statusPill, justifyContent: "center"}}>
-            <img src="/thd-logo.jpeg" alt="THD Logo" style={{ height: "18px", objectFit: "contain", borderRadius: "2px" }} />
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: "12px" }}>
+            <img src="/thd-logo.jpeg" alt="THD Logo" style={{ height: "46px", objectFit: "contain", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }} />
           </div>
         )}
         <button
