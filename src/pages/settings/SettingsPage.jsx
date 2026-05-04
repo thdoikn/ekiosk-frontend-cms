@@ -24,6 +24,7 @@ function toTitleCase(str) {
 function formatDirektorat(str) {
   if (!str) return ""
   return toTitleCase(str)
+    .replace(/^Kepala\s+/i, "")
     .replace(/^Direktur\b/, "Direktorat")
     .replace(/\b(Dan|Di|Ke|Dari)\b/g, w => w.toLowerCase())
 }

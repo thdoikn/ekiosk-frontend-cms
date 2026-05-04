@@ -56,6 +56,7 @@ export default function LoginPage() {
           <div style={s.leftInner}>
             <div style={s.logoMark}>
               <img src="/logo.png" alt="Nusantara" style={{ width: "64px", height: "64px", objectFit: "contain" }} />
+              <img src="/thd-logo.jpeg" alt="THD" style={{ width: "64px", height: "64px", objectFit: "contain", marginLeft: "16px", borderRadius: "8px" }} />
             </div>
             <div style={s.brandBlock}>
               <span style={s.brandOrg}>OTORITA IBU KOTA NUSANTARA</span>
@@ -93,6 +94,7 @@ export default function LoginPage() {
                 <div style={s.cardHeader}>
                   <div style={s.ssoIcon}>
                     <img src="/logo.png" alt="Nusantara" style={{ width: "40px", height: "40px", objectFit: "contain" }} />
+                    <img src="/thd-logo.jpeg" alt="THD" style={{ width: "40px", height: "40px", objectFit: "contain", marginLeft: "12px", borderRadius: "6px" }} />
                   </div>
                   <h2 style={s.cardTitle}>Masuk ke eKiosk</h2>
                   <p style={s.cardSub}>
@@ -120,6 +122,7 @@ export default function LoginPage() {
                 <div style={s.cardHeader}>
                   <div style={s.ssoIcon}>
                     <img src="/logo.png" alt="Nusantara" style={{ width: "40px", height: "40px", objectFit: "contain" }} />
+                    <img src="/thd-logo.jpeg" alt="THD" style={{ width: "40px", height: "40px", objectFit: "contain", marginLeft: "12px", borderRadius: "6px" }} />
                   </div>
                   <h2 style={s.cardTitle}>Masuk ke eKiosk</h2>
                   <p style={s.cardSub}>Login dengan akun administrator</p>
