@@ -90,7 +90,7 @@ export default function Sidebar({ collapsed, onToggle }) {
       }}>
         {!collapsed && (
           <div style={{ display: "flex", justifyContent: "center", marginBottom: "12px" }}>
-            <img src="/thd-logo.jpeg" alt="THD Logo" style={{ height: "46px", objectFit: "contain", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }} />
+            <img src="/thd-logo-transparent.png" alt="THD Logo" style={{ height: "46px", objectFit: "contain", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.05)" }} />
           </div>
         )}
         <button
